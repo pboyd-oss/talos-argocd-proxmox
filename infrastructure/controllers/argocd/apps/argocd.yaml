@@ -35,3 +35,8 @@ spec:
     kind: Deployment
     jsonPointers:
     - /spec/replicas
+  - kind: Secret
+    name: argocd-secret
+    namespace: argocd
+    jsonPointers:
+    - /data
