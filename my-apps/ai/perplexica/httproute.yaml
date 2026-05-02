@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "perplexica.vanillax.me"
+    - "perplexica.tuxgrid.com"
   rules:
     - matches:
         - path:

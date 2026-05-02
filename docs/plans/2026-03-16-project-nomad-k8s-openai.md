@@ -503,7 +503,7 @@ data:
   REDIS_HOST: "redis-master.redis-instance.svc.cluster.local"
   REDIS_PORT: "6379"
   NOMAD_STORAGE_PATH: "/opt/project-nomad/storage"
-  URL: "https://nomad.vanillax.me"
+  URL: "https://nomad.tuxgrid.com"
   # LLM Provider Configuration
   LLM_PROVIDER: "openai"
   LLM_HOST: "http://llama-cpp-service.llama-cpp.svc.cluster.local:8080/v1"

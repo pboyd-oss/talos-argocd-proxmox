@@ -87,7 +87,7 @@ You need `kubectl` access before anything else. The default OIDC kubeconfig expi
 eval $(op signin)
 
 # Set Omni endpoint
-export OMNI_ENDPOINT=https://omni.vanillax.me:443
+export OMNI_ENDPOINT=https://omni.tuxgrid.com:443
 
 # Pull the service account key from 1Password
 export OMNI_SERVICE_ACCOUNT_KEY="$(op read 'op://homelab-prod/talos-prod-sa/OMNI_SERVICE_ACCOUNT_KEY')"
@@ -103,7 +103,7 @@ kubectl get nodes
 <summary>Fish shell</summary>
 
 ```fish
-set -x OMNI_ENDPOINT https://omni.vanillax.me:443
+set -x OMNI_ENDPOINT https://omni.tuxgrid.com:443
 set -x OMNI_SERVICE_ACCOUNT_KEY (op read 'op://homelab-prod/talos-prod-sa/OMNI_SERVICE_ACCOUNT_KEY')
 omnictl kubeconfig --cluster talos-prod-cluster --service-account --user talos-prod-sa --force
 kubectl get nodes
@@ -258,7 +258,7 @@ omnictl serviceaccount create talos-prod-sa --use-user-role
 #    Store both values in 1Password immediately. The key is shown ONCE.
 
 # 3. Generate a bearer-token kubeconfig (NOT OIDC)
-OMNI_ENDPOINT=https://omni.vanillax.me:443 \
+OMNI_ENDPOINT=https://omni.tuxgrid.com:443 \
 OMNI_SERVICE_ACCOUNT_KEY="<key-from-step-2>" \
 omnictl kubeconfig --cluster talos-prod-cluster --service-account --user talos-prod-sa --force
 

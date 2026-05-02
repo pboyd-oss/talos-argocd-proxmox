@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - grafana.vanillax.me
+    - grafana.tuxgrid.com
   rules:
     - matches:
         - path:

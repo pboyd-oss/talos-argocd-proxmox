@@ -9,7 +9,7 @@ OTEL Collector Agent (DaemonSet)  →  OTEL Collector Gateway (Deployment)  → 
 ```
 
 External clients (e.g. the radar-ng mobile app) hit the Gateway over HTTPS at
-`otel.vanillax.me/v1/{traces,logs,metrics}` via `collector-gateway-httproute.yaml`.
+`otel.tuxgrid.com/v1/{traces,logs,metrics}` via `collector-gateway-httproute.yaml`.
 
 - **OTEL Operator** (`infrastructure/controllers/opentelemetry-operator/`) — manages Collectors and auto-instrumentation
 - **Prometheus + Grafana** (`monitoring/prometheus-stack/`) — metrics storage, dashboards, alerting

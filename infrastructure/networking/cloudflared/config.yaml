@@ -7,7 +7,7 @@ no-autoupdate: true
 loglevel: debug # Increased log level for more details
 transport-loglevel: debug
 ingress:
-  - hostname: hello.vanillax.me
+  - hostname: hello.tuxgrid.com
     service: hello_world
     originRequest:
       # Add header logging with log-headers flag
@@ -33,11 +33,11 @@ ingress:
   # 2. Internal services (gateway-internal) have NO Cloudflare DNS records
   # 3. HTTPRoutes enforce specific hostname matching
   # 4. If you prefer explicit listing, see config-explicit.yaml.example
-  - hostname: "*.vanillax.me"
+  - hostname: "*.tuxgrid.com"
     service: https://cilium-gateway-gateway-external.gateway.svc.cluster.local:443
     originRequest:
       noTLSVerify: true
-      originServerName: "*.vanillax.me"
+      originServerName: "*.tuxgrid.com"
       logHeaders: true
       headers:
         - name: CF-Connecting-IP
@@ -62,11 +62,11 @@ ingress:
         - name: CF-Bot-Score
         - name: CF-Challenge
         - name: CF-Bot-Management-Tag
-  - hostname: vanillax.me
+  - hostname: tuxgrid.com
     service: https://cilium-gateway-gateway-external.gateway.svc.cluster.local:443
     originRequest:
       noTLSVerify: true
-      originServerName: vanillax.me
+      originServerName: tuxgrid.com
       logHeaders: true
       headers:
         - name: CF-Connecting-IP

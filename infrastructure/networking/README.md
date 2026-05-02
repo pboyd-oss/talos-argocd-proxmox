@@ -165,8 +165,8 @@ machine:
 - `gateway/gateway-external.yaml` - External services (192.168.10.49)
 
 **HTTPRoutes:**
-- ArgoCD: `argocd.vanillax.me`
-- Longhorn: `longhorn.vanillax.me`
+- ArgoCD: `argocd.tuxgrid.com`
+- Longhorn: `longhorn.tuxgrid.com`
 - Many others...
 
 ## Network Flow Examples
@@ -175,7 +175,7 @@ machine:
 
 ```
 User Browser
-    ↓ DNS: argocd.vanillax.me → 192.168.10.50
+    ↓ DNS: argocd.tuxgrid.com → 192.168.10.50
 Cilium Gateway (192.168.10.50:443)
     ↓ TLS termination
     ↓ HTTPRoute: argocd-server service

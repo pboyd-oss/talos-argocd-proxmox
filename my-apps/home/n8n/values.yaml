@@ -29,7 +29,7 @@ n8n:
   
   env:
     # Basic Configuration
-    N8N_HOST: "n8n.vanillax.me"
+    N8N_HOST: "n8n.tuxgrid.com"
     N8N_PORT: "5678"
     N8N_PROTOCOL: "https"
     
@@ -43,7 +43,7 @@ n8n:
     N8N_DIAGNOSTICS_ENABLED: "false"
     
     # Webhook Configuration
-    WEBHOOK_URL: "https://n8n.vanillax.me/"
+    WEBHOOK_URL: "https://n8n.tuxgrid.com/"
     
     # Timezone
     GENERIC_TIMEZONE: "America/New_York"

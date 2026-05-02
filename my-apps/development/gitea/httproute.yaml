@@ -10,7 +10,7 @@ spec:
     name: gateway-internal
     namespace: gateway
   hostnames:
-  - "gitea.vanillax.me"
+  - "gitea.tuxgrid.com"
   rules:
   - matches:
     - path:

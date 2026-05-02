@@ -8,7 +8,7 @@ thumbnails, ML embeddings, and DB rows.
 ## Architecture
 
 ```
- User → https://photos.vanillax.me (gateway-internal, HTTPS)
+ User → https://photos.tuxgrid.com (gateway-internal, HTTPS)
        │
        ▼
  immich-server (Deployment)  ──── reads /mnt/photos (RO, NFS)
@@ -96,7 +96,7 @@ ArgoCD picks this up automatically via the my-apps AppSet. Files:
 | `deployment-machine-learning.yaml` | Immich ML. Co-located via `podAffinity` on server hostname. |
 | `deployment-valkey.yaml` | Redis-compatible cache. Ephemeral. |
 | `services.yaml` | Three ClusterIPs — named ports matter for HTTPRoute + Prometheus scrape. |
-| `httproute.yaml` | **Internal** HTTPRoute → `photos.vanillax.me` via `gateway-internal`. No Cloudflare tunnel — LAN only. |
+| `httproute.yaml` | **Internal** HTTPRoute → `photos.tuxgrid.com` via `gateway-internal`. No Cloudflare tunnel — LAN only. |
 | `library-pvc.yaml` | 50Gi Longhorn PVC. |
 | `ml-cache-pvc.yaml` | 10Gi Longhorn PVC. |
 | `nfs-photos-pvc.yaml` | Claims the static NFS PV. |
@@ -150,7 +150,7 @@ Accelerate:
 
 ## Networking
 
-- **HTTPRoute:** `photos.vanillax.me` via `gateway-internal` (HTTPS).
+- **HTTPRoute:** `photos.tuxgrid.com` via `gateway-internal` (HTTPS).
   **Not public** — LAN-only, no Cloudflare tunnel.
 - **Cilium policy:** NFS traffic to TrueNAS (port 2049 TCP/UDP) is
   allowed in `block-lan-access.yaml`. Without that exemption the

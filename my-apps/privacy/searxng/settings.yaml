@@ -1,7 +1,7 @@
 use_default_settings: true
 
 server:
-    base_url: 'https://search.vanillax.me'  # Remove trailing slash
+    base_url: 'https://search.tuxgrid.com'  # Remove trailing slash
     secret_key: "${SEARXNG_SECRET_KEY}"  # Use from secret
     bind_address: "0.0.0.0"
     port: 8080  # Match with deployment port
@@ -69,7 +69,7 @@ hostnames:
         - (.*\.)?askubuntu.com$
         - (.*\.)?superuser.com$
     replace:
-        (www\.)?reddit\.com$: redlib.vanillax.me
+        (www\.)?reddit\.com$: redlib.tuxgrid.com
 
 engines:
     # Google is disabled: its frontend parser broke in 2026.4.17

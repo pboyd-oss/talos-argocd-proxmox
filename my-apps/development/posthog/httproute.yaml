@@ -9,7 +9,7 @@ spec:
       namespace: gateway
       sectionName: https
   hostnames:
-    - "posthog.vanillax.me"
+    - "posthog.tuxgrid.com"
   rules:
     # Event capture (Rust) - high throughput, must hit dedicated service
     - matches:
@@ -75,14 +75,14 @@ metadata:
   labels:
     external-dns: "true"
   annotations:
-    external-dns.alpha.kubernetes.io/target: "vanillax.me"
+    external-dns.alpha.kubernetes.io/target: "tuxgrid.com"
 spec:
   parentRefs:
     - name: gateway-external
       namespace: gateway
       sectionName: https
   hostnames:
-    - "ingest-posthog.vanillax.me"
+    - "ingest-posthog.tuxgrid.com"
   rules:
     - matches:
         - path:

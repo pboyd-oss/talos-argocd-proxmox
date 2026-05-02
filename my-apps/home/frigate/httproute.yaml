@@ -9,7 +9,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-  - "frigate.vanillax.me"
+  - "frigate.tuxgrid.com"
   rules:
   - matches:
     - path:

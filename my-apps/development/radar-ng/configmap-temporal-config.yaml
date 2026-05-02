@@ -25,7 +25,7 @@ data:
   DISSIPATE_DBZ_DELTA: "10"
   HAIL_DBZ_THRESHOLD: "60"
   NWS_ALERTS_URL: "https://api.weather.gov/alerts/active?status=actual"
-  NWS_USER_AGENT: "(radar-ng, mitch@vanillax.me)"
+  NWS_USER_AGENT: "(radar-ng, mitch@tuxgrid.com)"
   TROPICAL_FEED_URL: "https://www.nhc.noaa.gov/CurrentStorms.json"
   # lightning
   LIGHTNING_RETENTION_MIN: "15"

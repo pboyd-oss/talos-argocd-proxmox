@@ -30,19 +30,19 @@ Persistence.DataStores[visibility](value).SQL.ConnectProtocol: zero value.
 
 ### 2. `news-reader` and `temporal-worker` (custom app) — images never pushed
 
-Both apps point at `registry.vanillax.me/{name}:latest` but the registry
+Both apps point at `registry.tuxgrid.com/{name}:latest` but the registry
 catalog is empty. Registry itself is fine (in-cluster `kube-system/registry`).
 
 **Fix:** build + push. Dockerfiles exist, clean multi-stage.
 ```bash
 # from dev box
 cd ~/programming/talos-argocd-proxmox/my-apps/development/news-reader/app
-docker build -t registry.vanillax.me/news-reader:latest .
-docker push registry.vanillax.me/news-reader:latest
+docker build -t registry.tuxgrid.com/news-reader:latest .
+docker push registry.tuxgrid.com/news-reader:latest
 
 cd ~/programming/talos-argocd-proxmox/my-apps/development/temporal-worker
-docker build -t registry.vanillax.me/temporal-worker:latest -f Dockerfile .
-docker push registry.vanillax.me/temporal-worker:latest
+docker build -t registry.tuxgrid.com/temporal-worker:latest -f Dockerfile .
+docker push registry.tuxgrid.com/temporal-worker:latest
 
 kubectl rollout restart deploy -n news-reader news-reader
 kubectl rollout restart deploy -n temporal-worker temporal-worker

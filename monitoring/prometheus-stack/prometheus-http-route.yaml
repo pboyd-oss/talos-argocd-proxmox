@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - prometheus.vanillax.me
+    - prometheus.tuxgrid.com
   rules:
     - matches:
         - path:

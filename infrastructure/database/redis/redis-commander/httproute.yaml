@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "redis.vanillax.me"
+    - "redis.tuxgrid.com"
   rules:
     - matches:
         - path:

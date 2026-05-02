@@ -14,18 +14,18 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
-      hostname: "*.vanillax.me"
+      hostname: "*.tuxgrid.com"
       allowedRoutes:
         namespaces:
           from: All
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: "*.vanillax.me"
+      hostname: "*.tuxgrid.com"
       tls:
         mode: Terminate
         certificateRefs:
-          - name: cert-vanillax
+          - name: cert-tuxgrid
             kind: Secret
             group: "" # required
         # No QUIC/HTTP3 for internal gateway - only HTTP/2 and HTTP/1.1

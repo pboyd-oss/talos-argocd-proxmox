@@ -87,7 +87,7 @@ docs/                   # Documentation
 - Use directory structure for application discovery (no manual Application resources)
 - Name Service ports for HTTPRoute compatibility (`name: http`) — **fails silently without this**
 - Use Gateway API (not Ingress) — this cluster uses Gateway API exclusively
-- On **external** HTTPRoutes: add `labels: external-dns: "true"`, annotation `external-dns.alpha.kubernetes.io/target: vanillax.me`, and `sectionName: https` on the parentRef — **all three are required or DNS/routing silently fails**
+- On **external** HTTPRoutes: add `labels: external-dns: "true"`, annotation `external-dns.alpha.kubernetes.io/target: tuxgrid.com`, and `sectionName: https` on the parentRef — **all three are required or DNS/routing silently fails**
 - Follow GitOps workflow for all changes
 - Store secrets in 1Password, reference via ExternalSecret
 - Add `backup: "hourly"` or `backup: "daily"` labels to critical PVCs for automatic Kyverno backup
@@ -119,7 +119,7 @@ docs/                   # Documentation
 - Use `mutateExistingOnPolicyUpdate: true` on Kyverno generate policies — **re-evaluates ALL matching resources cluster-wide on any policy change**
 - Use `synchronize: true` on Kyverno generate policies — **drift watchers create UpdateRequests on every controller status update, hammering the API server; use `synchronize: false`**
 - Omit Kyverno canonical defaults (`emitWarning`, `validationFailureAction`, `skipBackgroundRequests`) from policy YAML — **Kyverno webhook adds them, ArgoCD detects the diff, app shows OutOfSync**
-- Create external HTTPRoutes without the three required pieces: `external-dns: "true"` label, `external-dns.alpha.kubernetes.io/target: vanillax.me` annotation, and `sectionName: https` — **DNS won't be created and Cloudflare tunnel routing fails silently**
+- Create external HTTPRoutes without the three required pieces: `external-dns: "true"` label, `external-dns.alpha.kubernetes.io/target: tuxgrid.com` annotation, and `sectionName: https` — **DNS won't be created and Cloudflare tunnel routing fails silently**
 - Use `Replace=true,Force=true` sync-options on Jobs — causes duplicate Job execution bug ([#24005](https://github.com/argoproj/argo-cd/issues/24005)); use ArgoCD hooks instead
 - Auto-merge major Helm chart version bumps for critical infrastructure (kube-prometheus-stack, longhorn, kyverno, cilium) — **a kube-prometheus-stack v82→v83 auto-merge caused a full cluster outage on 2026-04-08 via Kyverno webhook deadlock**. Pin Renovate to minor/patch only for these charts.
 - Remove infrastructure namespaces from Kyverno webhook exclusions in `values.yaml` — **longhorn-system, argocd, volsync-system, etc. MUST be excluded or a Kyverno crash causes full cluster deadlock**. See `infrastructure/controllers/kyverno/CLAUDE.md` for details.

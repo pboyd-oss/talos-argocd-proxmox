@@ -32,9 +32,9 @@ graph TB
     end
 
     subgraph "Access"
-        J --> L[grafana.vanillax.me]
-        H --> M[prometheus.vanillax.me]
-        K --> N[alertmanager.vanillax.me]
+        J --> L[grafana.tuxgrid.com]
+        H --> M[prometheus.tuxgrid.com]
+        K --> N[alertmanager.tuxgrid.com]
     end
 ```
 
@@ -48,7 +48,7 @@ authoritative sink so there's never a "which one do I trust" question:
 | Metrics | Prometheus (`prometheus-stack/`)| Grafana       |
 | Logs    | Loki (`loki-stack/`)            | Grafana Explore |
 | Traces  | Tempo (`tempo/`)                | Grafana Explore |
-| Alerts  | Alertmanager                    | alertmanager.vanillax.me |
+| Alerts  | Alertmanager                    | alertmanager.tuxgrid.com |
 
 Retention: metrics 15d, logs 30d, traces 72h (see table near the bottom).
 For anything longer-term, export from Loki/Tempo to S3 before rotation.
@@ -153,10 +153,10 @@ Grafana has data, it's the reverse.
 
 | Service | URL |
 |---------|-----|
-| Grafana | https://grafana.vanillax.me |
-| Prometheus | https://prometheus.vanillax.me |
-| Alertmanager | https://alertmanager.vanillax.me |
-| Loki | https://loki.vanillax.me |
+| Grafana | https://grafana.tuxgrid.com |
+| Prometheus | https://prometheus.tuxgrid.com |
+| Alertmanager | https://alertmanager.tuxgrid.com |
+| Loki | https://loki.tuxgrid.com |
 
 ## Key Files
 
@@ -183,7 +183,7 @@ kubectl get pods -n opentelemetry
 kubectl logs -n opentelemetry -l app.kubernetes.io/component=opentelemetry-collector
 
 # Prometheus scrape targets
-# Visit: https://prometheus.vanillax.me/targets
+# Visit: https://prometheus.tuxgrid.com/targets
 
 # Loki is receiving logs — in Grafana Explore, try:
 #   {k8s_namespace_name=~".+"}

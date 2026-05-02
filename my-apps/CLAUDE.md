@@ -54,7 +54,7 @@ metadata:
   labels:
     external-dns: "true"                                    # REQUIRED - external-dns won't create DNS without this
   annotations:
-    external-dns.alpha.kubernetes.io/target: vanillax.me    # REQUIRED - CNAMEs to Cloudflare tunnel
+    external-dns.alpha.kubernetes.io/target: tuxgrid.com    # REQUIRED - CNAMEs to Cloudflare tunnel
 spec:
   parentRefs:
   - kind: Gateway
@@ -62,7 +62,7 @@ spec:
     namespace: gateway
     sectionName: https          # REQUIRED - must bind to HTTPS listener, not just the gateway
   hostnames:
-  - app.vanillax.me
+  - app.tuxgrid.com
   rules:
   - backendRefs:
     - name: app-service
@@ -80,7 +80,7 @@ spec:
 #     name: gateway-internal
 #     namespace: gateway
 #   hostnames:
-#   - app.vanillax.me
+#   - app.tuxgrid.com
 #   rules:
 #   - backendRefs:
 #     - name: app-service

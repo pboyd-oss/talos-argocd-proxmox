@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "wyze-bridge.vanillax.me"
+    - "wyze-bridge.tuxgrid.com"
   rules:
     - matches:
         - path:

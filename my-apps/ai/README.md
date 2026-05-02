@@ -68,7 +68,7 @@ its own aliases listed there).
 llama-server natively supports the Anthropic Messages API at `/v1/messages`. No proxy needed:
 
 ```bash
-export ANTHROPIC_BASE_URL="http://llama.vanillax.me"
+export ANTHROPIC_BASE_URL="http://llama.tuxgrid.com"
 export ANTHROPIC_AUTH_TOKEN="no-key-required"
 export ANTHROPIC_API_KEY=""
 claude --model "qwen3.6 - qwen3.6-35b-a3b"
@@ -79,7 +79,7 @@ claude --model "qwen3.6 - qwen3.6-35b-a3b"
 llama-server also exposes the OpenAI-compatible API at `/v1/chat/completions`:
 
 ```bash
-export OPENAI_BASE_URL="http://llama.vanillax.me/v1"
+export OPENAI_BASE_URL="http://llama.tuxgrid.com/v1"
 export OPENAI_API_KEY="any-value"
 ```
 
@@ -177,7 +177,7 @@ Same as T2V but takes a reference image as the first frame and animates it.
 
 ### Video Workflow Notes
 
-- **Open WebUI cannot display video** -- use ComfyUI directly at `comfyui.vanillax.me`
+- **Open WebUI cannot display video** -- use ComfyUI directly at `comfyui.tuxgrid.com`
 - Video workflows are powered by [kijai/ComfyUI-WanVideoWrapper](https://github.com/kijai/ComfyUI-WanVideoWrapper)
 - The wrapper handles MoE expert switching automatically during sampling
 - **Use the wrapper's example workflows** -- they are auto-copied to ComfyUI's workflow browser
@@ -231,7 +231,7 @@ The job downloads (skips existing):
 4. Users can now generate images in chat
 
 **Text-to-Video / Image-to-Video (ComfyUI direct):**
-1. Open `comfyui.vanillax.me`
+1. Open `comfyui.tuxgrid.com`
 2. Load workflow from file: `workflows/wan22-t2v.json` or `workflows/wan22-i2v.json`
 3. Or browse the workflow menu -- example workflows from WanVideoWrapper are auto-copied on startup
 4. Edit the prompt and click Queue
@@ -284,9 +284,9 @@ IMAGE_STEPS: 9  (Z-Image-Turbo optimal)
 
 | Service | Internal URL | External URL |
 |---------|-------------|-------------|
-| llama-server | `llama-cpp-service.llama-cpp.svc:8080` | `llama.vanillax.me` |
-| Open WebUI | `open-webui-service.open-webui.svc:8080` | `open-webui.vanillax.me` |
-| ComfyUI | `comfyui-service.comfyui.svc:8188` | `comfyui.vanillax.me` |
+| llama-server | `llama-cpp-service.llama-cpp.svc:8080` | `llama.tuxgrid.com` |
+| Open WebUI | `open-webui-service.open-webui.svc:8080` | `open-webui.tuxgrid.com` |
+| ComfyUI | `comfyui-service.comfyui.svc:8188` | `comfyui.tuxgrid.com` |
 | SearXNG | `searxng.searxng.svc:8080` | -- |
 
 All routes use `gateway-internal` (Cilium Gateway API). LLM and Open WebUI routes have 30-minute timeouts.

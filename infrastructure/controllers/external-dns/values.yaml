@@ -14,9 +14,9 @@ cloudflare:
 sources:
   - gateway-httproute # Watch HTTPRoute resources
 
-# Domain filter - only manage vanillax.me domain
+# Domain filter - only manage tuxgrid.com domain
 domainFilters:
-  - vanillax.me
+  - tuxgrid.com
 
 # Policy - only create/update records, don't delete (safer)
 policy: sync # Options: sync (create/update/delete) or upsert-only (create/update)

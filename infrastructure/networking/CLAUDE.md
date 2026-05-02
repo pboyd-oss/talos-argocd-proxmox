@@ -33,7 +33,7 @@ spec:
     name: gateway-external
     namespace: gateway
   hostnames:
-  - app.vanillax.me
+  - app.tuxgrid.com
   rules:
   - backendRefs:
     - name: app-service

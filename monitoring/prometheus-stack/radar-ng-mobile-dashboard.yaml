@@ -1,5 +1,5 @@
 # Grafana dashboard for the radar-ng mobile app — driven entirely by data
-# the React Native client emits via OpenTelemetry to otel.vanillax.me.
+# the React Native client emits via OpenTelemetry to otel.tuxgrid.com.
 #
 # Sources:
 #   - Tempo (traces) — span name = api.fetch* / map.fetchStyle / api.inspectPoint

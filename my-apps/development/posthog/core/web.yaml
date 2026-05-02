@@ -76,7 +76,7 @@ spec:
               name: posthog-secrets
               key: rustfs-secret-key
         - name: LIVESTREAM_HOST
-          value: "https://posthog.vanillax.me/livestream"
+          value: "https://posthog.tuxgrid.com/livestream"
         - name: NGINX_UNIT_APP_PROCESSES
           value: "2"
         ports:
@@ -94,7 +94,7 @@ spec:
             port: 8000
             httpHeaders:
             - name: Host
-              value: posthog.vanillax.me
+              value: posthog.tuxgrid.com
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 45
@@ -112,7 +112,7 @@ spec:
             port: 8000
             httpHeaders:
             - name: Host
-              value: posthog.vanillax.me
+              value: posthog.tuxgrid.com
           periodSeconds: 10
           timeoutSeconds: 30
           failureThreshold: 3

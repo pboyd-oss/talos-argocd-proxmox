@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "temporal.vanillax.me"
+    - "temporal.tuxgrid.com"
   rules:
     - matches:
         - path:

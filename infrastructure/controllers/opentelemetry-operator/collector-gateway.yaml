@@ -23,7 +23,7 @@ spec:
           http:
             endpoint: 0.0.0.0:4318
             # Cap per-request body at 4 MiB — protects the public
-            # otel.vanillax.me endpoint from fill-storage floods. A normal
+            # otel.tuxgrid.com endpoint from fill-storage floods. A normal
             # OTLP batch is well under 1 MiB; 4 MiB is generous for big
             # span/log batches from the mobile app.
             max_request_body_size: 4194304

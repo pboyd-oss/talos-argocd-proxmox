@@ -38,7 +38,7 @@ spec:
               drop: ["ALL"]
           env:
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: homepage.vanillax.me
+              value: homepage.tuxgrid.com
           volumeMounts:
             - name: config
               mountPath: /app/config

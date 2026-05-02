@@ -38,7 +38,7 @@ spec:
             - name: SMTP_PORT
               value: "1025"
             - name: SMTP_DOMAIN
-              value: vanillax.me
+              value: tuxgrid.com
           ports:
             - name: http
               containerPort: 3000

@@ -12,7 +12,7 @@ spec:
       sectionName: https
 
   hostnames:
-    - "longhorn.vanillax.me" # You can change this hostname
+    - "longhorn.tuxgrid.com" # You can change this hostname
   rules:
     - matches:
         - path:

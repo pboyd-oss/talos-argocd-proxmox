@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "headlamp.vanillax.me"
+    - "headlamp.tuxgrid.com"
   rules:
     - matches:
         - path:

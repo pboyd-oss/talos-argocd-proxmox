@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - alertmanager.vanillax.me
+    - alertmanager.tuxgrid.com
   rules:
     - matches:
         - path:

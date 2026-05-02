@@ -8,7 +8,7 @@ ComfyUI for image generation, Kiwix for offline RAG, and an MCP tool proxy
 ## Architecture
 
 ```
-                       https://open-webui.vanillax.me
+                       https://open-webui.tuxgrid.com
                                    │
                         Gateway (Cilium) → HTTPRoute
                                    │
@@ -127,7 +127,7 @@ Applied by ArgoCD automatically (directory = Application). Files:
 | `deployment.yaml`         | Open WebUI main Deployment (stateful via PVC below)              |
 | `pvc.yaml`                | SQLite + uploaded files persist here                             |
 | `service.yaml`            | ClusterIP for HTTPRoute                                          |
-| `httproute.yaml`          | External HTTPRoute to `open-webui.vanillax.me`                   |
+| `httproute.yaml`          | External HTTPRoute to `open-webui.tuxgrid.com`                   |
 | `mcpo-deployment.yaml`    | MCPO Deployment (three tool bundles, ports 8000/8001/8002)       |
 | `mcp-config.yaml`         | Multi-tool server config (filesystem/memory/sqlite)              |
 | `mcp-kiwix.yaml`          | Kiwix fetch tool config                                          |
@@ -141,7 +141,7 @@ kubectl apply -k my-apps/ai/open-webui/
 
 ## Access
 
-- Public: https://open-webui.vanillax.me (Cloudflare tunnel → gateway-external)
+- Public: https://open-webui.tuxgrid.com (Cloudflare tunnel → gateway-external)
 
 ## Troubleshooting
 

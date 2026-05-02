@@ -10,7 +10,7 @@ spec:
     name: gateway-internal
     namespace: gateway
   hostnames:
-  - "llama.vanillax.me"
+  - "llama.tuxgrid.com"
   rules:
   - matches:
     - path:

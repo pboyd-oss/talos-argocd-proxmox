@@ -9,7 +9,7 @@ Gateway API.
 ## How it's wired
 
 ```
-users → https://comfyui.vanillax.me
+users → https://comfyui.tuxgrid.com
      → gateway-external → HTTPRoute: comfyui
      → Service (comfyui-service:8188)
      → Deployment: comfyui  (GPU pod, one replica, Recreate)
@@ -64,7 +64,7 @@ or remove `.download-complete` to force the image's first-run path again.
 | `pvc.yaml` | Static NFS PV + PVC (250Gi RWM, `nfs.csi.k8s.io` driver, `nconnect=16`) |
 | `deployment.yaml` | GPU Deployment, init-container to seed `pre-start.sh`, main container |
 | `service.yaml` | ClusterIP with named port `http:8188` (required for HTTPRoute) |
-| `httproute.yaml` | External HTTPRoute → `comfyui.vanillax.me` |
+| `httproute.yaml` | External HTTPRoute → `comfyui.tuxgrid.com` |
 | `externalsecret.yaml` | Pulls `HF_TOKEN` from 1Password for the Job + the deployment |
 | `configmap.yaml` | Manager `config.ini`, custom-node list, `pre-start.sh` |
 | `custom-nodes/` | Extra custom nodes shipped as files (ConfigMap source) |

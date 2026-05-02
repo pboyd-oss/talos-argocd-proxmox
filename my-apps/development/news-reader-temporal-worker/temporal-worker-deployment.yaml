@@ -52,12 +52,12 @@ spec:
       containers:
         - name: worker
           # Versioned tag — Renovate auto-PRs bumps when the build at
-          # gitea.vanillax.me/vanillax/news-reader-temporal-worker pushes
-          # a new registry.vanillax.me/news-reader-temporal-worker:vX.Y.Z.
+          # gitea.tuxgrid.com/vanillax/news-reader-temporal-worker pushes
+          # a new registry.tuxgrid.com/news-reader-temporal-worker:vX.Y.Z.
           # The Temporal Worker Controller turns each tag bump into a
           # new build_id + progressive worker rollout. Do not pin to
           # :latest here — the controller cannot tell two pushes apart.
-          image: registry.vanillax.me/news-reader-temporal-worker:v1.0.0
+          image: registry.tuxgrid.com/news-reader-temporal-worker:v1.0.0
           imagePullPolicy: Always
           # Controller injects TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE,
           # TEMPORAL_DEPLOYMENT_NAME, TEMPORAL_WORKER_BUILD_ID automatically

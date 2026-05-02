@@ -11,7 +11,7 @@ spec:
       namespace: gateway
       sectionName: https
   hostnames:
-    - "argocd.vanillax.me"
+    - "argocd.tuxgrid.com"
   rules:
     - matches:
         - path:

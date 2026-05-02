@@ -252,7 +252,7 @@ grafana:
   # Grafana configuration
   grafana.ini:
     server:
-      root_url: https://grafana.vanillax.me
+      root_url: https://grafana.tuxgrid.com
     security:
       allow_embedding: true
       cookie_secure: true

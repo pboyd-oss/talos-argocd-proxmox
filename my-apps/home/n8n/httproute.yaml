@@ -12,7 +12,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "n8n.vanillax.me"
+    - "n8n.tuxgrid.com"
   rules:
     - matches:
         - path:

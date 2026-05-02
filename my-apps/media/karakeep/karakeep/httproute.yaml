@@ -6,9 +6,9 @@ metadata:
   labels:
     external-dns: "true"  # Enable ExternalDNS for this route
   annotations:
-    # ExternalDNS will create a CNAME record pointing to vanillax.me
+    # ExternalDNS will create a CNAME record pointing to tuxgrid.com
     # which then points to the Cloudflare Tunnel
-    external-dns.alpha.kubernetes.io/target: "vanillax.me"
+    external-dns.alpha.kubernetes.io/target: "tuxgrid.com"
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
@@ -17,7 +17,7 @@ spec:
       namespace: gateway
       sectionName: https
   hostnames:
-    - "karakeep.vanillax.me"
+    - "karakeep.tuxgrid.com"
   rules:
     - matches:
         - path:

@@ -10,7 +10,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "copyparty.vanillax.me"
+    - "copyparty.tuxgrid.com"
   rules:
     - matches:
         - path:

@@ -162,7 +162,7 @@ kubectl exec -n <namespace> <pod> -- ping -c 2 8.8.8.8
 
 Deploy DVWA (Damn Vulnerable Web Application) for realistic testing:
 
-1. Access `https://dvwa.vanillax.me`
+1. Access `https://dvwa.tuxgrid.com`
 2. Login: `admin` / `password`
 3. Set security to "Low"
 4. Navigate to Command Injection

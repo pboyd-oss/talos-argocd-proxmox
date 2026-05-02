@@ -271,15 +271,15 @@ done
 
 **Currently deployed (use these first):**
 
-- **ArgoCD UI** (http://localhost:39681 or https://argocd.vanillax.me)
+- **ArgoCD UI** (http://localhost:39681 or https://argocd.tuxgrid.com)
   Shows sync/health status per DB app. Good for "is this DB's git in sync with cluster?"
-- **Grafana** (https://grafana.vanillax.me) via kube-prometheus-stack
+- **Grafana** (https://grafana.tuxgrid.com) via kube-prometheus-stack
   The CNPG Helm chart ships with Grafana dashboards — check for panels under
   "CloudNativePG" folder. Covers backup timing, WAL archiving, Cluster state.
   If missing, import from https://github.com/cloudnative-pg/grafana-dashboards.
 - **K8sGPT** (in `monitoring/k8sgpt/`) — detects CNPG Cluster anomalies and
   surfaces them in its dashboard.
-- **Headlamp** (https://headlamp.vanillax.me) — generic K8s UI, can view CNPG
+- **Headlamp** (https://headlamp.tuxgrid.com) — generic K8s UI, can view CNPG
   Cluster CRDs, pods, events. Good for "why is this DB stuck?"
 - **`kubectl cnpg plugin`** (install locally):
   ```bash

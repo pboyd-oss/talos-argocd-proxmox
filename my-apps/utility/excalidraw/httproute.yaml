@@ -1,5 +1,5 @@
 # Public HTTPRoute via gateway-external (Cloudflare tunnel + external-dns).
-# Publishes https://excalidraw.vanillax.me → excalidraw Service :80.
+# Publishes https://excalidraw.tuxgrid.com → excalidraw Service :80.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -8,7 +8,7 @@ metadata:
   labels:
     external-dns: "true"
   annotations:
-    external-dns.alpha.kubernetes.io/target: vanillax.me
+    external-dns.alpha.kubernetes.io/target: tuxgrid.com
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
@@ -17,7 +17,7 @@ spec:
       namespace: gateway
       sectionName: https
   hostnames:
-    - "excalidraw.vanillax.me"
+    - "excalidraw.tuxgrid.com"
   rules:
     - matches:
         - path:

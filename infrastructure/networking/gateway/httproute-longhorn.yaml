@@ -11,7 +11,7 @@ spec:
       namespace: gateway
       sectionName: https
   hostnames:
-    - "longhorn.vanillax.me"
+    - "longhorn.tuxgrid.com"
   rules:
     - matches:
         - path:

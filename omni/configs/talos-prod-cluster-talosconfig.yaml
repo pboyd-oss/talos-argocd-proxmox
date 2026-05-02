@@ -2,7 +2,7 @@ context: omni-prod-talos-prod-cluster
 contexts:
     omni-prod-talos-prod-cluster:
         endpoints:
-            - https://omni.vanillax.me
+            - https://omni.tuxgrid.com
         auth:
             siderov1:
                 identity: pboyd-oss09@gmail.com

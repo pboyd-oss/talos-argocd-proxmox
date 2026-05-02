@@ -23,7 +23,7 @@ If you just performed a **Fresh Start**, your previously registered CLI keys wil
 
 ```bash
 # Generate a new config (it will trigger the OIDC flow)
-omnictl config new --url https://omni.vanillax.me --insecure-skip-tls-verify > ~/.talos/omni/config
+omnictl config new --url https://omni.tuxgrid.com --insecure-skip-tls-verify > ~/.talos/omni/config
 ```
 
 *Note: If you are using OIDC/Auth0, this will provide a link to open in your browser to complete the authentication.*
@@ -36,7 +36,7 @@ If you prefer to keep your config relative to the project:
 export OMNICONFIG=$(pwd)/omni/omni.config
 
 # Then generate the config
-omnictl config new --url https://omni.vanillax.me --insecure-skip-tls-verify > $OMNICONFIG
+omnictl config new --url https://omni.tuxgrid.com --insecure-skip-tls-verify > $OMNICONFIG
 ```
 
 ## 2. Managing Machine Classes

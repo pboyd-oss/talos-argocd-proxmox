@@ -17,7 +17,7 @@ spec:
       name: gateway-internal
       namespace: gateway
   hostnames:
-    - "homeassistant.vanillax.me"
+    - "homeassistant.tuxgrid.com"
   rules:
     - matches:
         - path:

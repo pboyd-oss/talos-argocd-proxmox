@@ -10,7 +10,7 @@ spec:
     name: gateway-internal
     namespace: gateway
   hostnames:
-  - tube.vanillax.me
+  - tube.tuxgrid.com
   rules:
   - matches:
     - path:

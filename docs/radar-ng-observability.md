@@ -9,7 +9,7 @@ docs (collector layout, retention, storage backends) live in
 
 | component | sink | how it gets there |
 |---|---|---|
-| `radar-ng-mobile` (Expo app) | Tempo + Loki | OTel SDK in `src/lib/telemetry.ts` → OTLP/HTTP → `otel.vanillax.me` (gateway) |
+| `radar-ng-mobile` (Expo app) | Tempo + Loki | OTel SDK in `src/lib/telemetry.ts` → OTLP/HTTP → `otel.tuxgrid.com` (gateway) |
 | `tile-server` API logs | Loki | stdout JSON → otel-agent (DaemonSet) → gateway → Loki |
 | `tile-server` `/api/metrics` | Prometheus | ServiceMonitor at `my-apps/development/radar-ng/servicemonitor.yaml` |
 | `ingest-mrms` / `ingest-hrrr` / `ingest-lightning` / `ingest-tropical` / `nowcast` / `basemap` / `open-meteo` logs | Loki | same pipeline as tile-server |

@@ -13,7 +13,7 @@ spec:
       namespace: gateway
       sectionName: https
   hostnames:
-    - "search.vanillax.me"
+    - "search.tuxgrid.com"
   rules:
     - matches:
         - path:

@@ -12,7 +12,7 @@ spec:
       namespace: gateway
       sectionName: https
   hostnames:
-    - "kopia.vanillax.me"
+    - "kopia.tuxgrid.com"
   rules:
     - matches:
         - path:

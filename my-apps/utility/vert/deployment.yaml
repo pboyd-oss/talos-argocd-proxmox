@@ -28,7 +28,7 @@ spec:
             - name: PUB_ENV
               value: "production"
             - name: PUB_HOSTNAME
-              value: "vert.vanillax.me"
+              value: "vert.tuxgrid.com"
             # Optional: Configure vertd URL for video conversion
             # - name: PUB_VERTD_URL
             #   value: "http://vertd.development.svc.cluster.local:24153"

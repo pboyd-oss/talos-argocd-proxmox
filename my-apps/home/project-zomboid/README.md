@@ -6,7 +6,7 @@ standard worker node with Longhorn storage.
 
 ## Connecting
 
-- **Address:** `zomboid.vanillax.me`
+- **Address:** `zomboid.tuxgrid.com`
 - **Port:** `16261` (UDP, the primary game port)
 - **Password:** 1Password → `project-zomboid` → `server-password`
 - **LAN alternative:** `192.168.10.51:16261`
@@ -15,7 +15,7 @@ standard worker node with Longhorn storage.
 
 ```
  Internet
-    │ (DNS: zomboid.vanillax.me → public IP, grey cloud — Cloudflare DNS-only)
+    │ (DNS: zomboid.tuxgrid.com → public IP, grey cloud — Cloudflare DNS-only)
     │
  Firewalla Gold
     │  forwards UDP 16261–16262, TCP 27015 → 192.168.10.51
@@ -117,7 +117,7 @@ Hardcoded in the Deployment env (see `deployment.yaml`, lines
 UDP game server, no HTTP/TLS termination:
 
 - **Cloudflare:** DNS-only A record (**grey cloud**) pointing
-  `zomboid.vanillax.me` → public IP. The orange cloud proxies only HTTP;
+  `zomboid.tuxgrid.com` → public IP. The orange cloud proxies only HTTP;
   UDP game traffic needs the grey cloud to pass through.
 - **Firewalla:** port-forward `UDP 16261`, `UDP 16262`, `TCP 27015` →
   `192.168.10.51`.
