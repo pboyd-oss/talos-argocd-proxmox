@@ -39,7 +39,7 @@ spec:
             metadata:
               name: paperless-postgres-external
               annotations:
-                lbipam.cilium.io/ips: "192.168.10.42"
+                lbipam.cilium.io/ips: "192.168.100.42"
             spec:
               type: LoadBalancer
               ports:

@@ -41,9 +41,9 @@ spec:
     # Needed for pod-to-service via external IPs
     # ============================================
     - toCIDR:
-        - 192.168.10.32/27
+        - 192.168.100.32/27
 
-    # NOTE: Gateway (192.168.10.1) NOT whitelisted
+    # NOTE: Gateway (192.168.100.1) NOT whitelisted
     # Internet works via toEntities:host, no direct gateway access needed
     # This prevents pods from accessing router admin/SSH
 
@@ -74,7 +74,7 @@ spec:
     # ALLOW: Wyze Bridge RTSP (for Frigate)
     # ============================================
     - toCIDR:
-        - 192.168.10.46/32
+        - 192.168.100.46/32
       toPorts:
         - ports:
             - port: "8554"
@@ -85,7 +85,7 @@ spec:
     # Remove if not using Omni/Terraform in-cluster
     # ============================================
     - toCIDR:
-        - 192.168.10.14/32
+        - 192.168.100.14/32
       toPorts:
         - ports:
             - port: "8006"
@@ -95,7 +95,7 @@ spec:
     # ALLOW: RPi4 Solar MPPT Monitor (Prometheus scrape)
     # ============================================
     - toCIDR:
-        - 192.168.10.174/32
+        - 192.168.100.174/32
       toPorts:
         - ports:
             - port: "8080"

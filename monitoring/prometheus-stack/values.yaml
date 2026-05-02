@@ -59,7 +59,7 @@ prometheus:
         scheme: http
         scrape_interval: 15s
         static_configs:
-          - targets: ['192.168.10.174:9812']
+          - targets: ['192.168.100.174:9812']
             labels:
               instance: 'rpi4-solar'
               location: 'home'

@@ -189,13 +189,13 @@
         description: Network Attached Storage
     - Proxmox:
         icon: proxmox.png
-        href: https://192.168.10.13:8006
+        href: https://192.168.100.13:8006
         description: Virtualization Platform
     - iLO TrueNAS:
         icon: hp-ilo.png
-        href: https://192.168.10.197
+        href: https://192.168.100.197
         description: TrueNAS IPMI Management
     - iLO Proxmox:
         icon: hp-ilo.png
-        href: https://192.168.10.160
+        href: https://192.168.100.160
         description: Proxmox IPMI Management

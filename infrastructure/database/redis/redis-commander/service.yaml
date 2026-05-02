@@ -4,7 +4,7 @@ metadata:
   name: redis-commander
   namespace: redis
   annotations:
-    io.cilium/lb-ipam-ips: "192.168.10.45" # Your specified IP
+    io.cilium/lb-ipam-ips: "192.168.100.45" # Your specified IP
 spec:
   type: LoadBalancer
   ports:
