@@ -16,7 +16,7 @@ resources:
   # - keda-app.yaml          # Wave 4 - Event-driven autoscaler
   # - temporal-worker-controller-app.yaml # Wave 4 - Worker Versioning for Temporal workers
   # ApplicationSets for automatic discovery
-  # - infrastructure-appset.yaml  # Wave 4
+  - infrastructure-appset.yaml  # Wave 4
   # - database-appset.yaml        # Wave 4 - Database operators/instances (selfHeal: false for DR)
   # - opentelemetry-operator-app.yaml # Wave 5 - OTEL (needs cert-manager from Wave 4)
   # - monitoring-appset.yaml      # Wave 5
