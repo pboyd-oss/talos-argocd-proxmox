@@ -107,7 +107,7 @@ configs:
       return hs
 # Argo CD server settings
 server:
-  replicas: 2
+  replicas: 1
   ingress:
     enabled: false
   env:
@@ -131,7 +131,7 @@ server:
       memory: 1Gi
 # ApplicationSet controller settings
 applicationSet:
-  enabled: true
+  enabled: false
   metrics:
     enabled: true
     serviceMonitor:
@@ -151,7 +151,7 @@ applicationSet:
       memory: 512Mi  # Reduced from 1Gi
 # High Availability setup
 ha:
-  enabled: true
+  enabled: false
   redis:
     # VPA-optimized resources (2026-02-24)
     # VPA target: cpu 23m, memory 100Mi
@@ -195,7 +195,7 @@ controller:
       memory: 6Gi
 # Argo CD repo-server settings
 repoServer:
-  replicas: 2
+  replicas: 1
   env:
     - name: ARGOCD_EXEC_TIMEOUT
       value: "3m"
@@ -221,7 +221,7 @@ repoServer:
 dex:
   enabled: false
 notifications:
-  enabled: true
+  enabled: false
   secret:
     create: true
   metrics:
