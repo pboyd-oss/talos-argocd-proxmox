@@ -355,7 +355,7 @@ A simpler architecture that achieves ~90% of your goals:
 ```yaml
 initContainers:
   - name: restore-check
-    image: ghcr.io/mitchross/pvc-plumber:1.3.0
+    image: ghcr.io/pboyd-oss/pvc-plumber:1.3.0
     command: ["check-and-restore"]
     env:
       - name: PVC_NAME

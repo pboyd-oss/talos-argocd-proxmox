@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/mitchross/talos-argocd-proxmox.git
+    repoURL: https://github.com/pboyd-oss/talos-argocd-proxmox.git
     path: infrastructure/controllers/argocd/apps
     targetRevision: HEAD
   destination:

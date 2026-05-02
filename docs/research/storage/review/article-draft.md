@@ -376,7 +376,7 @@ The right long-term answer is a **conditional VolumePopulator** — a controller
 
 pvc-plumber is a proof-of-concept for functionality that CSI provisioners or backup operators should adopt natively. The admission webhook is the stopgap. The Volume Populator is the destination.
 
-Until that exists upstream, [pvc-plumber](https://github.com/mitchross/pvc-plumber) is 500 lines of Go that answers one question.
+Until that exists upstream, [pvc-plumber](https://github.com/pboyd-oss/pvc-plumber) is 500 lines of Go that answers one question.
 
 ---
 

@@ -439,7 +439,7 @@ These exist because I hit the failure modes they prevent.
 
 **23-hour API server overload (2026-03-25).** The original policy used `background: true` and `synchronize: true`. With 70+ workloads, Kyverno re-evaluated every matching PVC every ~30 seconds, generating hundreds of UpdateRequests that hammered the API server. The fix was `background: false` and `synchronize: false`. The trade-off: if a generated ReplicationSource is accidentally deleted, Kyverno won't recreate it until someone toggles the PVC label. VolSync metrics in Prometheus catch silent backup failures.
 
-**Full cluster deadlock (2026-04-08).** A Renovate auto-merge of a kube-prometheus-stack chart upgrade restarted too many pods simultaneously. Kyverno's admission controller crashed with a cache sync failure. Its webhook was still registered with `failurePolicy: Fail`. Every Deployment, StatefulSet, and DaemonSet creation outside kube-system was rejected. Longhorn couldn't restart its pods. ArgoCD couldn't mount PVCs. Even rebooting all nodes didn't fix it — webhook configurations persist in etcd. Fix: infrastructure namespaces (longhorn-system, argocd, volsync-system, cert-manager, external-secrets) are now excluded from Kyverno's webhook `namespaceSelector`. An [emergency script](https://github.com/mitchross/talos-argocd-proxmox/blob/main/scripts/emergency-webhook-cleanup.sh) deletes all webhook configurations to break the deadlock. Kyverno recreates them once healthy.
+**Full cluster deadlock (2026-04-08).** A Renovate auto-merge of a kube-prometheus-stack chart upgrade restarted too many pods simultaneously. Kyverno's admission controller crashed with a cache sync failure. Its webhook was still registered with `failurePolicy: Fail`. Every Deployment, StatefulSet, and DaemonSet creation outside kube-system was rejected. Longhorn couldn't restart its pods. ArgoCD couldn't mount PVCs. Even rebooting all nodes didn't fix it — webhook configurations persist in etcd. Fix: infrastructure namespaces (longhorn-system, argocd, volsync-system, cert-manager, external-secrets) are now excluded from Kyverno's webhook `namespaceSelector`. An [emergency script](https://github.com/pboyd-oss/talos-argocd-proxmox/blob/main/scripts/emergency-webhook-cleanup.sh) deletes all webhook configurations to break the deadlock. Kyverno recreates them once healthy.
 
 **Backup timing safeguards.** Two preconditions prevent backing up empty data:
 
@@ -468,7 +468,7 @@ The right long-term answer is a **conditional VolumePopulator** — a controller
 
 pvc-plumber is a proof-of-concept for functionality that CSI provisioners or backup operators should adopt natively. The admission webhook is the stopgap. The Volume Populator is the destination.
 
-Until that exists upstream, [pvc-plumber](https://github.com/mitchross/pvc-plumber) is 500 lines of Go that answers one question.
+Until that exists upstream, [pvc-plumber](https://github.com/pboyd-oss/pvc-plumber) is 500 lines of Go that answers one question.
 
 ---
 

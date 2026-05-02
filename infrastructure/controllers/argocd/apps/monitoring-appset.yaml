@@ -8,7 +8,7 @@ metadata:
 spec:
   generators:
   - git:
-      repoURL: https://github.com/mitchross/talos-argocd-proxmox.git
+      repoURL: https://github.com/pboyd-oss/talos-argocd-proxmox.git
       revision: main
       directories:
       - path: monitoring/*
@@ -22,7 +22,7 @@ spec:
       project: monitoring
       revisionHistoryLimit: 3
       source:
-        repoURL: https://github.com/mitchross/talos-argocd-proxmox.git
+        repoURL: https://github.com/pboyd-oss/talos-argocd-proxmox.git
         targetRevision: main
         path: '{{path}}'
       destination:

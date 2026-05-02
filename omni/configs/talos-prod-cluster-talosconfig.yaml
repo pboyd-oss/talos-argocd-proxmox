@@ -5,5 +5,5 @@ contexts:
             - https://omni.vanillax.me
         auth:
             siderov1:
-                identity: mitchross09@gmail.com
+                identity: pboyd-oss09@gmail.com
         cluster: talos-prod-cluster

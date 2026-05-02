@@ -528,7 +528,7 @@
 │     (volsync-system namespace)   │         │                                      │
 │                                  │         │  ClusterPolicy:                      │
 │  Image:                          │         │  volsync-pvc-backup-restore          │
-│  ghcr.io/mitchross/pvc-plumber   │         │                                      │
+│  ghcr.io/pboyd-oss/pvc-plumber   │         │                                      │
 │  :1.5.1                          │         │  Rules:                              │
 │                                  │         │  0. Check pvc-plumber readiness      │
 │  Env:                            │         │  1. Require authoritative decision   │

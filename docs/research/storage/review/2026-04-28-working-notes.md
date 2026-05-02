@@ -32,7 +32,7 @@ Status: working notes, not final recommendations.
   - `policies/volsync-nfs-inject.yaml`
   - `policies/volsync-orphan-cleanup.yaml`
 - At initial review, two newer Kyverno CEL policy files existed but were not included in the Kyverno kustomization. That dead-code risk was resolved in the hardening pass by deleting the unwired files and keeping the active combined `ClusterPolicy` as the bridge.
-- `pvc-plumber` deployment is at image `ghcr.io/mitchross/pvc-plumber:1.4.0`, with 2 replicas, pod anti-affinity, and a PDB.
+- `pvc-plumber` deployment is at image `ghcr.io/pboyd-oss/pvc-plumber:1.4.0`, with 2 replicas, pod anti-affinity, and a PDB.
 - Kyverno admission controller has 3 replicas, topology spread, PDB, and infrastructure namespace exclusions in chart values.
 - VolSync alerts exist, but no ServiceMonitor or alert for pvc-plumber metrics was found in the repo search.
 - Exact local references:
@@ -258,7 +258,7 @@ Code/manifests were updated after the review to make the current bridge safer be
   - `decision=unknown`, `authoritative=false`, HTTP 503 when Kopia/S3/backend truth is unavailable.
 - `HTTP_TIMEOUT` is now applied to per-request `/exists` backend calls.
 - `pvc-plumber` exposes `pvc_plumber_backup_check_total{backend,decision}` so unknown decisions can alert directly.
-- Talos deployment is updated to `ghcr.io/mitchross/pvc-plumber:1.5.1` and explicitly sets `HTTP_TIMEOUT=3s`.
+- Talos deployment is updated to `ghcr.io/pboyd-oss/pvc-plumber:1.5.1` and explicitly sets `HTTP_TIMEOUT=3s`.
 - The active Kyverno `volsync-pvc-backup-restore` policy now uses Enforce semantics and denies backup-labeled PVC CREATE when `/exists` is not authoritative.
 - Kyverno `apiCall.default` maps pvc-plumber HTTP failures to `decision=unknown`, `authoritative=false`, so service-call failure also denies rather than relying on implicit behavior.
 - The Kyverno mutate rule now requires authoritative `decision=restore`, not just `exists=true`.

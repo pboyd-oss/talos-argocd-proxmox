@@ -89,7 +89,7 @@ PVC Created ──▶ Kyverno ──▶ pvc-plumber /exists ──▶ restore / 
 ### 3. pvc-plumber
 - HTTP service that checks if a backup exists in Kopia repository
 - Called by Kyverno before creating a PVC to determine if restore is needed
-- Image: `ghcr.io/mitchross/pvc-plumber`
+- Image: `ghcr.io/pboyd-oss/pvc-plumber`
 - Endpoint: `GET /exists/{namespace}/{pvc}` returns `decision: restore|fresh|unknown` plus `authoritative: true|false`
 
 ### 4. Kyverno ClusterPolicy

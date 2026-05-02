@@ -8,18 +8,18 @@
 
 ## Overview
 
-Add OpenAI-compatible LLM backend support to [mitchross/project-nomad](https://github.com/mitchross/project-nomad) so it works with llama-cpp (and any OpenAI-compatible server). Add Kubernetes manifests with Kustomize for modular deployment of the **full Nomad stack** (all 9 services). Every optional service supports **BYO** (bring-your-own via URL) or **deploy** (uncomment in kustomization.yaml). Update the existing deployment in this repo to use ExternalSecrets and the new configuration.
+Add OpenAI-compatible LLM backend support to [pboyd-oss/project-nomad](https://github.com/pboyd-oss/project-nomad) so it works with llama-cpp (and any OpenAI-compatible server). Add Kubernetes manifests with Kustomize for modular deployment of the **full Nomad stack** (all 9 services). Every optional service supports **BYO** (bring-your-own via URL) or **deploy** (uncomment in kustomization.yaml). Update the existing deployment in this repo to use ExternalSecrets and the new configuration.
 
 ## Two Repositories, Two Workstreams
 
 | Repo | Changes | Branch |
 |------|---------|--------|
-| **mitchross/project-nomad** | LLMProvider abstraction, k8s manifests, GitHub Actions | `feature/openai-k8s` |
+| **pboyd-oss/project-nomad** | LLMProvider abstraction, k8s manifests, GitHub Actions | `feature/openai-k8s` |
 | **talos-argocd-proxmox** | ExternalSecret, updated configmap, image reference | `claude/install-project-nomad-XmxFL` |
 
 ---
 
-## Part 1: Fork Changes (mitchross/project-nomad)
+## Part 1: Fork Changes (pboyd-oss/project-nomad)
 
 ### 1A. LLMProvider Abstraction
 
@@ -235,7 +235,7 @@ All 9 services are **in scope** and will be deployed. Each supports BYO (set URL
 
 | Service | Image | BYO Config | Ports | Storage |
 |---------|-------|------------|-------|---------|
-| **Nomad** (admin) | `ghcr.io/mitchross/project-nomad:main` | — | 8080 | PVC 10Gi (uploads/ZIM) |
+| **Nomad** (admin) | `ghcr.io/pboyd-oss/project-nomad:main` | — | 8080 | PVC 10Gi (uploads/ZIM) |
 | **MySQL** | `mysql:8.0` | `DB_HOST`, `DB_PORT`, `DB_USER` | 3306 | PVC 10Gi |
 | **Redis** | `redis:7-alpine` | `REDIS_HOST`, `REDIS_PORT` | 6379 | — |
 | **Qdrant** | `qdrant/qdrant:latest` | `QDRANT_HOST` | 6333, 6334 | PVC 5Gi |
@@ -435,7 +435,7 @@ jobs:
           cache-to: type=gha,mode=max
 ```
 
-**Result**: Images published to `ghcr.io/mitchross/project-nomad:<tag>`
+**Result**: Images published to `ghcr.io/pboyd-oss/project-nomad:<tag>`
 
 ---
 
@@ -523,7 +523,7 @@ data:
 
 ### 2C. Updated Deployment
 
-- Change image from `ghcr.io/crosstalk-solutions/project-nomad:latest` to `ghcr.io/mitchross/project-nomad:main`
+- Change image from `ghcr.io/crosstalk-solutions/project-nomad:latest` to `ghcr.io/pboyd-oss/project-nomad:main`
 - Remove `OLLAMA_HOST` from configmap (replaced by `LLM_HOST`)
 - Add `QDRANT_HOST` env var
 
@@ -602,7 +602,7 @@ resources:
 16. Create 1Password item `project-nomad`
 17. Replace `secret.yaml` with `externalsecret.yaml`
 18. Update `configmap.yaml` with LLM env vars + all service URLs (pointing to in-cluster defaults)
-19. Update `deployment.yaml` image to `ghcr.io/mitchross/project-nomad:main`
+19. Update `deployment.yaml` image to `ghcr.io/pboyd-oss/project-nomad:main`
 20. Update `kustomization.yaml`
 21. Commit and push
 

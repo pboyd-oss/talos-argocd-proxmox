@@ -1,6 +1,6 @@
 # Talos ArgoCD Proxmox Cluster
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mitchross/talos-argocd-proxmox)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pboyd-oss/talos-argocd-proxmox)
 
 > Production-grade GitOps Kubernetes cluster on Talos OS with self-managing ArgoCD, Cilium, and zero-touch PVC backup/restore
 
@@ -22,7 +22,7 @@ A GitOps-driven Kubernetes cluster using **Talos OS** (secure, immutable Linux f
 |----------|-------------|
 | [Omni](https://github.com/siderolabs/omni) | Talos cluster management platform |
 | [Proxmox Infra Provider](https://github.com/siderolabs/omni-infra-provider-proxmox) | Proxmox infrastructure provider for Omni |
-| [Starter Repo](https://github.com/mitchross/sidero-omni-talos-proxmox-starter) | Full config & automation for Sidero Omni + Talos + Proxmox |
+| [Starter Repo](https://github.com/pboyd-oss/sidero-omni-talos-proxmox-starter) | Full config & automation for Sidero Omni + Talos + Proxmox |
 | [Reference Guide](https://www.virtualizationhowto.com/2025/08/how-to-install-talos-omni-on-prem-for-effortless-kubernetes-management/) | VirtualizationHowTo guide for Talos Omni on-prem setup |
 
 ## Architecture

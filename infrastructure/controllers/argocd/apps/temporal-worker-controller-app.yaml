@@ -13,7 +13,7 @@ spec:
   project: infrastructure
   revisionHistoryLimit: 3
   source:
-    repoURL: https://github.com/mitchross/talos-argocd-proxmox.git
+    repoURL: https://github.com/pboyd-oss/talos-argocd-proxmox.git
     targetRevision: main
     path: infrastructure/controllers/temporal-worker-controller
   destination:
