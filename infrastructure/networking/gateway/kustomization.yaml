@@ -6,7 +6,7 @@ resources:
 - gw-internal.yaml
 - httproute-argocd.yaml
 # - httproute-argocd-webhook.yaml
-# - httproute-longhorn.yaml
+- httproute-longhorn.yaml
 
 #- gw-tcp-postgres.yaml
 generatorOptions:
