@@ -6,7 +6,7 @@ resources:
   # Wave 0: Foundation components (networking + secrets infrastructure)
   - argocd.yaml            # Wave 0 - ArgoCD self-management (Helm chart + config)
   - cilium-app.yaml        # Wave 0 - Networking foundation
-  - 1passwordconnect.yaml  # Wave 0 - Secret backend (required by External Secrets)
+  - sealed-secrets.yaml    # Wave 0 - Sealed Secrets controller (replaces 1Password)
   - external-secrets.yaml  # Wave 0 - External Secrets CRDs (required by Longhorn)
   - longhorn-app.yaml      # Wave 1 - Storage foundation
   - snapshot-controller-app.yaml # Wave 1 - VolumeSnapshot controller + CRDs
