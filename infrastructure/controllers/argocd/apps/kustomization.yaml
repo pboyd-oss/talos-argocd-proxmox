@@ -7,14 +7,14 @@ resources:
   - argocd.yaml            # Wave 0 - ArgoCD self-management (Helm chart + config)
   - cilium-app.yaml        # Wave 0 - Networking foundation
   - sealed-secrets.yaml    # Wave 0 - Sealed Secrets controller
-  # - longhorn-app.yaml      # Wave 1 - Storage foundation (temporarily disabled during extension upgrade)
+  - longhorn-app.yaml      # Wave 1 - Storage foundation
   - snapshot-controller-app.yaml # Wave 1 - VolumeSnapshot controller + CRDs
-  # - volsync-app.yaml       # Wave 1 - PVC backup and replication (Kopia + NFS)
-  # - pvc-plumber-app.yaml   # Wave 2 - Backup existence checker for restore
+  - volsync-app.yaml       # Wave 1 - PVC backup and replication (Kopia + NFS)
+  - pvc-plumber-app.yaml   # Wave 2 - Backup existence checker for restore
   - kyverno-app.yaml         # Wave 3 - Policy engine (must be healthy before apps create PVCs)
-  # - cnpg-barman-plugin-app.yaml # Wave 3 - Barman Cloud Plugin (before CNPG Clusters in Wave 4)
-  # - keda-app.yaml          # Wave 4 - Event-driven autoscaler
-  # - temporal-worker-controller-app.yaml # Wave 4 - Worker Versioning for Temporal workers
+  - cnpg-barman-plugin-app.yaml # Wave 3 - Barman Cloud Plugin (before CNPG Clusters in Wave 4)
+  - keda-app.yaml          # Wave 4 - Event-driven autoscaler
+  - temporal-worker-controller-app.yaml # Wave 4 - Worker Versioning for Temporal workers
   # ApplicationSets for automatic discovery
   - infrastructure-appset.yaml  # Wave 4
   # - database-appset.yaml        # Wave 4 - Database operators/instances (selfHeal: false for DR)
