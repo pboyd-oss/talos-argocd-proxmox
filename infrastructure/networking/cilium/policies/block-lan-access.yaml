@@ -41,7 +41,7 @@ spec:
     # Needed for pod-to-service via external IPs
     # ============================================
     - toCIDR:
-        - 192.168.100.32/27
+        - 192.168.100.220/28
 
     # NOTE: Gateway (192.168.100.1) NOT whitelisted
     # Internet works via toEntities:host, no direct gateway access needed
