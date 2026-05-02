@@ -66,16 +66,6 @@ spec:
         kind: Cluster
         jsonPointers:
         - /metadata/generation
-      - group: external-secrets.io
-        kind: ExternalSecret
-        jqPathExpressions:
-        - .metadata.generation
-        - .metadata.finalizers
-        - .spec.data[].remoteRef.conversionStrategy
-        - .spec.data[].remoteRef.decodingStrategy
-        - .spec.data[].remoteRef.metadataPolicy
-        - .spec.data[].remoteRef.nullBytePolicy
-        - .spec.target.deletionPolicy
       # PVC fields that are immutable after creation
       - group: ""
         kind: PersistentVolumeClaim

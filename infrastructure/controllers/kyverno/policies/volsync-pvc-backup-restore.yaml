@@ -149,7 +149,8 @@ spec:
               kind: ReplicationDestination
               name: "{{request.object.metadata.name}}-backup"
 
-    # Rule 2: Generate ExternalSecret for Kopia repository credentials
+    # Rule 2: Generate Secret for Kopia repository credentials
+    # Reads credentials from volsync-kopia-template in volsync-system (SealedSecret).
     - name: generate-kopia-secret
       skipBackgroundRequests: true
       match:
@@ -169,10 +170,15 @@ spec:
                 - kube-system
                 - volsync-system
                 - kyverno
+      context:
+        - name: kopiaCreds
+          apiCall:
+            urlPath: "/api/v1/namespaces/volsync-system/secrets/volsync-kopia-template"
+            jmesPath: "data"
       generate:
         synchronize: false
-        apiVersion: external-secrets.io/v1
-        kind: ExternalSecret
+        apiVersion: v1
+        kind: Secret
         name: "volsync-{{request.object.metadata.name}}"
         namespace: "{{request.object.metadata.namespace}}"
         data:
@@ -180,31 +186,10 @@ spec:
             labels:
               app.kubernetes.io/managed-by: kyverno
               volsync.backup/pvc: "{{request.object.metadata.name}}"
-          spec:
-            refreshInterval: 1h
-            secretStoreRef:
-              kind: ClusterSecretStore
-              name: 1password
-            target:
-              name: "volsync-{{request.object.metadata.name}}"
-              creationPolicy: Owner
-              template:
-                engineVersion: v2
-                mergePolicy: Merge
-                metadata:
-                  labels:
-                    app.kubernetes.io/managed-by: kyverno
-                    volsync.backup/pvc: "{{request.object.metadata.name}}"
-                data:
-                  # Kopia NFS filesystem repository configuration
-                  # MutatingAdmissionPolicy injects NFS mount at /repository
-                  KOPIA_REPOSITORY: "filesystem:///repository"
-                  KOPIA_FS_PATH: "/repository"
-            data:
-              - secretKey: KOPIA_PASSWORD
-                remoteRef:
-                  key: rustfs
-                  property: kopia_password
+          data:
+            KOPIA_PASSWORD: "{{kopiaCreds.KOPIA_PASSWORD}}"
+            KOPIA_REPOSITORY: "{{kopiaCreds.KOPIA_REPOSITORY}}"
+            KOPIA_FS_PATH: "{{kopiaCreds.KOPIA_FS_PATH}}"
 
     # Rule 3: Generate ReplicationSource (backup schedule)
     # IMPORTANT: Only create backup AFTER PVC is Bound to avoid conflicts with restore

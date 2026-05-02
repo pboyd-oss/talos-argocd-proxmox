@@ -17,8 +17,6 @@ config:
           - volsync-system
           - snapshot-controller
           - cert-manager
-          - external-secrets
-          - 1passwordconnect
   excludeKyvernoNamespace: true
 
 admissionController:
@@ -143,15 +141,6 @@ cleanupController:
         resources:
         - replicationsources
         - replicationdestinations
-        verbs:
-        - get
-        - list
-        - watch
-        - delete
-      - apiGroups:
-        - external-secrets.io
-        resources:
-        - externalsecrets
         verbs:
         - get
         - list

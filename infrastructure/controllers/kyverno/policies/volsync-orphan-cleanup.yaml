@@ -28,7 +28,7 @@ spec:
                 operator: Exists
       - resources:
           kinds:
-            - ExternalSecret
+            - Secret
           selector:
             matchExpressions:
               - key: app.kubernetes.io/managed-by

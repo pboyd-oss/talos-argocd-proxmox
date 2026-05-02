@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: volsync-system
 resources:
   - namespace.yaml
+  - sealedsecret-kopia-template.yaml
   - volumesnapshotclass.yaml
   - kopia-maintenance-cronjob.yaml
   - orphan-reaper.yaml
