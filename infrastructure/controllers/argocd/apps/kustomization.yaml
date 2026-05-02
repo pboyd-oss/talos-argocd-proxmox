@@ -11,7 +11,7 @@ resources:
   - snapshot-controller-app.yaml # Wave 1 - VolumeSnapshot controller + CRDs
   # - volsync-app.yaml       # Wave 1 - PVC backup and replication (Kopia + NFS)
   # - pvc-plumber-app.yaml   # Wave 2 - Backup existence checker for restore
-  # - kyverno-app.yaml       # Wave 3 - Policy engine (must be healthy before apps create PVCs)
+  - kyverno-app.yaml         # Wave 3 - Policy engine (must be healthy before apps create PVCs)
   # - cnpg-barman-plugin-app.yaml # Wave 3 - Barman Cloud Plugin (before CNPG Clusters in Wave 4)
   # - keda-app.yaml          # Wave 4 - Event-driven autoscaler
   # - temporal-worker-controller-app.yaml # Wave 4 - Worker Versioning for Temporal workers
