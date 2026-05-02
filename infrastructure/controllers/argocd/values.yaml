@@ -16,7 +16,7 @@ configs:
     # Performance: increase repo-server timeout for large Helm charts like prometheus-stack
     controller.repo.server.timeout.seconds: "300"
   cm:
-    url: "https://argocd.vanillax.me"
+    url: "https://argocd.tuxgrid.com"
     kustomize.buildOptions: "--enable-helm"
     # Use server-side diff to match ServerSideApply - prevents false "in-sync" detection
     # Without this, client-side diff + server-side apply disagree on changes, causing
