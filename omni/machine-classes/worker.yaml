@@ -39,4 +39,4 @@ spec:
       cpu_type: host
       machine_type: q35
       balloon: false
-      # Storage via 10G switch (192.168.10.133) - no dedicated NIC needed
+      # Storage via 10G switch (192.168.100.2) - no dedicated NIC needed

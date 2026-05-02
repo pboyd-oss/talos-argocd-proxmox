@@ -185,7 +185,7 @@
         description: Container Image Registry
     - TrueNAS:
         icon: truenas.png
-        href: http://192.168.10.133
+        href: http://192.168.100.2
         description: Network Attached Storage
     - Proxmox:
         icon: proxmox.png

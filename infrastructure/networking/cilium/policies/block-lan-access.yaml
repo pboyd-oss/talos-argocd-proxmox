@@ -52,7 +52,7 @@ spec:
     # (NFS for Plex, SMB for Jellyfin, RustFS for VolSync backups)
     # ============================================
     - toCIDR:
-        - 192.168.10.133/32
+        - 192.168.100.2/32
       toPorts:
         - ports:
             - port: "2049"

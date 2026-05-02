@@ -23,7 +23,7 @@ spec:
     driver: nfs.csi.k8s.io
     volumeHandle: llama-cpp-nfs-pv
     volumeAttributes:
-      server: "192.168.10.133"
+      server: "192.168.100.2"
       share: "/mnt/ai-pool/llama-cpp"
 ---
 apiVersion: v1

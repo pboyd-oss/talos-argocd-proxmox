@@ -55,7 +55,7 @@ spec:
       # Write target. Clean-slate baseline after 2026-04-19 RustFS wipe.
       serverName: paperless-database-v1
       destinationPath: s3://postgres-backups/cnpg/paperless
-      endpointURL: http://192.168.10.133:30293
+      endpointURL: http://192.168.100.2:30293
       s3Credentials:
         accessKeyId:
           name: cnpg-s3-credentials

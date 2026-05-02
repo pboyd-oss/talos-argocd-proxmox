@@ -1,0 +1,151 @@
+controller:
+  image:
+    repository: jenkins/jenkins
+    tag: "2.504-lts-jdk21"
+    pullPolicy: IfNotPresent
+
+  # Admin credentials from ExternalSecret (1Password → jenkins-admin-secret)
+  admin:
+    existingSecret: "jenkins-admin-secret"
+    userKey: jenkins-admin-user
+    passwordKey: jenkins-admin-password
+
+  numExecutors: 0  # No builds on the controller node
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      memory: "3Gi"
+
+  # Delegate pod scheduling RBAC to our own rbac.yaml
+  serviceAccount:
+    create: false
+    name: jenkins
+
+  # Required plugins on top of chart defaults
+  installPlugins:
+    - kubernetes:4361.v47b_3d9b_14da_9
+    - job-dsl:1.92
+    - configuration-as-code:1950.va_853dfdbd2a_1
+    - workflow-aggregator:600.vb_57cdd26fdd7
+    - git:5.7.0
+    - credentials-binding:681.vf91669a_32e45
+    - pipeline-stage-view:2.35
+    - antisamy-markup-formatter:162.v0e6ec0fcfcf6
+    - build-timeout:1.32
+    - timestamper:1.27
+    - ws-cleanup:0.46
+    - matrix-auth:3.2.3
+
+  # Mount Job DSL scripts ConfigMap so the seed job can read them
+  volumes:
+    - name: jobdsl-scripts
+      configMap:
+        name: jenkins-jobdsl-scripts
+
+  volumeMounts:
+    - name: jobdsl-scripts
+      mountPath: /var/jenkins_home/jobdsl
+      readOnly: true
+
+  JCasC:
+    defaultConfig: true
+    configScripts:
+      # Kubernetes cloud: dynamic agent pod templates
+      01-kubernetes-cloud: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                name: "kubernetes"
+                serverUrl: ""
+                namespace: "jenkins"
+                jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+                jenkinsTunnel: "jenkins-agent.jenkins.svc.cluster.local:50000"
+                retentionTimeout: 5
+                connectTimeout: 10
+                readTimeout: 20
+                templates:
+                  # Default agent: plain JNLP pod for general pipeline stages
+                  - name: "default"
+                    label: "default"
+                    nodeUsageMode: "NORMAL"
+                    containers:
+                      - name: "jnlp"
+                        image: "jenkins/inbound-agent:latest-jdk21"
+                        resourceRequestCpu: "200m"
+                        resourceRequestMemory: "256Mi"
+                        resourceLimitMemory: "512Mi"
+                        alwaysPullImage: false
+
+                  # Skaffold agent: JNLP + skaffold + kubectl sidecars
+                  - name: "skaffold"
+                    label: "skaffold"
+                    serviceAccount: "jenkins"
+                    nodeUsageMode: "EXCLUSIVE"
+                    containers:
+                      - name: "jnlp"
+                        image: "jenkins/inbound-agent:latest-jdk21"
+                        resourceRequestCpu: "100m"
+                        resourceRequestMemory: "256Mi"
+                        resourceLimitMemory: "512Mi"
+                        alwaysPullImage: false
+                      - name: "skaffold"
+                        image: "gcr.io/k8s-skaffold/skaffold:v2.15.0"
+                        command: "cat"
+                        ttyEnabled: true
+                        resourceRequestCpu: "200m"
+                        resourceRequestMemory: "256Mi"
+                        resourceLimitMemory: "1Gi"
+                        alwaysPullImage: false
+                      - name: "kubectl"
+                        image: "bitnami/kubectl:1.31"
+                        command: "cat"
+                        ttyEnabled: true
+                        resourceRequestCpu: "50m"
+                        resourceRequestMemory: "64Mi"
+                        resourceLimitMemory: "128Mi"
+                        alwaysPullImage: false
+
+      # Disable script approval so Job DSL scripts run without manual approval
+      02-job-dsl-security: |
+        security:
+          globalJobDslSecurityConfiguration:
+            useScriptSecurity: false
+
+      # Seed job: reads groovy scripts from the mounted ConfigMap and creates all jobs
+      03-seed-job: |
+        jobs:
+          - script: |
+              job('seed-job') {
+                description('Reads Job DSL scripts from /var/jenkins_home/jobdsl/ and creates all jobs. Re-run after ConfigMap changes.')
+                triggers {
+                  cron('@hourly')
+                }
+                steps {
+                  jobDsl {
+                    targets('/var/jenkins_home/jobdsl/**/*.groovy')
+                    removedJobAction('DELETE')
+                    removedViewAction('DELETE')
+                    lookupStrategy('SEED_JOB')
+                    failOnMissingPlugin(true)
+                    ignoreMissingFiles(false)
+                    unstableOnDeprecation(false)
+                  }
+                }
+              }
+
+persistence:
+  enabled: true
+  existingClaim: "jenkins-home"
+
+rbac:
+  create: false
+
+networkPolicy:
+  enabled: false
+
+agent:
+  enabled: true
+  defaultsProviderTemplate: "default"

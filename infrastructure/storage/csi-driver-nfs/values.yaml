@@ -1,5 +1,5 @@
 # NFS CSI deployment
-# All nodes can reach TrueNAS at 192.168.10.133 via 10G switch
+# All nodes can reach TrueNAS at 192.168.100.2 via 10G switch
 
 storageClass:
   create: false

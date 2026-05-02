@@ -1,5 +1,5 @@
 # =============================================================================
-# 10G NFS Storage Classes (192.168.10.133) - via 10G switch
+# 10G NFS Storage Classes (192.168.100.2) - via 10G switch
 # =============================================================================
 
 # ComfyUI NFS storage class (10G)
@@ -9,7 +9,7 @@ metadata:
   name: nfs-comfyui-10g
 provisioner: nfs.csi.k8s.io
 parameters:
-  server: 192.168.10.133
+  server: 192.168.100.2
   share: /mnt/ai-pool/comfyui
 reclaimPolicy: Retain
 volumeBindingMode: Immediate
@@ -29,7 +29,7 @@ metadata:
   name: nfs-llama-cpp-10g
 provisioner: nfs.csi.k8s.io
 parameters:
-  server: 192.168.10.133
+  server: 192.168.100.2
   share: /mnt/ai-pool/llama-cpp
 reclaimPolicy: Retain
 volumeBindingMode: Immediate
@@ -73,5 +73,5 @@ spec:
     driver: nfs.csi.k8s.io
     volumeHandle: nfs-immich-photos
     volumeAttributes:
-      server: "192.168.10.133"
+      server: "192.168.100.2"
       share: "/mnt/BigTank/photos/All"

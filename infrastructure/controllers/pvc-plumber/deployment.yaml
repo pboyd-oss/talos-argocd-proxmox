@@ -106,7 +106,7 @@ spec:
       volumes:
       - name: repository
         nfs:
-          server: 192.168.10.133
+          server: 192.168.100.2
           path: /mnt/BigTank/k8s/volsync-kopia-nfs
       - name: kopia-tmp
         emptyDir: {}
