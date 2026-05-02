@@ -116,7 +116,7 @@ server:
   metrics:
     enabled: true
     serviceMonitor:
-      enabled: true
+      enabled: false
       additionalLabels:
         release: kube-prometheus-stack
   # VPA-optimized resources (2026-02-28)
@@ -135,7 +135,7 @@ applicationSet:
   metrics:
     enabled: true
     serviceMonitor:
-      enabled: true
+      enabled: false
       additionalLabels:
         release: kube-prometheus-stack
   # VPA-optimized resources (2026-02-24)
@@ -180,7 +180,7 @@ controller:
     applicationLabels:
       enabled: true
     serviceMonitor:
-      enabled: true
+      enabled: false
       additionalLabels:
         release: kube-prometheus-stack
   # VPA-optimized resources (2026-02-28)
@@ -188,11 +188,11 @@ controller:
   # Previous: memory 1536Mi → 4Gi (VPA lowerBound exceeded)
   resources:
     requests:
-      cpu: 2000m
-      memory: 4Gi   # Increased from 1536Mi (was below VPA lowerBound)
+      cpu: 500m
+      memory: 1Gi
     limits:
       cpu: 4000m
-      memory: 6Gi   # Increased from 4Gi to accommodate memory growth
+      memory: 6Gi
 # Argo CD repo-server settings
 repoServer:
   replicas: 2
@@ -202,7 +202,7 @@ repoServer:
   metrics:
     enabled: true
     serviceMonitor:
-      enabled: true
+      enabled: false
       additionalLabels:
         release: kube-prometheus-stack
   # VPA-optimized resources (2026-02-24)
@@ -212,11 +212,11 @@ repoServer:
   # CPU-bound (manifest generation) but low memory (template processing)
   resources:
     requests:
-      cpu: 3000m   # Match VPA target (was 1000m, tripled)
-      memory: 768Mi  # Reduced from 1Gi (VPA target only 523Mi)
+      cpu: 500m
+      memory: 512Mi
     limits:
-      cpu: 4000m   # Keep at 4000m (VPA upperBound: 28+ cores during Prometheus chart)
-      memory: 4Gi  # Keep at 4Gi (VPA upperBound: 3.95Gi for large Helm charts)
+      cpu: 4000m
+      memory: 4Gi
 # Dex is disabled; external authentication (e.g. SSO) is used
 dex:
   enabled: false
@@ -227,7 +227,7 @@ notifications:
   metrics:
     enabled: true
     serviceMonitor:
-      enabled: true
+      enabled: false
       additionalLabels:
         release: kube-prometheus-stack
 # HPA disabled — VPA handles resource optimization for this cluster.
