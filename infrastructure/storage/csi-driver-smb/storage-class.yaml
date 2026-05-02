@@ -102,6 +102,31 @@ reclaimPolicy: Retain
 volumeBindingMode: Immediate
 allowVolumeExpansion: true
 ---
+# kopia specific storage class
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: kopia-smb
+provisioner: smb.csi.k8s.io
+parameters:
+  source: //192.168.100.2/k8s/kopia
+  csi.storage.k8s.io/node-stage-secret-name: smbcreds
+  csi.storage.k8s.io/node-stage-secret-namespace: csi-driver-smb
+mountOptions:
+    - dir_mode=0770
+    - file_mode=0660
+    - vers=3.0
+    - noserverino
+    - cache=loose
+    - rsize=4194304
+    - wsize=4194304
+    - actimeo=60
+    - echo_interval=60
+    - max_credits=64
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+---
 # kiwix specific storage class
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
