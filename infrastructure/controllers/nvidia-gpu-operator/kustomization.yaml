@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: gpu-operator
 resources:
 - namespace.yaml
-- external-secret.yaml
+- sealedsecret.yaml
 - time-slicing-config.yaml
 - powerlimit-daemonset.yaml    # Caps each GPU at 220W (default 420W on RTX 3090) — see file header
 # cluster-policy.yaml intentionally not included — the Helm chart generates its

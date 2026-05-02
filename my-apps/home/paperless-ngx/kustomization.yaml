@@ -10,7 +10,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - httproute.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - tika-gotenberg.yaml
 
 configMapGenerator:

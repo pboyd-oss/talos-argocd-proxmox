@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: kopia-ui
 resources:
   - namespace.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - deployment.yaml
   - httproute.yaml
 

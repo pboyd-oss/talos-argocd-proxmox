@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: monitoring
 resources:
 - ns.yaml
-- externalsecret.yaml
+- sealedsecret.yaml
 helmCharts:
 - name: tempo
   repo: https://grafana.github.io/helm-charts

@@ -8,7 +8,7 @@ labels:
 
 resources:
   - namespace.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - nfs-photos-pvc.yaml
   - library-pvc.yaml
   - ml-cache-pvc.yaml

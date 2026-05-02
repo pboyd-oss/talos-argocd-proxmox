@@ -7,4 +7,4 @@ commonLabels:
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "-8"
 resources:
-  - externalsecret.yaml
+  - sealedsecret.yaml

@@ -13,5 +13,5 @@ commonAnnotations:
 resources:
   # - overlays/recovery      # swap to this for DR (restore from Barman)
   - overlays/initdb          # ← ACTIVE: fresh DB / normal operation
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - scheduled-backup.yaml

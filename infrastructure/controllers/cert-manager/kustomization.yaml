@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: cert-manager
 resources:
   - ns.yaml
-  - cloudflare-external-secret.yaml
+  - sealedsecret.yaml
   - cluster-issuer.yaml
 helmCharts:
   - name: cert-manager

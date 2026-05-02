@@ -4,7 +4,7 @@ namespace: temporal
 resources:
   - namespace.yaml
   - httproute.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - namespace-init-job.yaml
 
 # Shell script for the namespace-seed Job lives as its own file under

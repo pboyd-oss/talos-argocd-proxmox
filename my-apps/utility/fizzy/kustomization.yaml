@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - ns.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml

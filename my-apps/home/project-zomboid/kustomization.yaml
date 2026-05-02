@@ -6,7 +6,7 @@ namespace: project-zomboid
 resources:
   - namespace.yaml
   - pvc.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - deployment.yaml
   - service.yaml
   - pdb.yaml

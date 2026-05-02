@@ -8,7 +8,7 @@ resources:
   - service.yaml
   - servicemonitor.yaml
   - httproute.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
 namespace: frigate
 
 # Hash-suffixed ConfigMaps so any data change forces a Deployment rollout

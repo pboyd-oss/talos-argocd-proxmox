@@ -13,5 +13,5 @@ commonAnnotations:
 resources:
  # - overlays/recovery        # ← ACTIVE: restore from Barman at PITR pre-nuke
   - overlays/initdb        # swap to this for fresh DB (no recovery)
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - scheduled-backup.yaml

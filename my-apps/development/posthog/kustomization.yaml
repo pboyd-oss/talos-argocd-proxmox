@@ -4,7 +4,7 @@ namespace: posthog
 
 resources:
   - namespace.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - httproute.yaml
   # Data layer (all in posthog namespace)
   - data-layer/postgres.yaml

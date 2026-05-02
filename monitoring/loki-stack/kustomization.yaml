@@ -4,7 +4,7 @@ namespace: loki-stack
 resources:
   - ns.yaml
   - loki-http-route.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
 # Repo migrated 2026-04-27 from grafana/helm-charts to grafana-community/helm-charts.
 # Upstream Grafana split the OSS Loki Helm chart out of the main repo on 2026-03-16:
 # the original chart at grafana/helm-charts went GEL-only at v7.0.0; OSS users were

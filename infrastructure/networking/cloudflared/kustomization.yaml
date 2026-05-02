@@ -9,6 +9,6 @@ generatorOptions:
   disableNameSuffixHash: true
 resources:
   - ns.yaml
-  - external-secret.yaml
+  - sealedsecret.yaml
   - deployment.yaml
   - restart-cronjob.yaml
