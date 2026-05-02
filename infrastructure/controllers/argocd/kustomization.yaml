@@ -3,15 +3,6 @@ kind: Kustomization
 namespace: argocd
 resources:
   - ns.yaml
-  - sealed-webhook.yaml
-patches:
-  - target:
-      kind: Secret
-      name: argocd-secret
-    patch: |-
-      - op: add
-        path: /metadata/annotations/sealedsecrets.bitnami.com~1managed
-        value: "true"
   # NOTE: http-route.yaml moved to infrastructure/networking/gateway/ so it deploys
   # at wave 4 with the Gateway. Including it here (wave 0) causes a bootstrap deadlock:
   # HTTPRoute stays Progressing with no Gateway, blocking all subsequent sync waves.
