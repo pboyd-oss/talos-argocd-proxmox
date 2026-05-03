@@ -48,7 +48,7 @@ spec:
         volumeMounts:
           - name: jenkins-home
             mountPath: /var/jenkins_home
-    basePlugins:
+    plugins:
       - name: kubernetes
         version: latest
       - name: workflow-job
