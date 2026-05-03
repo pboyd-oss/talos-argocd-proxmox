@@ -6,3 +6,4 @@ resources:
   - rbac.yaml
   - httproute.yaml
   - casc-configmap.yaml
+  - jenkins.yaml
