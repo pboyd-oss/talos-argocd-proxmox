@@ -53,5 +53,5 @@ spec:
       description: "Load all pipeline definitions from repo"
       repositoryBranch: main
       repositoryUrl: https://github.com/pboyd-oss/talos-argocd-proxmox.git
-      targets: "my-apps/development/jenkins-lab/jobs/seed/**/*.groovy"
+      targets: "my-apps/development/jenkins-lab/build/seed/**/*.groovy"
       credentialType: ""

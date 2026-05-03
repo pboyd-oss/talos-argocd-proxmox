@@ -10,7 +10,7 @@ pipelineJob('deploy-dummy-nginx') {
                     branch('main')
                 }
             }
-            scriptPath('my-apps/development/jenkins-lab/jobs/deploy-dummy-nginx/Jenkinsfile')
+            scriptPath('my-apps/development/jenkins-lab/build/deploy-dummy-nginx/Jenkinsfile')
         }
     }
 }
