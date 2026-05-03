@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: jenkins-operator
+helmCharts:
+  - name: jenkins-operator
+    repo: https://jenkinsci.github.io/kubernetes-operator
+    version: "0.8.1"
+    releaseName: jenkins-operator
+    namespace: jenkins-operator
+    includeCRDs: true
+    valuesInline:
+      operator:
+        watchNamespace: ""

@@ -19,6 +19,6 @@ spec:
       backendRefs:
         - group: ""
           kind: Service
-          name: jenkins
+          name: jenkins-operator-http-jenkins
           port: 8080
           weight: 1

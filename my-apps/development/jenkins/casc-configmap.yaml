@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jenkins-casc
+  namespace: jenkins
+data:
+  01-kubernetes-cloud.yaml: |
+    jenkins:
+      clouds:
+        - kubernetes:
+            name: "kubernetes"
+            serverUrl: "https://kubernetes.default.svc"
+            namespace: "jenkins"
+            jenkinsUrl: "http://jenkins-operator-http-jenkins.jenkins.svc.cluster.local:8080"
+            jenkinsTunnel: "jenkins-operator-slave-jenkins.jenkins.svc.cluster.local:50000"
+            templates:
+              - name: "default"
+                label: "default"
+                serviceAccount: "jenkins"
+                containers:
+                  - name: "jnlp"
+                    image: "jenkins/inbound-agent:latest"
+              - name: "skaffold"
+                label: "skaffold"
+                serviceAccount: "jenkins"
+                containers:
+                  - name: "skaffold"
+                    image: "gcr.io/k8s-skaffold/skaffold:v2.15.0"
+                    command: "cat"
+                    ttyEnabled: true
+                  - name: "kubectl"
+                    image: "bitnami/kubectl:1.31"
+                    command: "cat"
+                    ttyEnabled: true
+  02-security.yaml: |
+    security:
+      globalJobDslSecurityConfiguration:
+        useScriptSecurity: false

@@ -1,0 +1,76 @@
+apiVersion: jenkins.io/v1alpha2
+kind: Jenkins
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  configurationAsCode:
+    configurations:
+      - name: jenkins-casc
+    secret:
+      name: ""
+  jenkinsAPISettings:
+    authorizationStrategy: createUser
+  master:
+    disableCSRFProtection: false
+    containers:
+      - name: jenkins-master
+        image: jenkins/jenkins:2.504.1-lts-jdk21
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /login
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 80
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /login
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1500m
+            memory: 2Gi
+        env:
+          - name: JAVA_OPTS
+            value: "-Xmx1024m -Xms256m"
+    plugins:
+      - name: kubernetes
+        version: "4361.v47b_3d9b_14da_9"
+      - name: job-dsl
+        version: "1.92"
+      - name: configuration-as-code
+        version: "1950.va_853dfdbd2a_1"
+      - name: workflow-aggregator
+        version: "600.vb_57cdd26fdd7"
+      - name: workflow-job
+        version: "1430.v8f2c6d85b_eb_f"
+      - name: git
+        version: "5.7.0"
+      - name: credentials-binding
+        version: "681.vf91669a_32e45"
+      - name: pipeline-stage-view
+        version: "2.37"
+    volumeClaims:
+      - name: jenkins-home
+        storageClassName: longhorn
+        access: ReadWriteOnce
+        capacity: 10Gi
+  seedJobs:
+    - id: seed-job
+      description: "Load all pipeline definitions from repo"
+      repositoryBranch: main
+      repositoryUrl: https://github.com/pboyd-oss/talos-argocd-proxmox.git
+      targets: "my-apps/development/jenkins/jobs/**/*.groovy"
+      credentialType: noCredentials
