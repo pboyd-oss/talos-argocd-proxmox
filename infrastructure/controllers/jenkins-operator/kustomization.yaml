@@ -9,3 +9,5 @@ helmCharts:
     namespace: jenkins-operator
     includeCRDs: true
     valuesFile: values.yaml
+resources:
+  - namespace.yaml
