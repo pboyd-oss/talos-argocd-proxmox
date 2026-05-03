@@ -29,7 +29,7 @@ data:
                     command: "cat"
                     ttyEnabled: true
                   - name: "kubectl"
-                    image: "registry.k8s.io/kubectl:v1.31.0"
+                    image: "alpine/k8s:1.31.4"
                     command: "cat"
                     ttyEnabled: true
   02-security.yaml: |
