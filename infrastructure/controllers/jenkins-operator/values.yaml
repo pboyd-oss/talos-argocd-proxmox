@@ -19,7 +19,7 @@ jenkins:
   # It's not recommended to use default namespace
   # Create new namespace for jenkins (called e.g. jenkins)
   # Note: this affects roles and rolebindings for jenkins operator itself
-  namespace: default
+  namespace: jenkins
 
   # labels are injected into metadata labels field
   labels: {}
