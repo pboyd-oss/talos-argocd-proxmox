@@ -107,7 +107,7 @@ jenkins:
     - name: job-dsl
       version: "latest"
     - name: configuration-as-code
-      version: "latest"
+      version: "2053.vb_0da_47381a_25"
     - name: kubernetes-credentials-provider
       version: "latest"
 
