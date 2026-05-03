@@ -33,19 +33,19 @@ spec:
             value: "-Xmx1024m -Xms256m -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"
     basePlugins:
       - name: kubernetes
-        version: "latest"
+        version: "4423.vb_59f230b_ce53"
       - name: workflow-job
-        version: "latest"
+        version: "1571.1580.v18e46842c125"
       - name: workflow-aggregator
-        version: "latest"
+        version: "608.v67378e9d3db_1"
       - name: git
-        version: "latest"
+        version: "5.10.1"
       - name: job-dsl
-        version: "latest"
+        version: "3654.vdf58f53e2d15"
       - name: configuration-as-code
         version: "2053.vb_0da_47381a_25"
       - name: kubernetes-credentials-provider
-        version: "latest"
+        version: "1.303.vdfcf47fb_b_fef"
     plugins: []
   seedJobs:
     - id: seed-job
@@ -53,4 +53,4 @@ spec:
       repositoryBranch: main
       repositoryUrl: https://github.com/pboyd-oss/talos-argocd-proxmox.git
       targets: "my-apps/development/jenkins-lab/jobs/**/*.groovy"
-      credentialType: noCredentials
+      credentialType: ""
