@@ -7,6 +7,7 @@ resources:
 - httproute-argocd.yaml
 # - httproute-argocd-webhook.yaml
 - httproute-longhorn.yaml
+- httproute-hubble.yaml
 
 #- gw-tcp-postgres.yaml
 generatorOptions:
