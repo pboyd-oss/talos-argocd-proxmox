@@ -1,8 +1,3 @@
-pipelineJob('deploy-dummy-nginx') {
-    description('Deploy a dummy nginx container to the cluster using skaffold')
-    definition {
-        cps {
-            script('''
 pipeline {
     agent {
         kubernetes {
@@ -12,7 +7,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/pboyd-oss/talos-argocd-proxmox.git'
+                checkout scm
             }
         }
         stage('Deploy') {
@@ -21,11 +16,6 @@ pipeline {
                     sh 'skaffold apply my-apps/development/jenkins-lab/jobs/deploy-dummy-nginx/manifests/dummy-nginx.yaml'
                 }
             }
-        }
-    }
-}
-''')
-            sandbox(true)
         }
     }
 }
