@@ -50,7 +50,7 @@ spec:
             mountPath: /var/jenkins_home
     plugins:
       - name: job-dsl
-        version: "1.87"
+        version: "3654.vdf58f53e2d15"
     volumes:
       - name: jenkins-home
         persistentVolumeClaim:
