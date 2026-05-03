@@ -95,23 +95,7 @@ jenkins:
   #
   # Example:
   #
-  basePlugins:
-    - name: kubernetes
-      version: latest
-    - name: workflow-job
-      version: latest
-    - name: workflow-aggregator
-      version: latest
-    - name: git
-      version: latest
-    - name: job-dsl
-      version: latest
-    - name: configuration-as-code
-      version: latest
-    - name: kubernetes-credentials-provider
-      version: latest
-
-  # basePlugins: []
+  basePlugins: []
 
   # plugins are plugins required by the user
   # You can define plugins here
