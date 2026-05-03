@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: jenkins-operator
 helmCharts:
   - name: jenkins-operator
-    repo: https://jenkinsci.github.io/kubernetes-operator
+    repo: https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart
     version: "0.8.1"
     releaseName: jenkins-operator
     namespace: jenkins-operator
