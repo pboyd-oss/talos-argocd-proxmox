@@ -70,11 +70,30 @@ spec:
         - .spec.dataSource
         - .spec.volumeName
         - .spec.resources.requests.storage
-      # Jenkins operator strips seedJobAgentImage on every reconcile
+      # Jenkins operator adds defaulted fields on every reconcile causing churn
       - group: jenkins.io
         kind: Jenkins
         jqPathExpressions:
         - .spec.seedJobAgentImage
+        - .spec.backup
+        - .spec.restore
+        - .spec.service
+        - .spec.slaveService
+        - .spec.serviceAccount
+        - .spec.master.plugins
+        - .spec.master.terminationGracePeriodSeconds
+        - .spec.master.containers[].command
+        - .spec.master.containers[].lifecycle
+        - .spec.master.containers[].livenessProbe
+        - .spec.master.containers[].readinessProbe
+        - .spec.seedJobs[].additionalClasspath
+        - .spec.seedJobs[].bitbucketPushTrigger
+        - .spec.seedJobs[].buildPeriodically
+        - .spec.seedJobs[].failOnMissingPlugin
+        - .spec.seedJobs[].githubPushTrigger
+        - .spec.seedJobs[].ignoreMissingFiles
+        - .spec.seedJobs[].pollSCM
+        - .spec.seedJobs[].unstableOnDeprecation
 
       info:
       - name: 'Description'
