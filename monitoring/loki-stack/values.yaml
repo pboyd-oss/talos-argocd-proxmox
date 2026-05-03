@@ -77,6 +77,12 @@ write:
 # This saves ~200Gi of Longhorn storage
 minio:
   enabled: false
+chunksCache:
+  allocatedMemory: 256
+
+resultsCache:
+  allocatedMemory: 128
+
 gateway:
   service:
     type: LoadBalancer
