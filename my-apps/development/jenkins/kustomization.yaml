@@ -6,7 +6,7 @@ resources:
   - namespace.yaml
   - pvc.yaml
   - rbac.yaml
-  - externalsecret.yaml
+  - sealedsecret.yaml
   - httproute.yaml
   - jobdsl-configmap.yaml
 
