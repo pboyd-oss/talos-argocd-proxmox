@@ -48,7 +48,7 @@ spec:
         stage('Deploy') {
             steps {
                 container('skaffold') {
-                    sh 'skaffold apply skaffold.yaml --kubeconfig=$KUBECONFIG'
+                    sh 'skaffold apply k8s.yaml --kubeconfig=$KUBECONFIG'
                 }
             }
         }
