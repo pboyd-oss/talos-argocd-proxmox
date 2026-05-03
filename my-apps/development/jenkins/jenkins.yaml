@@ -15,7 +15,7 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.504.1-lts-jdk21
+        image: jenkins/jenkins:2.452.3-lts-jdk17
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 12
@@ -49,22 +49,8 @@ spec:
           - name: jenkins-home
             mountPath: /var/jenkins_home
     plugins:
-      - name: kubernetes
-        version: "4361.v47b_3d9b_14da_9"
       - name: job-dsl
-        version: "1.92"
-      - name: configuration-as-code
-        version: "1950.va_853dfdbd2a_1"
-      - name: workflow-aggregator
-        version: "600.vb_57cdd26fdd7"
-      - name: workflow-job
-        version: "1430.v8f2c6d85b_eb_f"
-      - name: git
-        version: "5.7.0"
-      - name: credentials-binding
-        version: "681.vf91669a_32e45"
-      - name: pipeline-stage-view
-        version: "2.37"
+        version: "1.87"
     volumes:
       - name: jenkins-home
         persistentVolumeClaim:

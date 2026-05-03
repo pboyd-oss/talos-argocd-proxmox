@@ -11,7 +11,6 @@ spec:
       repoURL: https://github.com/pboyd-oss/talos-argocd-proxmox.git
       revision: main
       directories:
-      - path: infrastructure/controllers/jenkins-operator
       - path: infrastructure/controllers/cert-manager
       - path: infrastructure/controllers/external-dns
       - path: infrastructure/controllers/gpu-priority-classes
