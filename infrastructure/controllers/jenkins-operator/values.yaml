@@ -96,20 +96,20 @@ jenkins:
   # Example:
   #
   basePlugins:
-  - name: kubernetes
-    version: 4423.vb_59f230b_ce53
-  - name: workflow-job
-    version: 1581.ve4b_d0db_fcb_b_b_
-  - name: workflow-aggregator
-    version: 608.v67378e9d3db_1
-  - name: git
-    version: 5.10.1
-  - name: job-dsl
-    version: "3654.vdf58f53e2d15"
-  - name: configuration-as-code
-    version: 2053.vb_0da_47381a_25
-  - name: kubernetes-credentials-provider
-    version: 1.303.vdfcf47fb_b_fef
+    - name: kubernetes
+      version: 4423.vb_59f230b_ce53
+    - name: workflow-job
+      version: 1581.ve4b_d0db_fcb_b_b_
+    - name: workflow-aggregator
+      version: 608.v67378e9d3db_1
+    - name: git
+      version: 5.10.1
+    - name: job-dsl
+      version: "3654.vdf58f53e2d15"
+    - name: configuration-as-code
+      version: 2053.vb_0da_47381a_25
+    - name: kubernetes-credentials-provider
+      version: 1.303.vdfcf47fb_b_fef
 
   # basePlugins: []
 
