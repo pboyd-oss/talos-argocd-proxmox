@@ -15,7 +15,7 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.555.1-lts
+        image: jenkins/jenkins:2.555.1-lts-jdk25
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 12
