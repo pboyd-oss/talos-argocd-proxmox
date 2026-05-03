@@ -5,6 +5,7 @@ namespace: kopia-ui
 resources:
   - namespace.yaml
   - sealedsecret.yaml
+  - pv.yaml
   - pvc.yaml
   - deployment.yaml
   - httproute.yaml

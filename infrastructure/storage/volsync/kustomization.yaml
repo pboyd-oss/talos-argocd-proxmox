@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - sealedsecret-kopia-template.yaml
   - volumesnapshotclass.yaml
+  - pvc.yaml
   - kopia-maintenance-cronjob.yaml
   - orphan-reaper.yaml
 helmCharts:

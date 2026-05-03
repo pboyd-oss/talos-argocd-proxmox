@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kopia-repository-kopia-ui
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    namespace: kopia-ui
+    name: kopia-repository
+  mountOptions:
+    - dir_mode=0770
+    - file_mode=0660
+    - vers=3.0
+    - noserverino
+    - cache=loose
+    - rsize=4194304
+    - wsize=4194304
+    - actimeo=60
+    - echo_interval=60
+    - max_credits=64
+  csi:
+    driver: smb.csi.k8s.io
+    readOnly: false
+    volumeHandle: kopia-repository-kopia-ui
+    volumeAttributes:
+      source: "//192.168.100.2/k8s/kopia"
+    nodeStageSecretRef:
+      name: smbcreds
+      namespace: csi-driver-smb
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kopia-repository-volsync
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    namespace: volsync-system
+    name: kopia-repository
+  mountOptions:
+    - dir_mode=0770
+    - file_mode=0660
+    - vers=3.0
+    - noserverino
+    - cache=loose
+    - rsize=4194304
+    - wsize=4194304
+    - actimeo=60
+    - echo_interval=60
+    - max_credits=64
+  csi:
+    driver: smb.csi.k8s.io
+    readOnly: false
+    volumeHandle: kopia-repository-volsync
+    volumeAttributes:
+      source: "//192.168.100.2/k8s/kopia"
+    nodeStageSecretRef:
+      name: smbcreds
+      namespace: csi-driver-smb

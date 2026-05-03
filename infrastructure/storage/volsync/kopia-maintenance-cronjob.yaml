@@ -155,9 +155,8 @@ spec:
               mountPath: /tmp/kopia
           volumes:
           - name: repository
-            nfs:
-              server: 192.168.100.2
-              path: /mnt/BigTank/k8s/volsync-kopia-nfs
+            persistentVolumeClaim:
+              claimName: kopia-repository
           - name: kopia-tmp
             emptyDir: {}
           # Avoid scheduling on GPU nodes — leave their CPU for inference work
