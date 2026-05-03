@@ -1,6 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: jenkins-operator
+resources:
+  - namespace.yaml
 helmCharts:
   - name: jenkins-operator
     repo: https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart
@@ -9,5 +11,3 @@ helmCharts:
     namespace: jenkins-operator
     includeCRDs: true
     valuesFile: values.yaml
-resources:
-  - namespace.yaml
