@@ -141,7 +141,7 @@ jenkins:
   seedJobs: []
 
   # SeedJobAgentImage defines the image that will be used by the seed job agent. If not defined jenkins/inbound-agent:3248.v65ecb_254c298-6 will be used.
-  seedJobAgentImage: ""
+  seedJobAgentImage: "jenkins/inbound-agent:latest-jdk21"
 
   # skipPlugins allows to skip installation of both BasePlugins and Plugins.
   # Requires using a custom image which includes the BasePlugins.
