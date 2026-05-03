@@ -33,19 +33,19 @@ spec:
             value: "-Xmx1024m -Xms256m -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"
     plugins:
       - name: kubernetes
-        version: "4398.vb_b_33d9e7fe23"
+        version: "latest"
       - name: workflow-job
-        version: "1571.1580.v18e46842c125"
+        version: "latest"
       - name: workflow-aggregator
-        version: "608.v67378e9d3db_1"
+        version: "latest"
       - name: git
-        version: "5.8.1"
+        version: "latest"
       - name: job-dsl
-        version: "1.93"
+        version: "latest"
       - name: configuration-as-code
-        version: "2053.vb_0da_47381a_25"
+        version: "latest"
       - name: kubernetes-credentials-provider
-        version: "1.299.v610fa_e76761a_"
+        version: "latest"
   seedJobs:
     - id: seed-job
       description: "Load all pipeline definitions from repo"
