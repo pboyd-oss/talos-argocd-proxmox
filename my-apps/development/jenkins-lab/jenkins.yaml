@@ -47,6 +47,7 @@ spec:
       - name: kubernetes-credentials-provider
         version: "1.303.vdfcf47fb_b_fef"
     plugins: []
+  seedJobAgentImage: "jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job
       description: "Load all pipeline definitions from repo"
