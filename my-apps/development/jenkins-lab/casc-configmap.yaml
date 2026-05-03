@@ -19,7 +19,7 @@ data:
                 serviceAccount: "jenkins"
                 containers:
                   - name: "jnlp"
-                    image: "jenkins/inbound-agent:latest"
+                    image: "jenkins/inbound-agent:latest-jdk21"
               - name: "skaffold"
                 label: "skaffold"
                 serviceAccount: "jenkins"
