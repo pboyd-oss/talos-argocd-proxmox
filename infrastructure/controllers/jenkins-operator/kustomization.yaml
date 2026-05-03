@@ -8,6 +8,4 @@ helmCharts:
     releaseName: jenkins-operator
     namespace: jenkins-operator
     includeCRDs: true
-    valuesInline:
-      operator:
-        watchNamespace: ""
+    valuesFile: values.yaml
