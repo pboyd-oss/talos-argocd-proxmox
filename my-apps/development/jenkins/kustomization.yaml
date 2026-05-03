@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: jenkins
 resources:
   - namespace.yaml
+  - pvc.yaml
   - jenkins.yaml
   - rbac.yaml
   - httproute.yaml
