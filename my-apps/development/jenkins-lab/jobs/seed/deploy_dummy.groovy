@@ -18,7 +18,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 container('skaffold') {
-                    sh 'skaffold apply my-apps/development/jenkins-lab/jobs/manifests/dummy-nginx.yaml'
+                    sh 'skaffold apply my-apps/development/jenkins-lab/jobs/deploy-dummy-nginx/manifests/dummy-nginx.yaml'
                 }
             }
         }
