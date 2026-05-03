@@ -48,33 +48,12 @@ spec:
             memory: 2Gi
         env:
           - name: JAVA_OPTS
-            value: "-Xmx1024m -Xms256m"
-        volumeMounts:
-          - name: jenkins-home
-            mountPath: /var/jenkins_home
-    plugins:
-      - name: kubernetes
-        version: latest
-      - name: workflow-job
-        version: latest
-      - name: workflow-aggregator
-        version: latest
-      - name: git
-        version: latest
-      - name: job-dsl
-        version: latest
-      - name: configuration-as-code
-        version: latest
-      - name: kubernetes-credentials-provider
-        version: latest
-    volumes:
-      - name: jenkins-home
-        persistentVolumeClaim:
-          claimName: jenkins-home
+            value: "-Xmx1024m -Xms256m -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"
+    plugins: []
   seedJobs:
     - id: seed-job
       description: "Load all pipeline definitions from repo"
       repositoryBranch: main
       repositoryUrl: https://github.com/pboyd-oss/talos-argocd-proxmox.git
-      targets: "my-apps/development/jenkins/jobs/**/*.groovy"
+      targets: "my-apps/development/jenkins-lab/jobs/**/*.groovy"
       credentialType: noCredentials
