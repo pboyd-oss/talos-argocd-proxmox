@@ -68,6 +68,7 @@ spec:
         version: "1.303.vdfcf47fb_b_fef"
     plugins:
       - name: pipeline-utility-steps
+        version: "latest"
         downloadURL: "https://updates.jenkins.io/latest/pipeline-utility-steps.hpi"
   seedJobAgentImage: "jenkins/inbound-agent:latest-jdk21"
   seedJobs:
