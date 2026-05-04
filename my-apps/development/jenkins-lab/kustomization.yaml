@@ -9,3 +9,4 @@ resources:
   - jenkins.yaml
   - registry-secret.yaml
   - gitea-registry-sealedsecret.yaml
+  - kaniko-docker-config-sealedsecret.yaml
