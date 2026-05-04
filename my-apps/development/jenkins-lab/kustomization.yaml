@@ -9,3 +9,4 @@ resources:
   - jenkins.yaml
   - gitea-docker-cfg-sealedsecret.yaml
   - deploy-sa-rbac.yaml
+  - cosign-key-sealedsecret.yaml

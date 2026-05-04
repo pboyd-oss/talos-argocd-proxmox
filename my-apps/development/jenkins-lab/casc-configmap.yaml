@@ -23,6 +23,15 @@ data:
               - name: "skaffold"
                 label: "skaffold"
                 serviceAccount: "jenkins"
+                volumes:
+                  - secretVolume:
+                      mountPath: "/cosign-key"
+                      secretName: "cosign-key"
+                      readOnly: true
+                  - secretVolume:
+                      mountPath: "/root/.docker"
+                      secretName: "gitea-docker-cfg"
+                      readOnly: true
                 containers:
                   - name: "skaffold"
                     image: "gcr.io/k8s-skaffold/skaffold:v2.15.0"
@@ -34,6 +43,14 @@ data:
                     ttyEnabled: true
                   - name: "golang"
                     image: "golang:1.23"
+                    command: "cat"
+                    ttyEnabled: true
+                  - name: "cosign"
+                    image: "gcr.io/projectsigstore/cosign:v2.5.2"
+                    command: "cat"
+                    ttyEnabled: true
+                  - name: "syft"
+                    image: "anchore/syft:v1.21.0"
                     command: "cat"
                     ttyEnabled: true
   02-global-env.yaml: |
