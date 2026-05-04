@@ -18,6 +18,7 @@ resources:
   # ApplicationSets for automatic discovery
   - infrastructure-appset.yaml  # Wave 4
 #  - database-appset.yaml        # Wave 4 - Database operators/instances (selfHeal: false for DR)
+  - cnpg-operator-app.yaml      # Wave 3 - CNPG operator (must be healthy before database clusters)
   - gitea-database-app.yaml     # Wave 4 - Gitea CNPG database (standalone, not via AppSet)
 #  - opentelemetry-operator-app.yaml # Wave 5 - OTEL (needs cert-manager from Wave 4)
 #  - monitoring-appset.yaml      # Wave 5
