@@ -82,20 +82,8 @@ spec:
         - .spec.serviceAccount
         - .spec.master.plugins
         - .spec.master.terminationGracePeriodSeconds
-        - .spec.master.containers[].command
-        - .spec.master.containers[].env
-        - .spec.master.containers[].lifecycle
-        - .spec.master.containers[].livenessProbe
-        - .spec.master.containers[].readinessProbe
-        - .spec.seedJobs[].additionalClasspath
-        - .spec.seedJobs[].bitbucketPushTrigger
-        - .spec.seedJobs[].buildPeriodically
-        - .spec.seedJobs[].failOnMissingPlugin
-        - .spec.seedJobs[].githubPushTrigger
-        - .spec.seedJobs[].ignoreMissingFiles
-        - .spec.seedJobs[].pollSCM
-        - .spec.seedJobs[].unstableOnDeprecation
-        - .spec.seedJobs[].credentialType
+        - .spec.master.containers
+        - .spec.seedJobs
 
       info:
       - name: 'Description'
