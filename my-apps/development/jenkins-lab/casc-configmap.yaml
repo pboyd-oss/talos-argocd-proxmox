@@ -59,3 +59,14 @@ data:
                 scm:
                   git:
                     remote: "https://github.com/pboyd-oss/jenkins-library.git"
+  05-credentials.yaml: |
+    credentials:
+      system:
+        domainCredentials:
+          - credentials:
+              - usernamePassword:
+                  id: "gitea-registry"
+                  description: "Gitea Docker Registry"
+                  scope: GLOBAL
+                  username: "${username}"
+                  password: "${password}"

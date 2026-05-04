@@ -8,7 +8,7 @@ spec:
     configurations:
       - name: jenkins-casc
     secret:
-      name: ""
+      name: "gitea-registry"
   groovyScripts:
     configurations: []
     secret:
