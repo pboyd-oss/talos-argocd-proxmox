@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: harbor
+
+resources:
+  - namespace.yaml
+  - httproute.yaml
+  - pvc-registry.yaml
+  - sealedsecret.yaml
+
+helmCharts:
+  - name: harbor
+    repo: https://helm.goharbor.io
+    version: 1.18.3
+    releaseName: harbor
+    namespace: harbor
+    valuesFile: values.yaml
+
+patches:
+  # Harbor deployments use RWO PVCs — RollingUpdate causes Multi-Attach deadlock
+  - patch: |
+      - op: replace
+        path: /spec/strategy
+        value:
+          type: Recreate
+    target:
+      kind: Deployment
+      namespace: harbor

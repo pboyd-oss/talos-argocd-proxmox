@@ -1,0 +1,96 @@
+expose:
+  type: clusterIP
+  tls:
+    enabled: false
+    certSource: none
+  clusterIP:
+    name: harbor
+    ports:
+      httpPort: 80
+      httpsPort: 443
+
+# TLS is terminated at gateway-internal; Harbor itself speaks plain HTTP internally.
+externalURL: https://harbor.tuxgrid.com
+
+existingSecretAdminPassword: harbor-admin
+existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
+
+persistence:
+  enabled: true
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+    registry:
+      # Pre-created PVC with backup:daily label (pvc-registry.yaml)
+      existingClaim: harbor-registry
+      accessMode: ReadWriteOnce
+    jobservice:
+      jobLog:
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 5Gi
+    database:
+      storageClass: longhorn
+      accessMode: ReadWriteOnce
+      size: 5Gi
+    redis:
+      storageClass: longhorn
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    trivy:
+      storageClass: longhorn
+      accessMode: ReadWriteOnce
+      size: 5Gi
+
+database:
+  type: internal
+
+redis:
+  type: internal
+
+trivy:
+  enabled: true
+
+core:
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+portal:
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 50m
+    limits:
+      memory: 256Mi
+      cpu: 250m
+
+registry:
+  registry:
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
+  controller:
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 50m
+      limits:
+        memory: 256Mi
+        cpu: 250m
+
+jobservice:
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 50m
+    limits:
+      memory: 256Mi
+      cpu: 250m
