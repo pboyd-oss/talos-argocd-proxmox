@@ -83,6 +83,7 @@ spec:
         - .spec.master.plugins
         - .spec.master.terminationGracePeriodSeconds
         - .spec.master.containers[].command
+        - .spec.master.containers[].env
         - .spec.master.containers[].lifecycle
         - .spec.master.containers[].livenessProbe
         - .spec.master.containers[].readinessProbe
@@ -94,6 +95,7 @@ spec:
         - .spec.seedJobs[].ignoreMissingFiles
         - .spec.seedJobs[].pollSCM
         - .spec.seedJobs[].unstableOnDeprecation
+        - .spec.seedJobs[].credentialType
 
       info:
       - name: 'Description'
