@@ -58,7 +58,5 @@ data:
             retriever:
               modernSCM:
                 scm:
-                  gitSCM:
-                    userRemoteConfigs:
-                      - userRemoteConfig:
-                          url: "https://github.com/pboyd-oss/jenkins-library.git"
+                  git:
+                    remote: "https://github.com/pboyd-oss/jenkins-library.git"
