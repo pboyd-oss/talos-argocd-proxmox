@@ -49,13 +49,6 @@ spec:
           periodSeconds: 10
           failureThreshold: 6
           timeoutSeconds: 5
-        volumeMounts:
-          - name: jenkins-data
-            mountPath: /var/lib/jenkins
-    volumes:
-      - name: jenkins-data
-        persistentVolumeClaim:
-          claimName: jenkins-home
     basePlugins:
       - name: kubernetes
         version: "4423.vb_59f230b_ce53"
