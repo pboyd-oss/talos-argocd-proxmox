@@ -43,6 +43,14 @@ data:
                     image: "golang:1.23"
                     command: "cat"
                     ttyEnabled: true
+                  - name: "cosign"
+                    image: "cgr.dev/chainguard/cosign:latest-dev"
+                    command: "cat"
+                    ttyEnabled: true
+                  - name: "syft"
+                    image: "cgr.dev/chainguard/syft:latest-dev"
+                    command: "cat"
+                    ttyEnabled: true
   02-global-env.yaml: |
     jenkins:
       globalNodeProperties:
