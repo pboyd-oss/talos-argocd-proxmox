@@ -36,23 +36,22 @@ data:
                     image: "gcr.io/kaniko-project/executor:debug"
                     command: "cat"
                     ttyEnabled: true
-                    envVars:
-                      - envVar:
-                          key: "DOCKER_CONFIG"
-                          value: "/kaniko/.docker"
                   - name: "golang"
                     image: "golang:1.23"
                     command: "cat"
                     ttyEnabled: true
-                volumes:
-                  - secretVolume:
-                      secretName: "registry-credentials"
-                      mountPath: "/kaniko/.docker"
-  02-security.yaml: |
+  02-global-env.yaml: |
+    jenkins:
+      globalNodeProperties:
+        - envVars:
+            env:
+              - key: "REGISTRY"
+                value: "gitea.tuxgrid.com/pboyd"
+  03-security.yaml: |
     security:
       globalJobDslSecurityConfiguration:
         useScriptSecurity: false
-  03-global-library.yaml: |
+  04-global-library.yaml: |
     unclassified:
       globalLibraries:
         libraries:

@@ -8,3 +8,4 @@ resources:
   - casc-configmap.yaml
   - jenkins.yaml
   - registry-secret.yaml
+  - gitea-registry-sealedsecret.yaml
