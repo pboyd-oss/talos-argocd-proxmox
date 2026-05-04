@@ -3,8 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: harbor-registry
   namespace: harbor
-  labels:
-    backup: "daily"
+  labels: {}
 spec:
   accessModes:
     - ReadWriteOnce
