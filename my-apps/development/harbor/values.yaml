@@ -20,7 +20,6 @@ persistence:
   resourcePolicy: "keep"
   persistentVolumeClaim:
     registry:
-      # Pre-created PVC with backup:daily label (pvc-registry.yaml)
       existingClaim: harbor-registry
       accessMode: ReadWriteOnce
     jobservice:
