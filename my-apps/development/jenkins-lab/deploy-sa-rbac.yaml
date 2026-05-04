@@ -1,0 +1,68 @@
+# TODO: Restrict deploy-sa to team-* namespaces only.
+# Currently ClusterRoleBinding grants cluster-wide deploy permissions.
+# Replace with a Kyverno generate policy that creates RoleBindings in
+# each team-* namespace automatically when they are provisioned.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deploy-sa
+  namespace: jenkins
+---
+# Full deploy permissions for the deploy service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jenkins-app-deployer
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces", "serviceaccounts", "services", "configmaps", "pods", "pods/log"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "rolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["httproutes"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-app-deployer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: jenkins-app-deployer
+subjects:
+  - kind: ServiceAccount
+    name: deploy-sa
+    namespace: jenkins
+---
+# Allow jenkins SA to mint short-lived tokens for deploy-sa only
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: jenkins-deploy-sa-token
+  namespace: jenkins
+rules:
+  - apiGroups: [""]
+    resources: ["serviceaccounts/token"]
+    verbs: ["create"]
+    resourceNames: ["deploy-sa"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: jenkins-deploy-sa-token
+  namespace: jenkins
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: jenkins-deploy-sa-token
+subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: jenkins

@@ -8,3 +8,4 @@ resources:
   - casc-configmap.yaml
   - jenkins.yaml
   - gitea-docker-cfg-sealedsecret.yaml
+  - deploy-sa-rbac.yaml
