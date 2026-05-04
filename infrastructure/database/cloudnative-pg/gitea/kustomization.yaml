@@ -23,4 +23,3 @@ resources:
   # - overlays/recovery      # swap to this for DR (restore from Barman)
   - overlays/initdb          # ← ACTIVE: fresh DB / normal operation
   - sealedsecret.yaml
-  - scheduled-backup.yaml
