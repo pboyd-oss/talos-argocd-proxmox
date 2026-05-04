@@ -3,14 +3,14 @@
 #
 # Prerequisites:
 #   - Docker (or Podman) on the machine running this script.
-#   - Network reachability to registry.vanillax.me (internal gateway at
-#     192.168.10.50, or Cloudflare tunnel from outside the LAN).
+#   - Network reachability to registry.tuxgrid.com (internal gateway at
+#     192.168.100.221, or Cloudflare tunnel from outside the LAN).
 #   - No auth needed — the in-cluster registry at kube-system/registry:5000
 #     is anonymous-push.
 #
 # What gets built:
-#   registry.vanillax.me/news-reader:latest      (Next.js RSS reader UI)
-#   registry.vanillax.me/temporal-worker:latest  (Python Temporal worker)
+#   registry.tuxgrid.com/news-reader:latest      (Next.js RSS reader UI)
+#   registry.tuxgrid.com/temporal-worker:latest  (Python Temporal worker)
 #
 # After push, the two pending pods auto-heal once kubelet retries the pull:
 #   kubectl rollout restart -n news-reader      deploy/news-reader
@@ -23,7 +23,7 @@
 
 set -euo pipefail
 
-REGISTRY="${REGISTRY:-registry.vanillax.me}"
+REGISTRY="${REGISTRY:-registry.tuxgrid.com}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNTIME="${RUNTIME:-docker}"  # override with RUNTIME=podman if preferred
 

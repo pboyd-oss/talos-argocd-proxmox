@@ -25,6 +25,11 @@ podSecurityContext:
 
 gitea:
   config:
+    server:
+      DOMAIN: gitea.tuxgrid.com
+      ROOT_URL: https://gitea.tuxgrid.com
+    packages:
+      ENABLED: true
     database:
       DB_TYPE: postgres
       HOST: gitea-database-rw.cloudnative-pg.svc.cluster.local:5432

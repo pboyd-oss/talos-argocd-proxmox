@@ -15,32 +15,32 @@ vert.vanillax.me    192.168.10.49
 
 # ==========================================
 # INTERNAL SERVICES (Required - LAN ONLY!)
-# Point to gateway-internal (192.168.10.50)
+# Point to gateway-internal (192.168.100.221)
 # NEVER add these to Cloudflare!
 # ==========================================
 
-argocd.vanillax.me    192.168.10.50
-comfyui.vanillax.me    192.168.10.50
-echo.vanillax.me    192.168.10.50
-frigate.vanillax.me    192.168.10.50
-garage.vanillax.me    192.168.10.50
-gitea.vanillax.me    192.168.10.50
-headlamp.vanillax.me    192.168.10.50
-homeassistant.vanillax.me    192.168.10.50
-homepage.vanillax.me    192.168.10.50
-jellyfin.vanillax.me    192.168.10.50
-llama.vanillax.me    192.168.10.50
-longhorn.vanillax.me#Youcanchangethishostname    192.168.10.50
-n8n.vanillax.me    192.168.10.50
-nestmtx.vanillax.me    192.168.10.50
-netbox.vanillax.me    192.168.10.50
-nginx.vanillax.me    192.168.10.50
-ollama.vanillax.me    192.168.10.50
-ollamawebui.vanillax.me    192.168.10.50
-paperless.vanillax.me    192.168.10.50
-photos.vanillax.me    192.168.10.50
-redis.vanillax.me    192.168.10.50
-registry.vanillax.me    192.168.10.50
-temporal.vanillax.me    192.168.10.50
-tube.vanillax.me    192.168.10.50
-wyzebridge.vanillax.me    192.168.10.50
+argocd.vanillax.me    192.168.100.221
+comfyui.vanillax.me    192.168.100.221
+echo.vanillax.me    192.168.100.221
+frigate.vanillax.me    192.168.100.221
+garage.vanillax.me    192.168.100.221
+gitea.tuxgrid.com    192.168.100.221
+headlamp.vanillax.me    192.168.100.221
+homeassistant.vanillax.me    192.168.100.221
+homepage.vanillax.me    192.168.100.221
+jellyfin.vanillax.me    192.168.100.221
+llama.vanillax.me    192.168.100.221
+longhorn.vanillax.me#Youcanchangethishostname    192.168.100.221
+n8n.vanillax.me    192.168.100.221
+nestmtx.vanillax.me    192.168.100.221
+netbox.vanillax.me    192.168.100.221
+nginx.vanillax.me    192.168.100.221
+ollama.vanillax.me    192.168.100.221
+ollamawebui.vanillax.me    192.168.100.221
+paperless.vanillax.me    192.168.100.221
+photos.vanillax.me    192.168.100.221
+redis.vanillax.me    192.168.100.221
+registry.tuxgrid.com    192.168.100.221
+temporal.vanillax.me    192.168.100.221
+tube.vanillax.me    192.168.100.221
+wyzebridge.vanillax.me    192.168.100.221

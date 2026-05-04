@@ -161,7 +161,7 @@ machine:
 - More expressive API
 
 **Resources in this cluster:**
-- `gateway/gateway-internal.yaml` - Internal services (192.168.10.50)
+- `gateway/gateway-internal.yaml` - Internal services (192.168.100.221)
 - `gateway/gateway-external.yaml` - External services (192.168.10.49)
 
 **HTTPRoutes:**
@@ -175,8 +175,8 @@ machine:
 
 ```
 User Browser
-    ↓ DNS: argocd.tuxgrid.com → 192.168.10.50
-Cilium Gateway (192.168.10.50:443)
+    ↓ DNS: argocd.tuxgrid.com → 192.168.100.221
+Cilium Gateway (192.168.100.221:443)
     ↓ TLS termination
     ↓ HTTPRoute: argocd-server service
 Cilium Service LB
@@ -261,8 +261,8 @@ kubectl get ciliumloadbalancerippool -A
 **Check ARP announcements:**
 ```bash
 # From external host on same network
-ping 192.168.10.50
-arp -a | grep 192.168.10.50
+ping 192.168.100.221
+arp -a | grep 192.168.100.221
 ```
 
 ## Performance Tuning
@@ -318,7 +318,7 @@ gatewayAPI:
 - `allowFirstLastIPs: "No"` — `.32` and `.63` are reserved for network/broadcast, not used
 - Current assignments:
   - `192.168.10.49` — `gateway-external`
-  - `192.168.10.50` — `gateway-internal`
+  - `192.168.100.221` — `gateway-internal`
   - `192.168.10.51` — `project-zomboid` (UDP game server)
 - Managed by: Cilium L2 announcements (`cilium/l2-policy.yaml`)
 

@@ -364,7 +364,7 @@ kind: ConfigMap
 metadata:
   name: project-nomad-config
 data:
-  KIWIX_URL: "http://192.168.10.50:8080"   # BYO Kiwix on LAN
+  KIWIX_URL: "http://192.168.100.221:8080"   # BYO Kiwix on LAN
   REDIS_HOST: "redis.my-other-namespace.svc.cluster.local"  # BYO Redis
 ```
 
