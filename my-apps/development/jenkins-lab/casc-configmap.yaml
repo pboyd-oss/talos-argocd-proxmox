@@ -40,6 +40,10 @@ data:
                       - envVar:
                           key: "DOCKER_CONFIG"
                           value: "/kaniko/.docker"
+                  - name: "golang"
+                    image: "golang:1.23"
+                    command: "cat"
+                    ttyEnabled: true
                 volumes:
                   - secretVolume:
                       secretName: "registry-credentials"
