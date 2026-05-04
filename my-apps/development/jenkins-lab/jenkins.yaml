@@ -50,11 +50,11 @@ spec:
           failureThreshold: 6
           timeoutSeconds: 5
     volumes:
-      - name: jenkins-home
+      - name: jenkins-data
         persistentVolumeClaim:
           claimName: jenkins-home
     volumeMounts:
-      - name: jenkins-home
+      - name: jenkins-data
         mountPath: /var/lib/jenkins
     basePlugins:
       - name: kubernetes
