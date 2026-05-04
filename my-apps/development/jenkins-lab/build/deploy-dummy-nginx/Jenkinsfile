@@ -26,7 +26,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 container('skaffold') {
-                    sh 'cd my-apps/development/jenkins-lab/build/deploy-dummy-nginx && skaffold run --prune'
+                    sh 'cd my-apps/development/jenkins-lab/build/deploy-dummy-nginx && skaffold run'
                 }
             }
         }
