@@ -48,3 +48,15 @@ data:
     security:
       globalJobDslSecurityConfiguration:
         useScriptSecurity: false
+  03-global-library.yaml: |
+    unclassified:
+      globalLibraries:
+        libraries:
+          - name: "jenkins-library"
+            defaultVersion: "main"
+            implicit: true
+            retriever:
+              modernSCM:
+                scm:
+                  git:
+                    remote: "https://github.com/pboyd-oss/jenkins-library.git"

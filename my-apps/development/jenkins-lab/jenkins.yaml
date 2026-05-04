@@ -50,8 +50,8 @@ spec:
   seedJobAgentImage: "jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job
-      description: "Load all pipeline definitions from repo"
+      description: "Load all pipeline definitions"
       repositoryBranch: main
-      repositoryUrl: https://github.com/pboyd-oss/talos-argocd-proxmox.git
-      targets: "my-apps/development/jenkins-lab/build/seed/**/*.groovy"
+      repositoryUrl: https://github.com/pboyd-oss/seed-jobs.git
+      targets: "jobs/**/*.groovy"
       credentialType: ""
