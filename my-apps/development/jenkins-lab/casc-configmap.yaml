@@ -44,11 +44,11 @@ data:
                     command: "cat"
                     ttyEnabled: true
                   - name: "cosign"
-                    image: "gcr.io/projectsigstore/cosign:v2.5.2"
+                    image: "gcr.io/projectsigstore/cosign:debug"
                     command: "cat"
                     ttyEnabled: true
                   - name: "syft"
-                    image: "anchore/syft:v1.21.0"
+                    image: "anchore/syft:v1.21.0-debug"
                     command: "cat"
                     ttyEnabled: true
   02-global-env.yaml: |
