@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitea-database
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: infrastructure
+  revisionHistoryLimit: 3
+  source:
+    repoURL: https://github.com/pboyd-oss/talos-argocd-proxmox.git
+    targetRevision: main
+    path: infrastructure/database/cloudnative-pg/gitea
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cloudnative-pg
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+    - RespectIgnoreDifferences=true
+    - Replace=false
+    retry:
+      limit: -1
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 10m
+  ignoreDifferences:
+  - group: postgresql.cnpg.io
+    kind: Cluster
+    jsonPointers:
+    - /metadata/generation
+  - group: ""
+    kind: PersistentVolumeClaim
+    jqPathExpressions:
+    - .spec.dataSourceRef
+    - .spec.dataSource
+    - .spec.volumeName
+    - .spec.resources.requests.storage
