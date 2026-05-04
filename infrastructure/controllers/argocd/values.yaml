@@ -186,10 +186,11 @@ controller:
   # VPA-optimized resources (2026-02-28)
   # VPA target: cpu 2048m, memory 3.5Gi — memory below lowerBound
   # Previous: memory 1536Mi → 4Gi (VPA lowerBound exceeded)
+  # Temporarily lowered request to 256Mi to schedule while t6dppn node is down
   resources:
     requests:
       cpu: 500m
-      memory: 1Gi
+      memory: 256Mi
     limits:
       cpu: 4000m
       memory: 6Gi
