@@ -32,10 +32,6 @@ data:
                     image: "alpine/k8s:1.31.4"
                     command: "cat"
                     ttyEnabled: true
-                  - name: "kaniko"
-                    image: "gcr.io/kaniko-project/executor:debug"
-                    command: "cat"
-                    ttyEnabled: true
                   - name: "golang"
                     image: "golang:1.23"
                     command: "cat"
