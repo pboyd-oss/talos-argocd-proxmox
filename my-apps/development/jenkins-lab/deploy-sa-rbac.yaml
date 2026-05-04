@@ -41,28 +41,3 @@ subjects:
     name: deploy-sa
     namespace: jenkins
 ---
-# Allow jenkins SA to mint short-lived tokens for deploy-sa only
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: jenkins-deploy-sa-token
-  namespace: jenkins
-rules:
-  - apiGroups: [""]
-    resources: ["serviceaccounts/token"]
-    verbs: ["create"]
-    resourceNames: ["deploy-sa"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: jenkins-deploy-sa-token
-  namespace: jenkins
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: jenkins-deploy-sa-token
-subjects:
-  - kind: ServiceAccount
-    name: jenkins
-    namespace: jenkins

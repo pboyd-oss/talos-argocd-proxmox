@@ -36,6 +36,14 @@ data:
                     image: "golang:1.23"
                     command: "cat"
                     ttyEnabled: true
+              - name: "deploy"
+                label: "deploy"
+                serviceAccount: "deploy-sa"
+                containers:
+                  - name: "skaffold"
+                    image: "gcr.io/k8s-skaffold/skaffold:v2.15.0"
+                    command: "cat"
+                    ttyEnabled: true
   02-global-env.yaml: |
     jenkins:
       globalNodeProperties:
