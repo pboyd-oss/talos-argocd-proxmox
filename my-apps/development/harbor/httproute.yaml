@@ -19,6 +19,6 @@ spec:
       backendRefs:
         - group: ""
           kind: Service
-          name: harbor
+          name: harbor-nginx
           port: 80
           weight: 1
