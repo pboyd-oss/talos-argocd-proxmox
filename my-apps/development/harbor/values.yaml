@@ -45,6 +45,7 @@ database:
   podAnnotations: {}
   livenessProbe:
     timeoutSeconds: 5
+    failureThreshold: 10
   readinessProbe:
     timeoutSeconds: 5
 
