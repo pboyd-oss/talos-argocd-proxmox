@@ -4,7 +4,7 @@ namespace: jenkins-operator
 helmCharts:
   - name: jenkins-operator
     repo: https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart
-    version: "0.9.0-beta2"
+    version: "0.8.0"
     releaseName: jenkins-operator
     namespace: jenkins-operator
     includeCRDs: true
