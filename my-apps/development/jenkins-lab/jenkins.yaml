@@ -31,6 +31,26 @@ spec:
         env:
           - name: JAVA_OPTS
             value: "-Xmx1024m -Xms256m -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"
+        livenessProbe:
+          httpGet:
+            path: /login
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 420
+          periodSeconds: 30
+          failureThreshold: 10
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /login
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 15
+          failureThreshold: 20
+          successThreshold: 1
+          timeoutSeconds: 10
     basePlugins:
       - name: kubernetes
         version: "4423.vb_59f230b_ce53"
