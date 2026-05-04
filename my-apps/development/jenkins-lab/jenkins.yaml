@@ -31,6 +31,24 @@ spec:
         env:
           - name: JAVA_OPTS
             value: "-Xmx1024m -Xms256m -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"
+        livenessProbe:
+          httpGet:
+            path: /login
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          failureThreshold: 6
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /login
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 6
+          timeoutSeconds: 5
     volumes:
       - name: jenkins-home
         persistentVolumeClaim:
