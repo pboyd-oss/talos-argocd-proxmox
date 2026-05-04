@@ -27,11 +27,9 @@ data:
                   - secretVolume:
                       mountPath: "/cosign-key"
                       secretName: "cosign-key"
-                      readOnly: true
                   - secretVolume:
                       mountPath: "/root/.docker"
                       secretName: "gitea-docker-cfg"
-                      readOnly: true
                 containers:
                   - name: "skaffold"
                     image: "gcr.io/k8s-skaffold/skaffold:v2.15.0"

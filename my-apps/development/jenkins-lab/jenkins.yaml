@@ -68,7 +68,7 @@ spec:
         version: "1.303.vdfcf47fb_b_fef"
     plugins:
       - name: pipeline-utility-steps
-        version: "latest"
+        version: "2.20.0"
   seedJobAgentImage: "jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job
