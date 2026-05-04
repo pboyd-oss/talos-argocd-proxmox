@@ -19,7 +19,7 @@ data:
                 serviceAccount: "jenkins"
                 containers:
                   - name: "jnlp"
-                    image: "jenkins/inbound-agent:latest-jdk21"
+                    image: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
               - name: "skaffold"
                 label: "skaffold"
                 serviceAccount: "jenkins"
@@ -32,15 +32,15 @@ data:
                       secretName: "gitea-docker-cfg"
                 containers:
                   - name: "skaffold"
-                    image: "gcr.io/k8s-skaffold/skaffold:v2.15.0"
+                    image: "harbor.tuxgrid.com/gcr.io/k8s-skaffold/skaffold:v2.15.0"
                     command: "cat"
                     ttyEnabled: true
                   - name: "kubectl"
-                    image: "alpine/k8s:1.31.4"
+                    image: "harbor.tuxgrid.com/docker.io/alpine/k8s:1.31.4"
                     command: "cat"
                     ttyEnabled: true
                   - name: "golang"
-                    image: "golang:1.23"
+                    image: "harbor.tuxgrid.com/docker.io/golang:1.23"
                     command: "cat"
                     ttyEnabled: true
   02-global-env.yaml: |

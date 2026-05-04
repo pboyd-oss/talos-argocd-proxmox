@@ -19,7 +19,7 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.555.1-lts-jdk21
+        image: harbor.tuxgrid.com/docker.io/jenkins/jenkins:2.555.1-lts-jdk21
         imagePullPolicy: IfNotPresent
         resources:
           requests:
@@ -69,7 +69,7 @@ spec:
     plugins:
       - name: pipeline-utility-steps
         version: "2.20.0"
-  seedJobAgentImage: "jenkins/inbound-agent:latest-jdk21"
+  seedJobAgentImage: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job
       description: "Load all pipeline definitions"
