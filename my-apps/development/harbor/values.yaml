@@ -42,6 +42,11 @@ persistence:
 
 database:
   type: internal
+  podAnnotations: {}
+  livenessProbe:
+    timeoutSeconds: 5
+  readinessProbe:
+    timeoutSeconds: 5
 
 redis:
   type: internal
