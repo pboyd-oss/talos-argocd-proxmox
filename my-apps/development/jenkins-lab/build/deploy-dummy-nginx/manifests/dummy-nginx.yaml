@@ -13,6 +13,7 @@ spec:
       labels:
         app: dummy-nginx
     spec:
+      serviceAccountName: dummy-nginx
       containers:
         - name: nginx
           image: nginx:alpine
