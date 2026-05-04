@@ -7,3 +7,4 @@ resources:
   - httproute.yaml
   - casc-configmap.yaml
   - jenkins.yaml
+  - registry-secret.yaml

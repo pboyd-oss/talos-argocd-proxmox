@@ -32,6 +32,18 @@ data:
                     image: "alpine/k8s:1.31.4"
                     command: "cat"
                     ttyEnabled: true
+                  - name: "kaniko"
+                    image: "gcr.io/kaniko-project/executor:debug"
+                    command: "cat"
+                    ttyEnabled: true
+                    envVars:
+                      - envVar:
+                          key: "DOCKER_CONFIG"
+                          value: "/kaniko/.docker"
+                volumes:
+                  - secretVolume:
+                      secretName: "registry-credentials"
+                      mountPath: "/kaniko/.docker"
   02-security.yaml: |
     security:
       globalJobDslSecurityConfiguration:
