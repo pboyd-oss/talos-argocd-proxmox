@@ -4,7 +4,7 @@ expose:
     enabled: false
     certSource: none
   clusterIP:
-    name: harbor
+    name: harbor-nginx
     ports:
       httpPort: 80
       httpsPort: 443
