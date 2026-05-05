@@ -11,6 +11,7 @@ resources:
   - deploy-sa-rbac.yaml
   - cosign-key-sealedsecret.yaml
   - token-service-token-sealedsecret.yaml
+  - jenkins-credentials-sealedsecret.yaml
 
 configMapGenerator:
   - name: jenkins-groovy-init
