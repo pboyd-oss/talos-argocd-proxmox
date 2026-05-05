@@ -21,7 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	stypes "github.com/aws/aws-sdk-go-v2/service/sts/types"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"gopkg.in/yaml.v3"
 )
 
@@ -55,7 +55,6 @@ type teamConfig struct {
 var teamSlugRe = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
 
 var (
-	jenkinsJWKSURL      = envOrDefault("JENKINS_JWKS_URL", "http://jenkins-operator-http-jenkins.jenkins.svc.cluster.local:8080/oidc/jwks")
 	jenkinsBaseURL      = envOrDefault("JENKINS_URL", "http://jenkins-operator-http-jenkins.jenkins.svc.cluster.local:8080")
 	jenkinsAPIUser      = envOrDefault("JENKINS_API_USER", "token-service")
 	jenkinsAPIToken     = os.Getenv("JENKINS_API_TOKEN")
@@ -186,32 +185,23 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(creds)
 }
 
-// verifyJWT fetches the Jenkins JWKS and validates the token signature and audience.
-func verifyJWT(rawToken string) (jwt.MapClaims, error) {
-	keyFunc := func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		resp, err := http.Get(jenkinsJWKSURL)
-		if err != nil {
-			return nil, fmt.Errorf("fetching JWKS: %w", err)
-		}
-		defer resp.Body.Close()
-		// Expect a single PEM-wrapped public key from Jenkins' /oidc/jwks endpoint
-		data, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, fmt.Errorf("reading JWKS: %w", err)
-		}
-		return jwt.ParseRSAPublicKeyFromPEM(data)
-	}
-
-	token, err := jwt.Parse(rawToken, keyFunc, jwt.WithAudiences("platform-token-service"))
+// verifyJWT validates the token against Jenkins' OIDC provider via discovery.
+// go-oidc fetches /.well-known/openid-configuration, resolves the JWKS URI,
+// and verifies signature + audience in one call.
+func verifyJWT(rawToken string) (map[string]interface{}, error) {
+	ctx := context.Background()
+	provider, err := oidc.NewProvider(ctx, jenkinsBaseURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("OIDC discovery failed: %w", err)
 	}
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return nil, fmt.Errorf("invalid claims")
+	verifier := provider.Verifier(&oidc.Config{ClientID: "platform-token-service"})
+	idToken, err := verifier.Verify(ctx, rawToken)
+	if err != nil {
+		return nil, fmt.Errorf("token verification failed: %w", err)
+	}
+	var claims map[string]interface{}
+	if err := idToken.Claims(&claims); err != nil {
+		return nil, fmt.Errorf("extracting claims: %w", err)
 	}
 	return claims, nil
 }
