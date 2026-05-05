@@ -17,18 +17,12 @@ data:
               - name: "default"
                 label: "default"
                 serviceAccount: "jenkins"
-                podLabels:
-                  - key: "role"
-                    value: "build"
                 containers:
                   - name: "jnlp"
                     image: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
               - name: "skaffold"
                 label: "skaffold"
                 serviceAccount: "jenkins"
-                podLabels:
-                  - key: "role"
-                    value: "build"
                 volumes:
                   - secretVolume:
                       mountPath: "/cosign-key"
@@ -52,9 +46,6 @@ data:
               - name: "platform-scanner"
                 label: "platform-scanner"
                 serviceAccount: "jenkins"
-                podLabels:
-                  - key: "role"
-                    value: "platform-scanner"
                 volumes:
                   - secretVolume:
                       mountPath: "/root/.docker"
@@ -101,9 +92,6 @@ data:
               - name: "platform-deployer"
                 label: "platform-deployer"
                 serviceAccount: "platform-deployer"
-                podLabels:
-                  - key: "role"
-                    value: "platform-deployer"
                 yaml: |
                   spec:
                     volumes:
