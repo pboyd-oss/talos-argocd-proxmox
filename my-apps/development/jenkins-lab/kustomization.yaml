@@ -10,6 +10,7 @@ resources:
   - gitea-docker-cfg-sealedsecret.yaml
   - deploy-sa-rbac.yaml
   - cosign-key-sealedsecret.yaml
+  - token-service-token-sealedsecret.yaml
 
 configMapGenerator:
   - name: jenkins-groovy-init
@@ -17,3 +18,4 @@ configMapGenerator:
       disableNameSuffixHash: true
     files:
       - attest-build-listener.groovy
+      - seed-token-service-user.groovy

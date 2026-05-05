@@ -1,0 +1,106 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-signed-images
+  annotations:
+    policies.kyverno.io/title: Require Platform-Signed Images with Scan Attestation
+    policies.kyverno.io/description: >-
+      Blocks Pod admission unless the container image carries a platform cosign
+      signature AND a passing scan/v1 attestation (trivy.passed + checkov.passed).
+      Both must be signed by the platform cosign key — self-signed attestations are rejected.
+spec:
+  validationFailureAction: Enforce
+  background: false
+  emitWarning: false
+  rules:
+    - name: check-image-signature-and-scan
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - "team-*"
+                - "build-*"
+      verifyImages:
+        - imageReferences:
+            - "harbor.tuxgrid.com/*"
+          required: true
+          mutateDigest: true
+          verifyDigest: true
+          attestors:
+            - count: 1
+              entries:
+                - keys:
+                    publicKeys: |-
+                      -----BEGIN PUBLIC KEY-----
+                      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeY5MIXLLqRrl0kQHG93kjw4d1gjS
+                      58uVyTQgetO3kj2Q26oXG2cPFl6Ru1HVRjrYWDUrQ9I6ber23/YMMxb5CA==
+                      -----END PUBLIC KEY-----
+                    signatureAlgorithm: sha256
+          attestations:
+            - predicateType: "https://tuxgrid.com/attestation/scan/v1"
+              attestors:
+                - count: 1
+                  entries:
+                    - keys:
+                        publicKeys: |-
+                          -----BEGIN PUBLIC KEY-----
+                          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeY5MIXLLqRrl0kQHG93kjw4d1gjS
+                          58uVyTQgetO3kj2Q26oXG2cPFl6Ru1HVRjrYWDUrQ9I6ber23/YMMxb5CA==
+                          -----END PUBLIC KEY-----
+              conditions:
+                - all:
+                    - key: "{{ trivy_image.passed }}"
+                      operator: Equals
+                      value: true
+                      message: "Trivy image scan (vuln+secret) must have passed"
+                    - key: "{{ trivy_repo.passed }}"
+                      operator: Equals
+                      value: true
+                      message: "Trivy repo scan (misconfig+secret) must have passed"
+                    - key: "{{ checkov.passed }}"
+                      operator: Equals
+                      value: true
+                      message: "Checkov IaC policy scan must have passed"
+            - predicateType: "https://tuxgrid.com/attestation/pipeline/v1"
+              attestors:
+                - count: 1
+                  entries:
+                    - keys:
+                        publicKeys: |-
+                          -----BEGIN PUBLIC KEY-----
+                          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeY5MIXLLqRrl0kQHG93kjw4d1gjS
+                          58uVyTQgetO3kj2Q26oXG2cPFl6Ru1HVRjrYWDUrQ9I6ber23/YMMxb5CA==
+                          -----END PUBLIC KEY-----
+              conditions:
+                - all:
+                    - key: "{{ platform_verified.tests_passed }}"
+                      operator: Equals
+                      value: true
+                      message: "Pipeline attestation: tests must have passed"
+                    - key: "{{ platform_verified.scan_passed }}"
+                      operator: Equals
+                      value: true
+                      message: "Pipeline attestation: scan must have passed"
+                    - key: "{{ platform_verified.scan_triggered_by_pipeline }}"
+                      operator: Equals
+                      value: true
+                      message: "Pipeline attestation: scan must have been triggered by the pipeline, not manually"
+            - predicateType: "https://spdx.dev/Document"
+              attestors:
+                - count: 1
+                  entries:
+                    - keys:
+                        publicKeys: |-
+                          -----BEGIN PUBLIC KEY-----
+                          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeY5MIXLLqRrl0kQHG93kjw4d1gjS
+                          58uVyTQgetO3kj2Q26oXG2cPFl6Ru1HVRjrYWDUrQ9I6ber23/YMMxb5CA==
+                          -----END PUBLIC KEY-----
+              conditions:
+                - all:
+                    - key: "{{ spdxVersion }}"
+                      operator: NotEquals
+                      value: ""
+                      message: "SBOM attestation must be a valid SPDX document"

@@ -1,0 +1,219 @@
+# Egress restrictions for platform build and scan pods.
+#
+# Uses egressDeny to override the cluster-wide internet-allow from
+# default-deny-lan-egress (CiliumClusterwideNetworkPolicy). Deny rules take
+# precedence over allow rules in Cilium, so these policies tighten egress for
+# the labeled pods regardless of what the cluster-wide policy permits.
+#
+# NOTE: The 'role: build' policy targets the build cluster (k8s-build.tuxgrid.com).
+# The 'platform-scanner', 'platform-deployer', and 'platform-token-service'
+# policies target the main cluster (this repo's cluster).
+#
+# Apply to build cluster:
+#   kubectl apply -f build-pods-egress.yaml --context k8s-build
+# Apply to main cluster:
+#   kubectl apply -f build-pods-egress.yaml --context k8s-main
+---
+# Team build pods — can only reach Harbor, Gitea, and Jenkins controller.
+# Blocks internet access, preventing rogue tooling downloads or data exfiltration.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: build-pod-egress-restrict
+  namespace: jenkins
+spec:
+  endpointSelector:
+    matchLabels:
+      role: build
+  egressDeny:
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+  egress:
+    - toFQDNs:
+        - matchName: harbor.tuxgrid.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    - toFQDNs:
+        - matchName: git.tuxgrid.com
+      toPorts:
+        - ports:
+            - port: "22"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    # Jenkins JNLP agent connection back to controller
+    - toEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "50000"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+---
+# Platform scanner pods — same whitelist as build pods.
+# Checkov stage also needs Gitea to clone source for IaC scanning.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: platform-scanner-egress-restrict
+  namespace: jenkins
+spec:
+  endpointSelector:
+    matchLabels:
+      role: platform-scanner
+  egressDeny:
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+  egress:
+    - toFQDNs:
+        - matchName: harbor.tuxgrid.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    - toFQDNs:
+        - matchName: git.tuxgrid.com
+      toPorts:
+        - ports:
+            - port: "22"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "50000"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+---
+# Platform deployer pods — no Gitea needed; adds sts.amazonaws.com for the
+# credential exchange with the Token Service (which calls STS internally).
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: platform-deployer-egress-restrict
+  namespace: jenkins
+spec:
+  endpointSelector:
+    matchLabels:
+      role: platform-deployer
+  egressDeny:
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+  egress:
+    - toFQDNs:
+        - matchName: harbor.tuxgrid.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Token Service — platform in-cluster service
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: platform
+            app: platform-token-service
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    - toEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "50000"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+---
+# Token Service pods — needs Harbor (cosign verify-attestation pulls attestation),
+# sts.amazonaws.com (AssumeRole), and Jenkins (JWKS for JWT verification).
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: platform-token-service-egress-restrict
+  namespace: platform
+spec:
+  endpointSelector:
+    matchLabels:
+      role: platform-token-service
+  egressDeny:
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+  egress:
+    # cosign verify-attestation fetches the attestation from Harbor
+    - toFQDNs:
+        - matchName: harbor.tuxgrid.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # sts:AssumeRole
+    - toFQDNs:
+        - matchName: sts.amazonaws.com
+        - matchPattern: "sts.*.amazonaws.com"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Jenkins JWKS endpoint for JWT public key
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: jenkins
+            app.kubernetes.io/name: jenkins
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
