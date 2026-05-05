@@ -10,7 +10,8 @@ spec:
     secret:
       name: ""
   groovyScripts:
-    configurations: []
+    configurations:
+      - name: jenkins-groovy-init
     secret:
       name: ""
   jenkinsAPISettings:
@@ -31,6 +32,21 @@ spec:
         env:
           - name: JAVA_OPTS
             value: "-Xmx1024m -Xms256m -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"
+          - name: GIT_DEPLOY_KEY
+            valueFrom:
+              secretKeyRef:
+                name: jenkins-credentials
+                key: git-deploy-key
+          - name: COSIGN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: jenkins-credentials
+                key: cosign-private-key
+          - name: COSIGN_PUBLIC_KEY
+            valueFrom:
+              secretKeyRef:
+                name: jenkins-credentials
+                key: cosign-public-key
         livenessProbe:
           httpGet:
             path: /login
@@ -69,6 +85,10 @@ spec:
     plugins:
       - name: pipeline-utility-steps
         version: "2.20.0"
+      - name: copyartifact
+        version: "756.vda_a_68a_dae5f5"
+      - name: role-strategy
+        version: "703.vd4b_7b_29b_9d64"
   seedJobAgentImage: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job

@@ -61,8 +61,32 @@ data:
           - name: "jenkins-library"
             defaultVersion: "main"
             implicit: true
+            allowVersionOverride: false
             retriever:
               modernSCM:
                 scm:
                   git:
                     remote: "https://github.com/pboyd-oss/jenkins-library.git"
+  05-credentials.yaml: |
+    credentials:
+      system:
+        domainCredentials:
+          - credentials:
+              - basicSSHUserPrivateKey:
+                  scope: GLOBAL
+                  id: "git-deploy-key"
+                  description: "SSH deploy key for internal team repos"
+                  username: git
+                  privateKeySource:
+                    directEntry:
+                      privateKey: "${GIT_DEPLOY_KEY}"
+              - string:
+                  scope: GLOBAL
+                  id: "cosign-key"
+                  description: "Cosign private key for attestation and image signing"
+                  secret: "${COSIGN_PRIVATE_KEY}"
+              - string:
+                  scope: GLOBAL
+                  id: "cosign-public-key"
+                  description: "Cosign public key for attestation verification"
+                  secret: "${COSIGN_PUBLIC_KEY}"
