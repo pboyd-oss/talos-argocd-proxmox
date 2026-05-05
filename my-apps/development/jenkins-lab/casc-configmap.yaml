@@ -82,6 +82,22 @@ data:
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "128Mi"
+                  - name: "tfsec"
+                    image: "harbor.tuxgrid.com/aquasecurity/tfsec:v1.28.11"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "128Mi"
+                    resourceLimitCpu: "500m"
+                    resourceLimitMemory: "512Mi"
+                  - name: "infracost"
+                    image: "harbor.tuxgrid.com/infracost/infracost:ci-0.10"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "128Mi"
+                    resourceLimitCpu: "500m"
+                    resourceLimitMemory: "512Mi"
               - name: "platform-deployer"
                 label: "platform-deployer"
                 serviceAccount: "platform-deployer"
@@ -166,6 +182,11 @@ data:
                   id: "cosign-public-key"
                   description: "Cosign public key for attestation verification"
                   secret: "${COSIGN_PUBLIC_KEY}"
+              - string:
+                  scope: GLOBAL
+                  id: "infracost-api-key"
+                  description: "Infracost API key for cost estimation"
+                  secret: "${INFRACOST_API_KEY}"
   06-oidc-provider.yaml: |
     unclassified:
       jwtTokenConfiguration:

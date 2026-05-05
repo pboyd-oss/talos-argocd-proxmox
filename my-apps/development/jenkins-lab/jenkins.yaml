@@ -52,6 +52,11 @@ spec:
               secretKeyRef:
                 name: token-service-token
                 key: token
+          - name: INFRACOST_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: infracost-api-key
+                key: api-key
         livenessProbe:
           httpGet:
             path: /login
