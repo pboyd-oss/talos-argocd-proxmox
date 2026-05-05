@@ -175,19 +175,3 @@ data:
                   id: "infracost-api-key"
                   description: "Infracost API key for cost estimation"
                   secret: "${INFRACOST_API_KEY}"
-  06-oidc-provider.yaml: |
-    unclassified:
-      jwtTokenConfiguration:
-        enabled: true
-        tokenExpiration: 600
-        algorithmConfiguration:
-          algorithm: "RS256"
-        claimsTemplates:
-          - claimName: "sub"
-            valueTemplate: "${JOB_NAME}"
-          - claimName: "team_slug"
-            valueTemplate: "${TUXGRID_TEAM_SLUG}"
-          - claimName: "build_number"
-            valueTemplate: "${BUILD_NUMBER}"
-          - claimName: "aud"
-            valueTemplate: "platform-token-service"
