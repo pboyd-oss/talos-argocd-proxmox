@@ -94,15 +94,10 @@ spec:
         version: "1.303.vdfcf47fb_b_fef"
     plugins:
       - name: pipeline-utility-steps
-        version: "2.20.0"
       - name: copyartifact
-        version: "756.vda_a_68a_dae5f5"
       - name: role-strategy
-        version: "703.vd4b_7b_29b_9d64"
       - name: jacoco
-        version: "3.3.9"
       - name: jwt-support
-        version: "72.v8a_514fc5a_d8b_"
   seedJobAgentImage: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job
