@@ -101,6 +101,8 @@ spec:
         version: "latest"
       - name: jacoco
         version: "latest"
+      - name: junit
+        version: "latest"
       - name: oidc-provider
         version: "latest"
   seedJobAgentImage: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
