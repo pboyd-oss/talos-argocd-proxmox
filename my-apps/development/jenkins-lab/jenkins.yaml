@@ -105,6 +105,10 @@ spec:
         version: "latest"
       - name: oidc-provider
         version: "latest"
+      - name: matrix-auth
+        version: "latest"
+      - name: folder-properties
+        version: "latest"
   seedJobAgentImage: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job
