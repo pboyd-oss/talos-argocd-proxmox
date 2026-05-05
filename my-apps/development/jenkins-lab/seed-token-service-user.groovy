@@ -40,7 +40,7 @@ if (!apiTokenProp) {
 }
 
 def store = apiTokenProp.tokenStore
-if (store.tokenListSortedByName().any { it.name == tokenName }) {
+if (store.getTokenListSortedByName().any { it.name == tokenName }) {
     println "[seed-token-service-user] token '${tokenName}' already exists — skipping"
     return
 }
