@@ -6,8 +6,14 @@ resources:
   - rbac.yaml
   - httproute.yaml
   - casc-configmap.yaml
-  - groovy-init-configmap.yaml
   - jenkins.yaml
   - gitea-docker-cfg-sealedsecret.yaml
   - deploy-sa-rbac.yaml
   - cosign-key-sealedsecret.yaml
+
+configMapGenerator:
+  - name: jenkins-groovy-init
+    options:
+      disableNameSuffixHash: true
+    files:
+      - attest-build-listener.groovy

@@ -1,0 +1,46 @@
+import hudson.model.Result
+import hudson.model.Run
+import hudson.model.StringParameterValue
+import hudson.model.TaskListener
+import hudson.model.listeners.RunListener
+import hudson.tasks.junit.TestResultAction
+import jenkins.model.Jenkins
+
+// Fires after every build in a teams/ folder.
+// If the build succeeded and Jenkins recorded passing test results,
+// schedules the platform attestation job for that team.
+// Teams cannot trigger attestation themselves — this is the only entry point.
+
+RunListener.all().add(new RunListener<Run>() {
+    @Override
+    void onCompleted(Run run, TaskListener listener) {
+        def fullName = run.parent.fullName
+        if (!fullName.startsWith('teams/')) return
+        if (run.result != Result.SUCCESS) return
+
+        def testAction = run.getAction(TestResultAction)
+        if (!testAction) {
+            listener.logger.println("[Platform] Skipping attestation for ${fullName} #${run.number} — no test results recorded")
+            return
+        }
+        if (testAction.failCount > 0) {
+            listener.logger.println("[Platform] Skipping attestation for ${fullName} #${run.number} — ${testAction.failCount} test failure(s)")
+            return
+        }
+
+        def teamSlug = fullName.split('/')[1]
+        def attestJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/attest")
+
+        if (!attestJob) {
+            listener.logger.println("[Platform] WARNING: no attestation job at platform/${teamSlug}/attest")
+            return
+        }
+
+        attestJob.scheduleBuild2(0, new hudson.model.ParametersAction([
+            new StringParameterValue('UPSTREAM_JOB',   fullName),
+            new StringParameterValue('UPSTREAM_BUILD', run.number.toString()),
+        ]))
+
+        listener.logger.println("[Platform] Attestation scheduled for ${fullName} #${run.number}")
+    }
+})
