@@ -47,6 +47,6 @@ if (store.getTokenListSortedByName().any { it.name == tokenName }) {
 
 // addFixedNewToken seeds the store with a known plaintext (stores SHA-256 internally).
 // This is the same method used by JCasC for apiTokenProperty.tokenStore entries.
-store.addFixedNewToken(tokenName, tokenPlaintext)
+store.addFixedNewToken(tokenName, tokenPlaintext, null)
 user.save()
 println "[seed-token-service-user] seeded API token '${tokenName}' for '${userId}'"
