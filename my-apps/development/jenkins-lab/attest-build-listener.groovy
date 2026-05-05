@@ -33,7 +33,7 @@ import org.jenkinsci.plugins.workflow.libs.LibrariesAction
 
 // Coverage threshold — percentage (0–100). Override per-team via TUXGRID_COVERAGE_THRESHOLD
 // folder property or Jenkins system property 'platform.coverage.threshold'.
-private static final int DEFAULT_COVERAGE_THRESHOLD = 70
+DEFAULT_COVERAGE_THRESHOLD = 70
 
 RunListener.all().add(new RunListener<Run>() {
     @Override
