@@ -17,7 +17,7 @@ spec:
   jenkinsAPISettings:
     authorizationStrategy: createUser
   master:
-    disableCSRFProtection: false
+    disableCSRFProtection: true
     containers:
       - name: jenkins-master
         image: harbor.tuxgrid.com/docker.io/jenkins/jenkins:2.555.1-lts-jdk21
