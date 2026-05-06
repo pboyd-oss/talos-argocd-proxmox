@@ -109,6 +109,8 @@ spec:
         version: "latest"
       - name: folder-properties
         version: "latest"
+      - name: envinject
+        version: "latest"
   seedJobAgentImage: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
   seedJobs:
     - id: seed-job
