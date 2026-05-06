@@ -135,8 +135,8 @@ data:
                     image: "harbor.tuxgrid.com/gcr.io/kaniko-project/executor:v1.23.2-debug"
                     command: "cat"
                     ttyEnabled: true
-                    resourceRequestCpu: "500m"
-                    resourceRequestMemory: "1Gi"
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "4Gi"
         - kubernetes:
@@ -161,16 +161,16 @@ data:
                     image: "harbor.tuxgrid.com/gcr.io/k8s-skaffold/skaffold:v2.15.0"
                     command: "cat"
                     ttyEnabled: true
-                    resourceRequestCpu: "500m"
-                    resourceRequestMemory: "1Gi"
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "128Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "4Gi"
                   - name: "golang"
                     image: "harbor.tuxgrid.com/docker.io/golang:1.23"
                     command: "cat"
                     ttyEnabled: true
-                    resourceRequestCpu: "500m"
-                    resourceRequestMemory: "512Mi"
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "128Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "2Gi"
   02-global-env.yaml: |
