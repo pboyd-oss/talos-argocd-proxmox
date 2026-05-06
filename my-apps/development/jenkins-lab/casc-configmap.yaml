@@ -114,8 +114,8 @@ data:
                     image: "harbor.tuxgrid.com/gcr.io/kaniko-project/executor:v1.23.2-debug"
                     command: "cat"
                     ttyEnabled: true
-                    resourceRequestCpu: "500m"
-                    resourceRequestMemory: "1Gi"
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "6Gi"
         - kubernetes:
