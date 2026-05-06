@@ -13,6 +13,7 @@ resources:
   - token-service-token-sealedsecret.yaml
   - jenkins-credentials-sealedsecret.yaml
   - infracost-api-key-sealedsecret.yaml
+  - harbor-robot-platform-sealedsecret.yaml
 
 configMapGenerator:
   - name: jenkins-groovy-init

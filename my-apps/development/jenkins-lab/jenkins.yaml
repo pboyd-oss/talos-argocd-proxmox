@@ -57,6 +57,11 @@ spec:
               secretKeyRef:
                 name: infracost-api-key
                 key: api-key
+          - name: HARBOR_ROBOT_PLATFORM_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: harbor-robot-platform
+                key: token
         livenessProbe:
           httpGet:
             path: /login

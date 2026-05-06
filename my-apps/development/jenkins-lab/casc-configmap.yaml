@@ -225,3 +225,9 @@ data:
                   id: "infracost-api-key"
                   description: "Infracost API key for cost estimation"
                   secret: "${INFRACOST_API_KEY}"
+              - usernamePassword:
+                  scope: GLOBAL
+                  id: "harbor-robot-platform"
+                  description: "Harbor robot account for platform image pushes"
+                  username: "robot$platform+jenkins"
+                  password: "${HARBOR_ROBOT_PLATFORM_TOKEN}"
