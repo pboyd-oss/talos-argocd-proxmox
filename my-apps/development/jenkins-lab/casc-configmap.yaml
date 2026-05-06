@@ -123,6 +123,40 @@ data:
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "128Mi"
+        - kubernetes:
+            name: "build-shared"
+            serverUrl: "https://kubernetes.default.svc"
+            namespace: "jenkins"
+            jenkinsUrl: "http://jenkins-operator-http-jenkins.jenkins.svc.cluster.local:8080"
+            jenkinsTunnel: "jenkins-operator-slave-jenkins.jenkins.svc.cluster.local:50000"
+            templates:
+              - name: "base"
+                label: "base"
+                serviceAccount: "jenkins"
+                volumes:
+                  - secretVolume:
+                      mountPath: "/cosign-key"
+                      secretName: "cosign-key"
+                  - secretVolume:
+                      mountPath: "/root/.docker"
+                      secretName: "gitea-docker-cfg"
+                containers:
+                  - name: "skaffold"
+                    image: "harbor.tuxgrid.com/gcr.io/k8s-skaffold/skaffold:v2.15.0"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "500m"
+                    resourceRequestMemory: "1Gi"
+                    resourceLimitCpu: "2"
+                    resourceLimitMemory: "4Gi"
+                  - name: "golang"
+                    image: "harbor.tuxgrid.com/docker.io/golang:1.23"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "500m"
+                    resourceRequestMemory: "512Mi"
+                    resourceLimitCpu: "2"
+                    resourceLimitMemory: "2Gi"
   02-global-env.yaml: |
     jenkins:
       globalNodeProperties:
