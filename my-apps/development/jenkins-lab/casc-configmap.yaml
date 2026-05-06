@@ -123,6 +123,22 @@ data:
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "128Mi"
+              - name: "platform-builder"
+                label: "platform-builder"
+                serviceAccount: "jenkins"
+                volumes:
+                  - secretVolume:
+                      mountPath: "/kaniko/.docker"
+                      secretName: "gitea-docker-cfg"
+                containers:
+                  - name: "kaniko"
+                    image: "harbor.tuxgrid.com/gcr.io/kaniko-project/executor:v1.23.2-debug"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "500m"
+                    resourceRequestMemory: "1Gi"
+                    resourceLimitCpu: "2"
+                    resourceLimitMemory: "4Gi"
         - kubernetes:
             name: "build-shared"
             serverUrl: "https://kubernetes.default.svc"
