@@ -43,52 +43,25 @@ data:
                     image: "harbor.tuxgrid.com/docker.io/golang:1.23"
                     command: "cat"
                     ttyEnabled: true
-              - name: "platform-scanner"
-                label: "platform-scanner"
+              - name: "build-sec-base"
+                label: "build-sec-base"
                 serviceAccount: "jenkins"
                 volumes:
                   - secretVolume:
                       mountPath: "/root/.docker"
                       secretName: "gitea-docker-cfg"
+                  - secretVolume:
+                      mountPath: "/cosign-key"
+                      secretName: "cosign-key"
                 containers:
-                  - name: "trivy"
-                    image: "harbor.tuxgrid.com/aquasecurity/trivy:0.60.0"
+                  - name: "build-sec-base"
+                    image: "harbor.tuxgrid.com/platform/build-sec-base:latest"
                     command: "cat"
                     ttyEnabled: true
-                    resourceRequestCpu: "50m"
-                    resourceRequestMemory: "64Mi"
-                    resourceLimitCpu: "500m"
-                    resourceLimitMemory: "1Gi"
-                  - name: "checkov"
-                    image: "harbor.tuxgrid.com/bridgecrew/checkov:3.2.285"
-                    command: "cat"
-                    ttyEnabled: true
-                    resourceRequestCpu: "50m"
-                    resourceRequestMemory: "64Mi"
-                    resourceLimitCpu: "500m"
-                    resourceLimitMemory: "512Mi"
-                  - name: "cosign"
-                    image: "harbor.tuxgrid.com/sigstore/cosign:v2.5.2"
-                    command: "cat"
-                    ttyEnabled: true
-                    resourceRequestCpu: "50m"
-                    resourceRequestMemory: "64Mi"
-                  - name: "tfsec"
-                    image: "harbor.tuxgrid.com/aquasecurity/tfsec:v1.28.11"
-                    command: "cat"
-                    ttyEnabled: true
-                    resourceRequestCpu: "50m"
-                    resourceRequestMemory: "64Mi"
-                    resourceLimitCpu: "500m"
-                    resourceLimitMemory: "512Mi"
-                  - name: "infracost"
-                    image: "harbor.tuxgrid.com/infracost/infracost:ci-0.10"
-                    command: "cat"
-                    ttyEnabled: true
-                    resourceRequestCpu: "50m"
-                    resourceRequestMemory: "64Mi"
-                    resourceLimitCpu: "500m"
-                    resourceLimitMemory: "512Mi"
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
+                    resourceLimitCpu: "1"
+                    resourceLimitMemory: "2Gi"
               - name: "platform-deployer"
                 label: "platform-deployer"
                 serviceAccount: "platform-deployer"
@@ -110,7 +83,7 @@ data:
                             readOnly: true
                 containers:
                   - name: "terraform"
-                    image: "harbor.tuxgrid.com/hashicorp/terraform:1.9.0"
+                    image: "harbor.tuxgrid.com/docker.io/hashicorp/terraform:1.9.0"
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "250m"
@@ -118,7 +91,7 @@ data:
                     resourceLimitCpu: "1"
                     resourceLimitMemory: "1Gi"
                   - name: "awscli"
-                    image: "harbor.tuxgrid.com/amazon/aws-cli:2.15.0"
+                    image: "harbor.tuxgrid.com/docker.io/amazon/aws-cli:2.15.0"
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
