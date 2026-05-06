@@ -123,8 +123,8 @@ data:
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "128Mi"
-              - name: "platform-builder"
-                label: "platform-builder"
+              - name: "kaniko-builder"
+                label: "kaniko-builder"
                 serviceAccount: "jenkins"
                 volumes:
                   - secretVolume:
