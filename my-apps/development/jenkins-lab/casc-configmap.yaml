@@ -115,7 +115,7 @@ data:
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
-                    resourceRequestMemory: "256Mi"
+                    resourceRequestMemory: "1Gi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "6Gi"
         - kubernetes:
