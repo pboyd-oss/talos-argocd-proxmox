@@ -68,7 +68,7 @@
         'argocd',
       ],
       automerge: true,
-      automergeType: 'branch',
+      automergeType: 'pr',
     },
     {
       matchUpdateTypes: [
@@ -136,7 +136,7 @@
       matchFileNames: ['my-apps/development/posthog/**'],
       groupName: 'posthog images',
       automerge: true,
-      automergeType: 'branch',
+      automergeType: 'pr',
       schedule: ['every weekend'],
     },
     {
@@ -205,7 +205,7 @@
       ],
       matchUpdateTypes: ['patch', 'minor'],
       automerge: true,
-      automergeType: 'branch',
+      automergeType: 'pr',
     },
     {
       description: 'news-reader + news-reader-temporal-worker images (in-cluster registry): only consider semver vX.Y.Z tags. Build flows live in news-reader/.gitea/workflows/build.yml and news-reader-temporal-worker/.gitea/workflows/build.yml (both Gitea Actions, both run on the in-cluster act-runner so they can reach registry.tuxgrid.com — GitHub-hosted runners cannot). Every push to main auto-bumps patch (next semver computed by reading the registry), pushes the image, Renovate sees it within an hour and PRs the bump here. Excludes :latest and :buildcache from the candidate set.',
