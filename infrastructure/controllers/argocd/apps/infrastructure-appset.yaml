@@ -43,6 +43,8 @@ spec:
       # healthy before PVC Plumber (Wave 2) and Kyverno (Wave 3).
       - path: infrastructure/storage/kopia-ui
       - path: infrastructure/controllers/token-service
+      - path: infrastructure/controllers/tetragon
+      - path: infrastructure/controllers/audit-service
   template:
     metadata:
       name: '{{path.basename}}'

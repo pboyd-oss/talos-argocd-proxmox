@@ -15,6 +15,12 @@ import org.jenkinsci.plugins.workflow.graphanalysis.DepthFirstScanner
 import org.jenkinsci.plugins.workflow.job.WorkflowRun
 import org.jenkinsci.plugins.workflow.libs.LibrariesAction
 
+// Resolves the PLATFORM_AUDIT_ID injected by audit-graph-listener.groovy.
+// Returns null if the GraphListener was not active for this build.
+private String resolveAuditId(Run run) {
+    return run.getAction(AuditIdEnvironmentAction)?.auditId
+}
+
 DEFAULT_COVERAGE_THRESHOLD = 70
 
 RunListener.all().add(new RunListener<Run>() {
@@ -35,6 +41,14 @@ RunListener.all().add(new RunListener<Run>() {
         def log    = { String msg -> listener.logger.println("[Platform] ${msg}") }
         def refuse = { String reason ->
             log("Attestation REFUSED for ${fullName} #${run.number} -- ${reason}")
+        }
+
+        // Resolve audit ID from GraphListener — required for full attestation.
+        def auditId = resolveAuditId(run)
+        log("Audit ID: ${auditId ?: 'NOT PRESENT -- graph listener may not be active'}")
+        if (!auditId) {
+            refuse('no PLATFORM_AUDIT_ID found -- audit-graph-listener may not be loaded')
+            return
         }
 
         log("Checking attestation eligibility for ${fullName} #${run.number}")
@@ -109,22 +123,33 @@ RunListener.all().add(new RunListener<Run>() {
             return
         }
 
-        def stages     = extractStages(run)
-        def librarySHA = getLibrarySHA(run)
+        def stages      = extractStages(run)
+        def librarySHAs = getLibrarySHAs(run)
+        log("Libraries: ${librarySHAs.collect { "${it.name}@${it.sha}" }.join(', ') ?: 'none'}")
+
+        // Verify audit-log.json was produced by the GraphListener flush.
+        def hasAuditLog = run.getArtifacts().any { it.fileName == 'audit-log.json' }
+        log("audit-log.json present: ${hasAuditLog}")
+        if (!hasAuditLog) {
+            refuse('audit-log.json was not archived -- graph listener may not have flushed')
+            return
+        }
 
         attestJob.scheduleBuild2(0, new hudson.model.ParametersAction([
-            new StringParameterValue('UPSTREAM_JOB',              fullName),
-            new StringParameterValue('UPSTREAM_BUILD',            run.number.toString()),
-            new StringParameterValue('PLATFORM_TESTS_COUNT',      testAction.totalCount.toString()),
-            new StringParameterValue('PLATFORM_TESTS_FAILURES',   testAction.failCount.toString()),
-            new StringParameterValue('PLATFORM_COVERAGE_PCT',     lineCoverage.round(2).toString()),
-            new StringParameterValue('PLATFORM_COVERAGE_THRESH',  threshold.toString()),
-            new StringParameterValue('PLATFORM_SCAN_JOB_REF',     "platform/${teamSlug}/scan#${scanResult.number}"),
-            new StringParameterValue('PLATFORM_STAGES_JSON',      JsonOutput.toJson(stages)),
-            new StringParameterValue('PLATFORM_LIBRARY_SHA',      librarySHA),
+            new StringParameterValue('UPSTREAM_JOB',                fullName),
+            new StringParameterValue('UPSTREAM_BUILD',              run.number.toString()),
+            new StringParameterValue('PLATFORM_AUDIT_ID',           auditId),
+            new StringParameterValue('PLATFORM_AUDIT_LOG_REF',      "${fullName}#${run.number}/artifact/audit-log.json"),
+            new StringParameterValue('PLATFORM_TESTS_COUNT',        testAction.totalCount.toString()),
+            new StringParameterValue('PLATFORM_TESTS_FAILURES',     testAction.failCount.toString()),
+            new StringParameterValue('PLATFORM_COVERAGE_PCT',       lineCoverage.round(2).toString()),
+            new StringParameterValue('PLATFORM_COVERAGE_THRESH',    threshold.toString()),
+            new StringParameterValue('PLATFORM_SCAN_JOB_REF',       "platform/${teamSlug}/scan#${scanResult.number}"),
+            new StringParameterValue('PLATFORM_STAGES_JSON',        JsonOutput.toJson(stages)),
+            new StringParameterValue('PLATFORM_LIBRARIES_JSON',     JsonOutput.toJson(librarySHAs)),
         ]))
 
-        log("Attestation scheduled for ${fullName} #${run.number} (tests: ${testAction.totalCount}, coverage: ${lineCoverage.round(1)}%)")
+        log("Attestation scheduled for ${fullName} #${run.number} | auditId=${auditId} | tests=${testAction.totalCount} | coverage=${lineCoverage.round(1)}% | libraries=${librarySHAs.size()}")
     }
 
     private Run findSuccessfulScan(String teamSlug, String upstreamJob, String upstreamBuild) {
@@ -167,11 +192,12 @@ RunListener.all().add(new RunListener<Run>() {
         return stages
     }
 
-    private String getLibrarySHA(Run run) {
+    private List getLibrarySHAs(Run run) {
         def libAction = run.getAction(LibrariesAction)
-        if (!libAction) return 'unknown'
-        def lib = libAction.libraries.find { it.name == 'jenkins-library' }
-        return lib?.version ?: 'unknown'
+        if (!libAction) return []
+        return libAction.libraries.collect { lib ->
+            [name: lib.name, sha: lib.version ?: 'unknown']
+        }
     }
 
     private int resolveCoverageThreshold(Run run) {

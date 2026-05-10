@@ -1,0 +1,44 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-signed-platform-images
+  annotations:
+    policies.kyverno.io/title: Require Cosign Signature for Platform Service Images
+    policies.kyverno.io/description: >-
+      Blocks Pod admission in the platform namespace unless the container image
+      carries a valid platform cosign signature. Platform services only require
+      a signature — not the full 3-attestation pipeline enforced for team builds.
+spec:
+  mutateExistingOnPolicyUpdate: false
+  background: false
+  emitWarning: false
+  validationFailureAction: Enforce
+  rules:
+    - name: verify-platform-image-signature
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - platform
+      verifyImages:
+        - imageReferences:
+            - "harbor.tuxgrid.com/platform/*"
+          required: true
+          mutateDigest: true
+          verifyDigest: true
+          attestors:
+            - count: 1
+              entries:
+                - keys:
+                    publicKeys: |-
+                      -----BEGIN PUBLIC KEY-----
+                      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeY5MIXLLqRrl0kQHG93kjw4d1gjS
+                      58uVyTQgetO3kj2Q26oXG2cPFl6Ru1HVRjrYWDUrQ9I6ber23/YMMxb5CA==
+                      -----END PUBLIC KEY-----
+                    signatureAlgorithm: sha256
+                    rekor:
+                      url: ""
+                      ignoreTlog: true

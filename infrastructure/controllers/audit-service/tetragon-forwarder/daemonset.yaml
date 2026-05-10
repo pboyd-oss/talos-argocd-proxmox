@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: tetragon-forwarder
+  namespace: kube-system
+  labels:
+    app: tetragon-forwarder
+spec:
+  selector:
+    matchLabels:
+      app: tetragon-forwarder
+  template:
+    metadata:
+      labels:
+        app: tetragon-forwarder
+    spec:
+      serviceAccountName: tetragon-forwarder
+      tolerations:
+        # Run on all nodes including control plane
+        - operator: Exists
+          effect: NoSchedule
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: forwarder
+          image: harbor.tuxgrid.com/platform/tetragon-forwarder:latest
+          imagePullPolicy: Always
+          env:
+            - name: TETRAGON_EXPORT_FILE
+              value: /var/run/tetragon/tetragon.log
+            - name: AUDIT_SERVICE_URL
+              value: http://platform-audit-service.platform.svc.cluster.local:8080
+            - name: BUILD_NAMESPACE
+              value: jenkins
+          volumeMounts:
+            - name: tetragon-export
+              mountPath: /var/run/tetragon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+      volumes:
+        - name: tetragon-export
+          hostPath:
+            path: /var/run/tetragon
+            type: DirectoryOrCreate

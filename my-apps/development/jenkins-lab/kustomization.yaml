@@ -20,5 +20,6 @@ configMapGenerator:
     options:
       disableNameSuffixHash: true
     files:
-      - attest-build-listener.groovy
+      - 01-audit-graph-listener.groovy
+      - 02-attest-build-listener.groovy
       - seed-token-service-user.groovy

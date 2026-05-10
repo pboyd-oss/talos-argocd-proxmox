@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+helmCharts:
+  - name: tetragon
+    repo: https://helm.cilium.io
+    version: "1.3.0"
+    releaseName: tetragon
+    namespace: kube-system
+    valuesInline:
+      tetragon:
+        # Write JSON events to a host-mounted file. The tetragon-forwarder
+        # DaemonSet mounts /var/run/tetragon from the host and tails this file.
+        exportFilename: /var/run/tetragon/tetragon.log
+        # Retain logs across process restarts for in-flight builds.
+        exportFileMaxSizeMB: 256
+        exportFileRotationInterval: "24h"
+        # Enable environment variable capture for PLATFORM_AUDIT_ID extraction.
+        # Required for matchEnvVars selectors in TracingPolicies to work.
+        enableProcessCred: false
+        enableProcessNs: false
+      tetragonOperator:
+        enabled: true

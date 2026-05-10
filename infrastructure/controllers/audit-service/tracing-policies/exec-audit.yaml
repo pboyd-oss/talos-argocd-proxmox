@@ -1,0 +1,30 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: platform-exec-audit
+spec:
+  # Restrict to build pods in the jenkins namespace via label selector.
+  # matchEnvVars further limits to processes that inherited PLATFORM_AUDIT_ID
+  # from the Jenkins build environment — eliminates noise from Jenkins itself.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: jenkins-operator
+  kprobes:
+    - call: "sys_execve"
+      syscall: true
+      return: false
+      args:
+        - index: 0
+          type: "string"       # binary path
+        - index: 1
+          type: "string_array" # argv
+        - index: 2
+          type: "string_array" # envp — captured so forwarder can extract PLATFORM_AUDIT_ID
+      selectors:
+        - matchEnvVars:
+            - operator: In
+              values:
+                - "PLATFORM_AUDIT_ID"
+          matchActions:
+            - action: Post
+              argFmt: "binary=%s args=%s"

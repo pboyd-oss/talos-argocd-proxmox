@@ -118,6 +118,26 @@ data:
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "6Gi"
+              - name: "platform-builder"
+                label: "platform-builder"
+                serviceAccount: "jenkins"
+                containers:
+                  - name: "kaniko"
+                    image: "harbor.tuxgrid.com/gcr.io/kaniko-project/executor:v1.23.2-debug"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
+                    resourceLimitCpu: "2"
+                    resourceLimitMemory: "6Gi"
+                  - name: "build-sec-base"
+                    image: "harbor.tuxgrid.com/platform/build-sec-base:latest"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
+                    resourceLimitCpu: "1"
+                    resourceLimitMemory: "2Gi"
         - kubernetes:
             name: "build-shared"
             serverUrl: "https://kubernetes.default.svc"

@@ -1,0 +1,27 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: platform-network-audit
+spec:
+  # Capture outbound TCP connections from build pods.
+  # Every dependency pull, registry fetch, or unexpected outbound call
+  # is logged and correlated to PLATFORM_AUDIT_ID by the forwarder.
+  # matchEnvVars limits capture to processes in the build environment.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: jenkins-operator
+  kprobes:
+    - call: "tcp_connect"
+      syscall: false
+      return: false
+      args:
+        - index: 0
+          type: "sock" # Tetragon extracts saddr/sport/daddr/dport from the sock struct
+      selectors:
+        - matchEnvVars:
+            - operator: In
+              values:
+                - "PLATFORM_AUDIT_ID"
+          matchActions:
+            - action: Post
+              argFmt: "dest=%s"
