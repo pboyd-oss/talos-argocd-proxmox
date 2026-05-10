@@ -34,6 +34,12 @@ final Map<String, List<Map>> auditStore = [:].asSynchronized()
 @groovy.transform.Field
 final Map<String, Long> stepStartTimes = [:].asSynchronized()
 
+// Library step registry: auditId:nodeId → {library, version, stepName}.
+// Populated when a step is identified as a library GlobalVariable or src/ step.
+// Used by resolveCalledFrom to attribute inner steps to their library caller.
+@groovy.transform.Field
+final Map<String, Map> libraryNodeMap = [:].asSynchronized()
+
 FlowExecutionListener.all().add(new FlowExecutionListener() {
 
     @Override
@@ -63,7 +69,7 @@ FlowExecutionListener.all().add(new FlowExecutionListener() {
         execution.addListener(new GraphListener.Synchronous() {
             @Override
             void onNewHead(FlowNode node) {
-                handleNode(auditId, node)
+                handleNode(auditId, run, node)
             }
         })
     }
@@ -93,25 +99,37 @@ FlowExecutionListener.all().add(new FlowExecutionListener() {
 
 // --- Node handler -----------------------------------------------------------
 
-private void handleNode(String auditId, FlowNode node) {
+private void handleNode(String auditId, WorkflowRun run, FlowNode node) {
     def ts    = System.currentTimeMillis()
     def label = resolveLabel(node)
 
     if (node instanceof StepStartNode) {
         stepStartTimes["${auditId}:${node.id}"] = ts
 
-        def args    = resolveArguments(node)
-        def libSrc  = resolveLibrarySource(node)
+        def args      = resolveArguments(node)
+        def libSrc    = resolveLibrarySource(node, run)
+        def calledFrom = resolveCalledFrom(node, auditId)
+
+        // Register this node so inner steps can attribute themselves to it.
+        if (libSrc?.source == 'library') {
+            libraryNodeMap["${auditId}:${node.id}"] = [
+                library : libSrc.library,
+                version : libSrc.version ?: 'unknown',
+                stepName: label,
+            ]
+        }
+
         emitEvent(auditId, [
-            event       : 'STEP_START',
-            nodeId      : node.id,
-            stepName    : label,
-            functionName: node.descriptor?.functionName,
-            arguments   : args,
-            enclosingId : node.enclosingBlocks*.id,
-            workspace   : node.getAction(WorkspaceAction)?.path,
-            thread      : node.getAction(ThreadNameAction)?.threadName,
+            event        : 'STEP_START',
+            nodeId       : node.id,
+            stepName     : label,
+            functionName : node.descriptor?.functionName,
+            arguments    : args,
+            enclosingIds : node.enclosingBlocks*.id,
+            workspace    : node.getAction(WorkspaceAction)?.path,
+            thread       : node.getAction(ThreadNameAction)?.threadName,
             librarySource: libSrc,
+            calledFrom   : calledFrom,
         ])
         return
     }
@@ -124,14 +142,14 @@ private void handleNode(String auditId, FlowNode node) {
         def errorAction = node.getAction(ErrorAction)
 
         emitEvent(auditId, [
-            event       : 'STEP_END',
-            nodeId      : node.id,
-            startNodeId : startNode?.id,
-            stepName    : label,
-            functionName: startNode?.descriptor?.functionName,
-            result      : errorAction ? 'FAILURE' : 'SUCCESS',
-            error       : errorAction?.error?.message,
-            durationMs  : duration,
+            event        : 'STEP_END',
+            nodeId       : node.id,
+            startNodeId  : startNode?.id,
+            stepName     : label,
+            functionName : startNode?.descriptor?.functionName,
+            result       : errorAction ? 'FAILURE' : 'SUCCESS',
+            error        : errorAction?.error?.message,
+            durationMs   : duration,
         ])
         return
     }
@@ -247,29 +265,71 @@ private Map resolveArguments(StepStartNode node) {
     }
 }
 
-// Detects whether a step was defined in a shared library by inspecting
-// the descriptor's defining class loader. Returns library name and step
-// class if identifiable, null map if the step is from the Jenkinsfile directly.
-private Map resolveLibrarySource(StepStartNode node) {
+// Resolves which shared library a step came from by walking the class loader
+// chain and matching against the libraries declared in LibrariesAction.
+// Returns {source:'library', library:<name>, version:<sha>} or {source:'pipeline'}.
+private Map resolveLibrarySource(StepStartNode node, WorkflowRun run) {
     try {
         def descriptor = node.descriptor
-        if (!descriptor) return null
-        def className = descriptor.class.name
-        // Library steps are loaded under org.jenkinsci.plugins.workflow.libs
-        // or carry the library name in their class loader context.
-        if (className.contains('GlobalVariable') || className.contains('LibraryStep')) {
-            return [source: 'library', className: className]
-        }
-        // Check if the step's defining class came from a library classloader
+        if (!descriptor) return [source: 'pipeline']
+
+        def libAction = run?.getAction(LibrariesAction)
+        def libs = libAction?.libraries ?: []
+
+        // Walk the class loader chain looking for a GroovyClassLoader.
+        // Jenkins compiles each library into its own GroovyClassLoader whose
+        // toString() contains the library name.
         def cl = descriptor.class.classLoader
-        if (cl?.class?.name?.contains('LibraryRecord') ||
-            cl?.class?.name?.contains('GroovyClassLoader')) {
-            return [source: 'library', classLoader: cl.class.name]
+        while (cl != null) {
+            if (cl.class.name.contains('GroovyClassLoader')) {
+                def clStr = cl.toString()
+                for (def lib : libs) {
+                    if (clStr.contains(lib.name)) {
+                        return [source: 'library', library: lib.name, version: lib.version ?: 'unknown']
+                    }
+                }
+                // GroovyClassLoader present but library name not in its toString —
+                // still mark as library so calledFrom attribution works downstream.
+                return [source: 'library', library: 'unknown']
+            }
+            try { cl = cl.parent } catch (ignored) { break }
         }
+
+        // Fallback: detect GlobalVariable pattern by class name.
+        // Library vars/ steps compiled as GlobalVariable subclasses carry the
+        // library name in their enclosing class hierarchy.
+        def className = descriptor.class.name
+        if (className.contains('GlobalVariable') || className.contains('LibraryStep')) {
+            def fn = descriptor.functionName?.toLowerCase()
+            if (fn) {
+                for (def lib : libs) {
+                    // e.g. functionName 'tuxgridBuild' declared in 'jenkins-library'
+                    def libSlug = lib.name.toLowerCase().replaceAll('[^a-z0-9]', '')
+                    if (fn.contains(libSlug) || libSlug.contains(fn)) {
+                        return [source: 'library', library: lib.name, version: lib.version ?: 'unknown', via: 'GlobalVariable']
+                    }
+                }
+            }
+            return [source: 'library', library: 'unknown', via: 'GlobalVariable']
+        }
+
         return [source: 'pipeline']
     } catch (ignored) {
-        return null
+        return [source: 'pipeline']
     }
+}
+
+// Walks the enclosing blocks of a node to find the nearest library step ancestor.
+// Returns {library, version, stepName} of the innermost library step that
+// encloses this node, or null if the step is not inside any library step.
+private Map resolveCalledFrom(FlowNode node, String auditId) {
+    try {
+        for (def enc : node.enclosingBlocks) {
+            def entry = libraryNodeMap["${auditId}:${enc.id}"]
+            if (entry) return entry
+        }
+    } catch (ignored) {}
+    return null
 }
 
 private Run runFor(FlowExecution execution) {
