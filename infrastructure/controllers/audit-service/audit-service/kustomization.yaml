@@ -1,7 +1,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - rbac.yaml
-  - pvc.yaml
-  - service.yaml
-  - deployment.yaml
+  - https://github.com/pboyd-oss/platform-audit-service.git//k8s?ref=main
