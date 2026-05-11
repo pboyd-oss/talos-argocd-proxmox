@@ -33,10 +33,6 @@ final String AUDIT_SERVICE_URL = System.getProperty(
 @groovy.transform.Field
 final Map<String, List<Map>> auditStore = [:].asSynchronized()
 
-// Track step start times keyed by auditId:nodeId for duration calculation.
-@groovy.transform.Field
-final Map<String, Long> stepStartTimes = [:].asSynchronized()
-
 // Library step registry: auditId:nodeId → {library, version, stepName}.
 // Populated when a step is identified as a library GlobalVariable or src/ step.
 // Used by resolveCalledFrom to attribute inner steps to their library caller.
@@ -117,13 +113,13 @@ _flowListeners.add(new FlowExecutionListener() {
 
         flushToArtifact(auditId, run)
         auditStore.remove(auditId)
+        libraryNodeMap.keySet().removeIf { it.startsWith("${auditId}:") }
     }
 })
 
 // --- Node handler -----------------------------------------------------------
 
 private void handleNode(String auditId, WorkflowRun run, FlowNode node) {
-    def ts    = System.currentTimeMillis()
     def label = resolveLabel(node)
 
     if (node instanceof StepAtomNode) {
@@ -147,8 +143,6 @@ private void handleNode(String auditId, WorkflowRun run, FlowNode node) {
     }
 
     if (node instanceof StepStartNode) {
-        stepStartTimes["${auditId}:${node.id}"] = ts
-
         def args      = resolveArguments(node)
         def libSrc    = resolveLibrarySource(node, run)
         def calledFrom = resolveCalledFrom(node, auditId)
@@ -179,9 +173,9 @@ private void handleNode(String auditId, WorkflowRun run, FlowNode node) {
 
     if (node instanceof StepEndNode) {
         def startNode   = node.startNode
-        def startKey    = "${auditId}:${startNode?.id}"
-        def startTime   = stepStartTimes.remove(startKey)
-        def duration    = startTime ? (ts - startTime) : null
+        def startMs     = startNode ? TimingAction.getStartTime(startNode) : 0L
+        def endMs       = TimingAction.getStartTime(node)
+        def duration    = (startNode && startMs > 0L && endMs >= startMs) ? (endMs - startMs) : null
         def errorAction = node.getAction(ErrorAction)
 
         emitEvent(auditId, [
@@ -293,7 +287,7 @@ private String resolveLabel(FlowNode node) {
     node.id
 }
 
-private Map resolveArguments(StepStartNode node) {
+private Map resolveArguments(FlowNode node) {
     try {
         def args = ArgumentsAction.getStepArgumentsAsString(node)
         return args ? [raw: args] : [:]
@@ -305,7 +299,7 @@ private Map resolveArguments(StepStartNode node) {
 // Resolves which shared library a step came from by walking the class loader
 // chain and matching against the libraries declared in LibrariesAction.
 // Returns {source:'library', library:<name>, version:<sha>} or {source:'pipeline'}.
-private Map resolveLibrarySource(StepStartNode node, WorkflowRun run) {
+private Map resolveLibrarySource(FlowNode node, WorkflowRun run) {
     try {
         def descriptor = node.descriptor
         if (!descriptor) return [source: 'pipeline']
