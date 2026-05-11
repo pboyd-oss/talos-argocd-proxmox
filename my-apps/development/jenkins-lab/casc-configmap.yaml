@@ -126,10 +126,10 @@ data:
                     image: "harbor.tuxgrid.com/gcr.io/kaniko-project/executor:v1.23.2-debug"
                     command: "cat"
                     ttyEnabled: true
-                    resourceRequestCpu: "500m"
-                    resourceRequestMemory: "4Gi"
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "512Mi"
                     resourceLimitCpu: "2"
-                    resourceLimitMemory: "12Gi"
+                    resourceLimitMemory: "8Gi"
                   - name: "cosign"
                     image: "harbor.tuxgrid.com/platform/cosign:v2.5.2"
                     command: "cat"
