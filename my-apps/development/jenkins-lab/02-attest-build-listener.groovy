@@ -24,7 +24,17 @@ private String resolveAuditId(Run run) {
 
 DEFAULT_COVERAGE_THRESHOLD = 70
 
-RunListener.all().add(new RunListener<Run>() {
+// Idempotent registration — same reason as audit-graph-listener.
+final String ATTEST_LISTENER_MARKER = 'PlatformAttestBuildListener-v1'
+def _runListeners = Jenkins.instance.getExtensionList(RunListener.class)
+if (_runListeners.any { it.toString() == ATTEST_LISTENER_MARKER }) {
+    println("[Platform] Listener already registered — skipping")
+    return
+}
+_runListeners.add(new RunListener<Run>() {
+
+    String toString() { ATTEST_LISTENER_MARKER }
+
     @Override
     void onCompleted(Run run, TaskListener listener) {
         def fullName = run.parent.fullName

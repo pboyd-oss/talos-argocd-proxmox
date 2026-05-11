@@ -40,7 +40,19 @@ final Map<String, Long> stepStartTimes = [:].asSynchronized()
 @groovy.transform.Field
 final Map<String, Map> libraryNodeMap = [:].asSynchronized()
 
-FlowExecutionListener.all().add(new FlowExecutionListener() {
+// Idempotent registration — the Operator runs this via Script Console on every
+// reconcile cycle in addition to init.groovy.d at startup. Guard against
+// duplicates using a toString() marker; also fixes FlowExecutionListener.all()
+// which is not resolvable in the Script Console's Groovy classloader context.
+final String AUDIT_LISTENER_MARKER = 'PlatformAuditGraphListener-v1'
+def _flowListeners = Jenkins.instance.getExtensionList(FlowExecutionListener.class)
+if (_flowListeners.any { it.toString() == AUDIT_LISTENER_MARKER }) {
+    println("[Audit] Listener already registered — skipping")
+    return
+}
+_flowListeners.add(new FlowExecutionListener() {
+
+    String toString() { AUDIT_LISTENER_MARKER }
 
     @Override
     void onRunning(FlowExecution execution) {
