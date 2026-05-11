@@ -1,5 +1,7 @@
 import groovy.json.JsonOutput
+import hudson.model.ParametersAction
 import hudson.model.Run
+import hudson.model.StringParameterValue
 import jenkins.model.Jenkins
 import org.jenkinsci.plugins.workflow.flow.FlowExecution
 import org.jenkinsci.plugins.workflow.flow.FlowExecutionListener
@@ -71,12 +73,21 @@ _flowListeners.add(new FlowExecutionListener() {
             triggeredBy: run.getCauses().collect { it.shortDescription },
         ])
 
-        // Inject PLATFORM_AUDIT_ID into the build environment so every
-        // spawned process inherits it — Tetragon reads it from /proc/*/environ.
+        // Inject PLATFORM_AUDIT_ID into build env via ParametersAction.
+        // ParametersAction is a core Jenkins class (XStream-safe) and its values
+        // are automatically exported as environment variables for all build steps.
+        // AuditIdEnvironmentAction was removed — Groovy-script-defined Action
+        // subclasses are rejected by Jenkins's XStream class filter on save().
         try {
-            def envAction = run.getAction(hudson.model.EnvironmentContributingAction)
-            run.addAction(new AuditIdEnvironmentAction(auditId))
-        } catch (ignored) {}
+            def auditParam = new StringParameterValue('PLATFORM_AUDIT_ID', auditId)
+            def existing = run.getAction(ParametersAction)
+            def params = existing
+                ? existing.parameters.findAll { it.name != 'PLATFORM_AUDIT_ID' } + [auditParam]
+                : [auditParam]
+            run.replaceAction(new ParametersAction(params))
+        } catch (e) {
+            println("[Audit] Failed to inject PLATFORM_AUDIT_ID: ${e.message}")
+        }
 
         execution.addListener(new GraphListener.Synchronous() {
             @Override
@@ -258,7 +269,7 @@ private String generateAuditId(Run run) {
 }
 
 private String resolveAuditId(Run run) {
-    return run.getAction(AuditIdEnvironmentAction)?.auditId
+    return run.getAction(ParametersAction)?.getParameter('PLATFORM_AUDIT_ID')?.value
 }
 
 private String resolveLabel(FlowNode node) {
@@ -353,24 +364,6 @@ private Run runFor(FlowExecution execution) {
     }
 }
 
-// --- Environment action that injects PLATFORM_AUDIT_ID ---------------------
-
-class AuditIdEnvironmentAction implements hudson.model.EnvironmentContributingAction {
-    final String auditId
-
-    AuditIdEnvironmentAction(String auditId) {
-        this.auditId = auditId
-    }
-
-    @Override
-    void buildEnvironment(Run run, hudson.EnvVars env) {
-        env['PLATFORM_AUDIT_ID'] = auditId
-    }
-
-    @Override String getIconFileName()  { null }
-    @Override String getDisplayName()  { 'Audit ID' }
-    @Override String getUrlName()      { null }
-}
 
 // XStream2 blocks unknown classes from serialization by default.
 // AuditIdEnvironmentAction is defined here in a Groovy init script (not a plugin),

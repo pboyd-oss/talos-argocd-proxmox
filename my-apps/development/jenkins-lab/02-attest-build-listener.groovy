@@ -19,7 +19,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun
 import org.jenkinsci.plugins.workflow.libs.LibrariesAction
 
 private String resolveAuditId(Run run) {
-    return run.getAction(AuditIdEnvironmentAction)?.auditId
+    return run.getAction(ParametersAction)?.getParameter('PLATFORM_AUDIT_ID')?.value
 }
 
 DEFAULT_COVERAGE_THRESHOLD = 70
