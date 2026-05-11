@@ -101,6 +101,10 @@ _runListeners.add(new RunListener<Run>() {
         log("audit-log.json present: ${auditLogFile.exists()}")
         if (!auditLogFile.exists()) { refuse('audit-log.json was not written -- graph listener may not have flushed'); return }
 
+        def auditLogDigest = java.security.MessageDigest.getInstance('SHA-256')
+            .digest(auditLogFile.bytes).encodeHex().toString()
+        log("audit-log.json sha256: ${auditLogDigest}")
+
         def teamSlug = fullName.split('/')[1]
 
         // Standard 5: scan — check if already done, otherwise trigger it now
@@ -110,7 +114,7 @@ _runListeners.add(new RunListener<Run>() {
 
         if (scanResult) {
             log("Scan already completed — scheduling attestation immediately")
-            scheduleAttest(run, fullName, teamSlug, scanResult, testAction, lineCoverage, threshold, auditId, listener)
+            scheduleAttest(run, fullName, teamSlug, scanResult, testAction, lineCoverage, threshold, auditId, auditLogDigest, listener)
         } else {
             def scanJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/scan")
             if (!scanJob) { refuse("no scan job found at platform/${teamSlug}/scan"); return }
@@ -156,27 +160,30 @@ _runListeners.add(new RunListener<Run>() {
         def testAction     = teamBuild.getAction(TestResultAction)
         def coverageAction = teamBuild.getAction(JacocoBuildAction)
         def hasArtifacts   = teamBuild.getArtifacts().any { it.fileName == 'artifacts.json' }
-        def hasAuditLog    = new File(teamBuild.artifactsDir, 'audit-log.json').exists()
+        def auditLogFile   = new File(teamBuild.artifactsDir, 'audit-log.json')
         def auditId        = resolveAuditId(teamBuild)
 
-        if (!testAction || testAction.failCount > 0 || !coverageAction || !hasArtifacts || !hasAuditLog || !auditId) {
+        if (!testAction || testAction.failCount > 0 || !coverageAction || !hasArtifacts || !auditLogFile.exists() || !auditId) {
             log("Upstream build ${upstreamJob} #${upstreamBuild} no longer meets all attestation standards — skipping")
             return
         }
+
+        def auditLogDigest = java.security.MessageDigest.getInstance('SHA-256')
+            .digest(auditLogFile.bytes).encodeHex().toString()
 
         def threshold    = resolveCoverageThreshold(teamBuild)
         def lineCoverage = coverageAction.lineCoverage?.getPercentageFloat() ?: 0.0f
         def teamSlug     = upstreamJob.split('/')[1]
 
         log("All standards met — scheduling attestation for ${upstreamJob} #${upstreamBuild}")
-        scheduleAttest(teamBuild, upstreamJob, teamSlug, scanRun, testAction, lineCoverage, threshold, auditId, listener)
+        scheduleAttest(teamBuild, upstreamJob, teamSlug, scanRun, testAction, lineCoverage, threshold, auditId, auditLogDigest, listener)
     }
 
     // ── Shared: schedule the attest job ────────────────────────────────────
     private void scheduleAttest(Run teamBuild, String fullName, String teamSlug,
                                 Run scanRun, TestResultAction testAction,
                                 float lineCoverage, int threshold, String auditId,
-                                TaskListener listener) {
+                                String auditLogDigest, TaskListener listener) {
         def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
 
         def attestJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/attest")
@@ -187,17 +194,18 @@ _runListeners.add(new RunListener<Run>() {
         log("Libraries: ${librarySHAs.collect { "${it.name}@${it.sha}" }.join(', ') ?: 'none'}")
 
         attestJob.scheduleBuild2(0, new ParametersAction([
-            new StringParameterValue('UPSTREAM_JOB',             fullName),
-            new StringParameterValue('UPSTREAM_BUILD',           teamBuild.number.toString()),
-            new StringParameterValue('PLATFORM_AUDIT_ID',        auditId),
-            new StringParameterValue('PLATFORM_AUDIT_LOG_REF',   "${fullName}#${teamBuild.number}/artifact/audit-log.json"),
-            new StringParameterValue('PLATFORM_TESTS_COUNT',     testAction.totalCount.toString()),
-            new StringParameterValue('PLATFORM_TESTS_FAILURES',  testAction.failCount.toString()),
-            new StringParameterValue('PLATFORM_COVERAGE_PCT',    lineCoverage.round(2).toString()),
-            new StringParameterValue('PLATFORM_COVERAGE_THRESH', threshold.toString()),
-            new StringParameterValue('PLATFORM_SCAN_JOB_REF',   "platform/${teamSlug}/scan#${scanRun.number}"),
-            new StringParameterValue('PLATFORM_STAGES_JSON',     JsonOutput.toJson(stages)),
-            new StringParameterValue('PLATFORM_LIBRARIES_JSON',  JsonOutput.toJson(librarySHAs)),
+            new StringParameterValue('UPSTREAM_JOB',              fullName),
+            new StringParameterValue('UPSTREAM_BUILD',            teamBuild.number.toString()),
+            new StringParameterValue('PLATFORM_AUDIT_ID',         auditId),
+            new StringParameterValue('PLATFORM_AUDIT_LOG_REF',    "${fullName}#${teamBuild.number}/artifact/audit-log.json"),
+            new StringParameterValue('PLATFORM_AUDIT_LOG_DIGEST', auditLogDigest),
+            new StringParameterValue('PLATFORM_TESTS_COUNT',      testAction.totalCount.toString()),
+            new StringParameterValue('PLATFORM_TESTS_FAILURES',   testAction.failCount.toString()),
+            new StringParameterValue('PLATFORM_COVERAGE_PCT',     lineCoverage.round(2).toString()),
+            new StringParameterValue('PLATFORM_COVERAGE_THRESH',  threshold.toString()),
+            new StringParameterValue('PLATFORM_SCAN_JOB_REF',    "platform/${teamSlug}/scan#${scanRun.number}"),
+            new StringParameterValue('PLATFORM_STAGES_JSON',      JsonOutput.toJson(stages)),
+            new StringParameterValue('PLATFORM_LIBRARIES_JSON',   JsonOutput.toJson(librarySHAs)),
         ]))
 
         log("Attestation scheduled for ${fullName} #${teamBuild.number} | auditId=${auditId} | tests=${testAction.totalCount} | coverage=${lineCoverage.round(1)}% | scan=platform/${teamSlug}/scan#${scanRun.number}")
