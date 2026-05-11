@@ -106,6 +106,22 @@ _runListeners.add(new RunListener<Run>() {
         log("audit-log.json sha256: ${auditLogDigest}")
 
         def teamSlug = fullName.split('/')[1]
+        def repoName = fullName.split('/')[2]
+
+        // Resolve git metadata early — needed for Standard 7 and scan trigger
+        def gitData   = run.getAction(BuildData)
+        def gitUrl    = gitData?.remoteUrls?.find() ?: ''
+        def gitCommit = gitData?.lastBuiltRevision?.sha1String ?: ''
+
+        // Standard 7: a successful source-scan must exist for this exact commit
+        if (!gitCommit) { refuse('could not determine GIT_COMMIT from build data'); return }
+        log("Looking for successful source-scan: platform/${teamSlug}/${repoName}/source-scan@${gitCommit.take(7)}")
+        def sourceScanResult = findSuccessfulSourceScan(teamSlug, repoName, gitCommit)
+        log("Source scan found: ${sourceScanResult != null}${sourceScanResult ? ' (#' + sourceScanResult.number + ')' : ''}")
+        if (!sourceScanResult) {
+            refuse("no successful source-scan found for ${repoName}@${gitCommit.take(7)} — platform/${teamSlug}/${repoName}/source-scan must pass for this commit before attestation")
+            return
+        }
 
         // Standard 5: scan — check if already done, otherwise trigger it now
         log("Looking for successful scan: platform/${teamSlug}/scan upstream=${fullName} build=${run.number}")
@@ -118,10 +134,6 @@ _runListeners.add(new RunListener<Run>() {
         } else {
             def scanJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/scan")
             if (!scanJob) { refuse("no scan job found at platform/${teamSlug}/scan"); return }
-
-            def gitData   = run.getAction(BuildData)
-            def gitUrl    = gitData?.remoteUrls?.find() ?: ''
-            def gitCommit = gitData?.lastBuiltRevision?.sha1String ?: ''
 
             scanJob.scheduleBuild2(0,
                 new CauseAction(new Cause.UpstreamCause(run)),
@@ -157,13 +169,19 @@ _runListeners.add(new RunListener<Run>() {
         if (teamBuild.result != Result.SUCCESS) { log("Upstream build result is ${teamBuild.result} — skipping"); return }
 
         // Re-verify all standards still hold on the team build
+        def teamSlug       = upstreamJob.split('/')[1]
+        def repoName       = upstreamJob.split('/')[2]
         def testAction     = teamBuild.getAction(TestResultAction)
         def coverageAction = teamBuild.getAction(JacocoBuildAction)
         def hasArtifacts   = teamBuild.getArtifacts().any { it.fileName == 'artifacts.json' }
         def auditLogFile   = new File(teamBuild.artifactsDir, 'audit-log.json')
         def auditId        = resolveAuditId(teamBuild)
 
-        if (!testAction || testAction.failCount > 0 || !coverageAction || !hasArtifacts || !auditLogFile.exists() || !auditId) {
+        def gitData2     = teamBuild.getAction(BuildData)
+        def gitCommit2   = gitData2?.lastBuiltRevision?.sha1String ?: ''
+        def sourceScanOk = gitCommit2 ? findSuccessfulSourceScan(teamSlug, repoName, gitCommit2) != null : false
+
+        if (!testAction || testAction.failCount > 0 || !coverageAction || !hasArtifacts || !auditLogFile.exists() || !auditId || !sourceScanOk) {
             log("Upstream build ${upstreamJob} #${upstreamBuild} no longer meets all attestation standards — skipping")
             return
         }
@@ -173,7 +191,6 @@ _runListeners.add(new RunListener<Run>() {
 
         def threshold    = resolveCoverageThreshold(teamBuild)
         def lineCoverage = coverageAction.lineCoverage?.getPercentageFloat() ?: 0.0f
-        def teamSlug     = upstreamJob.split('/')[1]
 
         log("All standards met — scheduling attestation for ${upstreamJob} #${upstreamBuild}")
         scheduleAttest(teamBuild, upstreamJob, teamSlug, scanRun, testAction, lineCoverage, threshold, auditId, auditLogDigest, listener)
@@ -209,6 +226,18 @@ _runListeners.add(new RunListener<Run>() {
         ]))
 
         log("Attestation scheduled for ${fullName} #${teamBuild.number} | auditId=${auditId} | tests=${testAction.totalCount} | coverage=${lineCoverage.round(1)}% | scan=platform/${teamSlug}/scan#${scanRun.number}")
+    }
+
+    private Run findSuccessfulSourceScan(String teamSlug, String repoName, String gitCommit) {
+        def sourceScanJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/${repoName}/source-scan")
+        if (!sourceScanJob) return null
+
+        return sourceScanJob.builds.take(50).find { b ->
+            if (b.result != Result.SUCCESS) return false
+            def params = b.getAction(ParametersAction)
+            if (!params) return false
+            params.getParameter('GIT_COMMIT')?.value == gitCommit
+        }
     }
 
     private Run findSuccessfulScan(String teamSlug, String upstreamJob, String upstreamBuild) {
