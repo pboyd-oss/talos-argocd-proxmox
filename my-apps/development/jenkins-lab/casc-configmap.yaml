@@ -127,7 +127,7 @@ data:
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
-                    resourceRequestMemory: "512Mi"
+                    resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "8Gi"
                   - name: "cosign"
