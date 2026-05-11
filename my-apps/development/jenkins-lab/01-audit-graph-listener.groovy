@@ -363,10 +363,3 @@ private Run runFor(FlowExecution execution) {
         return null
     }
 }
-
-
-// XStream2 blocks unknown classes from serialization by default.
-// AuditIdEnvironmentAction is defined here in a Groovy init script (not a plugin),
-// so it isn't on the allowlist automatically. Without this, Jenkins throws
-// "Refusing to marshal AuditIdEnvironmentAction" when saving WorkflowRun state.
-Jenkins.get().XSTREAM2.allowTypes([AuditIdEnvironmentAction] as Class[])
