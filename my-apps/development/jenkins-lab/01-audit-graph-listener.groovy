@@ -48,10 +48,9 @@ final Map<String, Map> libraryNodeMap = [:].asSynchronized()
 // which is not resolvable in the Script Console's Groovy classloader context.
 final String AUDIT_LISTENER_MARKER = 'PlatformAuditGraphListener-v1'
 def _flowListeners = Jenkins.instance.getExtensionList(FlowExecutionListener.class)
-if (_flowListeners.any { it.toString() == AUDIT_LISTENER_MARKER }) {
-    println("[Audit] Listener already registered — skipping")
-    return
-}
+// Remove then re-add so the Operator always runs the current version of this script.
+// The skip-if-exists guard prevented code updates from taking effect without a restart.
+_flowListeners.removeIf { it.toString() == AUDIT_LISTENER_MARKER }
 _flowListeners.add(new FlowExecutionListener() {
 
     String toString() { AUDIT_LISTENER_MARKER }
