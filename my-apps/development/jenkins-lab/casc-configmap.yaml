@@ -131,7 +131,7 @@ data:
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "8Gi"
                   - name: "cosign"
-                    image: "harbor.tuxgrid.com/ghcr.io/sigstore/cosign/cosign:v2.5.2"
+                    image: "harbor.tuxgrid.com/platform/cosign:v2.5.2"
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
