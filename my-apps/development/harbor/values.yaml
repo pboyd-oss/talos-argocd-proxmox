@@ -27,10 +27,6 @@ persistence:
         storageClass: longhorn
         accessMode: ReadWriteOnce
         size: 5Gi
-    database:
-      storageClass: longhorn
-      accessMode: ReadWriteOnce
-      size: 5Gi
     redis:
       storageClass: longhorn
       accessMode: ReadWriteOnce
@@ -41,13 +37,15 @@ persistence:
       size: 5Gi
 
 database:
-  type: internal
-  podAnnotations: {}
-  livenessProbe:
-    timeoutSeconds: 5
-    failureThreshold: 10
-  readinessProbe:
-    timeoutSeconds: 5
+  type: external
+  external:
+    host: "harbor-database-rw.cloudnative-pg.svc.cluster.local"
+    port: "5432"
+    username: "harbor"
+    coreDatabase: "registry"
+    existingSecret: "harbor-database-secret"
+    existingSecretKey: "HARBOR_DATABASE_PASSWORD"
+    sslmode: "disable"
 
 redis:
   type: internal

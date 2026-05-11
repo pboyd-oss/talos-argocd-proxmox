@@ -57,6 +57,7 @@ The `serverName` values below live in each DB's `base/cluster.yaml` and
 | Database  | Current write target (base)  | Prior lineage (recovery source) |
 |-----------|------------------------------|---------------------------------|
 | gitea     | `gitea-database-v1`          | `gitea-database-v1`             |
+| harbor    | `harbor-database-v1`         | `harbor-database-v1`            |
 | immich    | `immich-database-v1`         | `immich-database-v1`            |
 | paperless | `paperless-database-v1`      | `paperless-database-v1`         |
 | temporal  | `temporal-database-v1`       | `temporal-database-v1`          |

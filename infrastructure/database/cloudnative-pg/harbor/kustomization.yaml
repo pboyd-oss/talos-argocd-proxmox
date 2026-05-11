@@ -1,0 +1,24 @@
+# Harbor CNPG database — root kustomization
+#
+# DR FEATURE FLAG: change the active overlay on this line to switch
+# bootstrap mode. Everything else is in Git.
+#
+#   overlays/initdb   = fresh DB (used for initial migration seeding)
+#   overlays/recovery = restore from Barman S3 (flip here for DR)
+#
+# In-place DR also requires:
+#   kubectl delete cluster harbor-database -n cloudnative-pg
+#   kubectl delete pvc -n cloudnative-pg -l cnpg.io/cluster=harbor-database
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cloudnative-pg
+commonLabels:
+  app.kubernetes.io/name: harbor-db
+  app.kubernetes.io/managed-by: argocd
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-5"
+resources:
+  # - overlays/recovery      # swap to this for DR (restore from Barman)
+  - overlays/initdb          # ← ACTIVE: fresh DB / normal operation
+  - sealedsecret.yaml
+  - scheduled-backup.yaml
