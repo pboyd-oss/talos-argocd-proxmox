@@ -44,7 +44,6 @@ database:
     username: "harbor"
     coreDatabase: "registry"
     existingSecret: "harbor-database-secret"
-    existingSecretKey: "HARBOR_DATABASE_PASSWORD"
     sslmode: "disable"
 
 redis:
