@@ -43,8 +43,8 @@ data:
                     image: "harbor.tuxgrid.com/docker.io/golang:1.23"
                     command: "cat"
                     ttyEnabled: true
-              - name: "build-sec-base"
-                label: "build-sec-base"
+              - name: "deploy-sec-base"
+                label: "deploy-sec-base"
                 serviceAccount: "jenkins"
                 volumes:
                   - secretVolume:
@@ -54,8 +54,8 @@ data:
                       mountPath: "/cosign-key"
                       secretName: "cosign-key"
                 containers:
-                  - name: "build-sec-base"
-                    image: "harbor.tuxgrid.com/platform/build-sec-base:latest"
+                  - name: "deploy-sec-base"
+                    image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
@@ -118,8 +118,8 @@ data:
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "6Gi"
-              - name: "build-sec-base-builder"
-                label: "build-sec-base-builder"
+              - name: "deploy-sec-base-builder"
+                label: "deploy-sec-base-builder"
                 serviceAccount: "jenkins"
                 containers:
                   - name: "kaniko"
@@ -150,8 +150,8 @@ data:
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "6Gi"
-                  - name: "build-sec-base"
-                    image: "harbor.tuxgrid.com/platform/build-sec-base:latest"
+                  - name: "deploy-sec-base"
+                    image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
