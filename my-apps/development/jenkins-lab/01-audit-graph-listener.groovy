@@ -244,21 +244,15 @@ private void flushToArtifact(String auditId, Run run) {
         events       : events,
     ]
 
-    def json    = JsonOutput.prettyPrint(JsonOutput.toJson(report))
-    def dir     = run.artifactsDir
-    dir.mkdirs()
-    def file    = new File(dir, 'audit-log.json')
-    file.text   = json
-
-    // Register with Jenkins so it appears in the build artifacts UI.
-    run.artifactManager.archive(
-        run.workspace,
-        run.getEnvironment(hudson.model.TaskListener.NULL),
-        run.getExecutor()?.owner?.channel,
-        ['audit-log.json': 'audit-log.json']
-    )
-
-    println("[Audit] Flushed ${events.size()} events to audit-log.json for ${auditId}")
+    def json = JsonOutput.prettyPrint(JsonOutput.toJson(report))
+    try {
+        def dir = run.artifactsDir
+        dir.mkdirs()
+        new File(dir, 'audit-log.json').text = json
+        println("[Audit] Flushed ${events.size()} events to audit-log.json for ${auditId}")
+    } catch (e) {
+        println("[Audit] Failed to flush audit-log.json: ${e.message}")
+    }
 }
 
 // --- Helpers ----------------------------------------------------------------
