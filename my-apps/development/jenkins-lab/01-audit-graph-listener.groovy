@@ -10,6 +10,7 @@ import org.jenkinsci.plugins.workflow.graph.FlowEndNode
 import org.jenkinsci.plugins.workflow.graph.FlowNode
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode
 import org.jenkinsci.plugins.workflow.cps.nodes.StepEndNode
+import org.jenkinsci.plugins.workflow.cps.nodes.StepAtomNode
 import org.jenkinsci.plugins.workflow.actions.ErrorAction
 import org.jenkinsci.plugins.workflow.actions.LabelAction
 import org.jenkinsci.plugins.workflow.actions.TimingAction
@@ -124,6 +125,26 @@ _flowListeners.add(new FlowExecutionListener() {
 private void handleNode(String auditId, WorkflowRun run, FlowNode node) {
     def ts    = System.currentTimeMillis()
     def label = resolveLabel(node)
+
+    if (node instanceof StepAtomNode) {
+        def args      = resolveArguments(node)
+        def libSrc    = resolveLibrarySource(node, run)
+        def calledFrom = resolveCalledFrom(node, auditId)
+
+        emitEvent(auditId, [
+            event        : 'STEP_ATOM',
+            nodeId       : node.id,
+            stepName     : label,
+            functionName : node.descriptor?.functionName,
+            arguments    : args,
+            enclosingIds : node.enclosingBlocks*.id,
+            workspace    : node.getAction(WorkspaceAction)?.path,
+            thread       : node.getAction(ThreadNameAction)?.threadName,
+            librarySource: libSrc,
+            calledFrom   : calledFrom,
+        ])
+        return
+    }
 
     if (node instanceof StepStartNode) {
         stepStartTimes["${auditId}:${node.id}"] = ts
