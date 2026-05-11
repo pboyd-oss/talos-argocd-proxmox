@@ -5,6 +5,7 @@ import hudson.model.ParametersAction
 import hudson.model.Result
 import hudson.model.Run
 import hudson.model.StringParameterValue
+import hudson.model.TaskListener
 import hudson.model.listeners.RunListener
 import hudson.plugins.git.util.BuildData
 import hudson.tasks.junit.TestResultAction
@@ -31,19 +32,17 @@ _runListeners.add(new RunListener<Run>() {
 
     String toString() { ATTEST_LISTENER_MARKER }
 
-    // onFinalized fires after RunListener.onCompleted and after
-    // FlowExecutionListener.onCompleted (which writes audit-log.json).
-    // Using onCompleted caused a race where the audit-log.json check ran
-    // before the graph listener had flushed the file.
     @Override
-    void onFinalized(Run run) {
+    void onCompleted(Run run, TaskListener listener) {
         def fullName = run.parent.fullName
-        println("[Platform:debug] onFinalized fired for ${fullName} #${run.number} result=${run.result}")
+        listener.logger.println("[Platform:debug] onCompleted fired for ${fullName} #${run.number} result=${run.result}")
 
         if (fullName.startsWith('teams/') && run.result == Result.SUCCESS) {
-            handleTeamBuild(run, fullName)
+            handleTeamBuild(run, listener, fullName)
         } else if ((fullName =~ /^platform\/[^\/]+\/scan$/).matches() && run.result == Result.SUCCESS) {
-            handleScanCompleted(run, fullName)
+            handleScanCompleted(run, listener, fullName)
+        } else {
+            listener.logger.println("[Platform:debug] skipping -- not a tracked build")
         }
     }
 
@@ -51,8 +50,8 @@ _runListeners.add(new RunListener<Run>() {
     // Check Standards 1–4. If all pass, look for an existing scan:
     //   found  → schedule attest immediately (scan was called from Jenkinsfile)
     //   absent → trigger scan now; attest fires when scan completes (Phase 2)
-    private void handleTeamBuild(Run run, String fullName) {
-        def log    = { String msg -> println("[Platform] ${msg}") }
+    private void handleTeamBuild(Run run, TaskListener listener, String fullName) {
+        def log    = { String msg -> listener.logger.println("[Platform] ${msg}") }
         def refuse = { String reason -> log("Attestation REFUSED for ${fullName} #${run.number} -- ${reason}") }
 
         log("Checking attestation eligibility for ${fullName} #${run.number}")
@@ -96,10 +95,11 @@ _runListeners.add(new RunListener<Run>() {
         log("Audit ID: ${auditId ?: 'NOT PRESENT -- graph listener may not be active'}")
         if (!auditId) { refuse('no PLATFORM_AUDIT_ID found -- audit-graph-listener may not be loaded'); return }
 
-        // audit-log.json flushed by graph listener at build completion
-        def hasAuditLog = run.getArtifacts().any { it.fileName == 'audit-log.json' }
-        log("audit-log.json present: ${hasAuditLog}")
-        if (!hasAuditLog) { refuse('audit-log.json was not archived -- graph listener may not have flushed'); return }
+        // audit-log.json written by the graph listener — check the file directly
+        // since run.getArtifacts() may not reflect it yet at onCompleted time
+        def auditLogFile = new File(run.artifactsDir, 'audit-log.json')
+        log("audit-log.json present: ${auditLogFile.exists()}")
+        if (!auditLogFile.exists()) { refuse('audit-log.json was not written -- graph listener may not have flushed'); return }
 
         def teamSlug = fullName.split('/')[1]
 
@@ -110,7 +110,7 @@ _runListeners.add(new RunListener<Run>() {
 
         if (scanResult) {
             log("Scan already completed — scheduling attestation immediately")
-            scheduleAttest(run, fullName, teamSlug, scanResult, testAction, lineCoverage, threshold, auditId)
+            scheduleAttest(run, fullName, teamSlug, scanResult, testAction, lineCoverage, threshold, auditId, listener)
         } else {
             def scanJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/scan")
             if (!scanJob) { refuse("no scan job found at platform/${teamSlug}/scan"); return }
@@ -135,8 +135,8 @@ _runListeners.add(new RunListener<Run>() {
     // ── Phase 2: platform scan completed ───────────────────────────────────
     // Scan finished successfully. Re-verify the upstream team build is still
     // eligible, then schedule attest. This is the completion of the wait.
-    private void handleScanCompleted(Run scanRun, String fullName) {
-        def log = { String msg -> println("[Platform] ${msg}") }
+    private void handleScanCompleted(Run scanRun, TaskListener listener, String fullName) {
+        def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
         log("Scan completed: ${fullName} #${scanRun.number} — looking up upstream build for attestation")
 
         def params = scanRun.getAction(ParametersAction)
@@ -156,7 +156,7 @@ _runListeners.add(new RunListener<Run>() {
         def testAction     = teamBuild.getAction(TestResultAction)
         def coverageAction = teamBuild.getAction(JacocoBuildAction)
         def hasArtifacts   = teamBuild.getArtifacts().any { it.fileName == 'artifacts.json' }
-        def hasAuditLog    = teamBuild.getArtifacts().any { it.fileName == 'audit-log.json' }
+        def hasAuditLog    = new File(teamBuild.artifactsDir, 'audit-log.json').exists()
         def auditId        = resolveAuditId(teamBuild)
 
         if (!testAction || testAction.failCount > 0 || !coverageAction || !hasArtifacts || !hasAuditLog || !auditId) {
@@ -169,14 +169,15 @@ _runListeners.add(new RunListener<Run>() {
         def teamSlug     = upstreamJob.split('/')[1]
 
         log("All standards met — scheduling attestation for ${upstreamJob} #${upstreamBuild}")
-        scheduleAttest(teamBuild, upstreamJob, teamSlug, scanRun, testAction, lineCoverage, threshold, auditId)
+        scheduleAttest(teamBuild, upstreamJob, teamSlug, scanRun, testAction, lineCoverage, threshold, auditId, listener)
     }
 
     // ── Shared: schedule the attest job ────────────────────────────────────
     private void scheduleAttest(Run teamBuild, String fullName, String teamSlug,
                                 Run scanRun, TestResultAction testAction,
-                                float lineCoverage, int threshold, String auditId) {
-        def log = { String msg -> println("[Platform] ${msg}") }
+                                float lineCoverage, int threshold, String auditId,
+                                TaskListener listener) {
+        def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
 
         def attestJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/attest")
         if (!attestJob) { log("WARNING: no attestation job at platform/${teamSlug}/attest"); return }
