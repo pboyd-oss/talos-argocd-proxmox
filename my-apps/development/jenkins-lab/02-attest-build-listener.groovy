@@ -101,9 +101,8 @@ _runListeners.add(new RunListener<Run>() {
         log("audit-log.json present: ${auditLogFile.exists()}")
         if (!auditLogFile.exists()) { refuse('audit-log.json was not written -- graph listener may not have flushed'); return }
 
-        def auditLogDigest = java.security.MessageDigest.getInstance('SHA-256')
-            .digest(auditLogFile.bytes).encodeHex().toString()
-        log("audit-log.json sha256: ${auditLogDigest}")
+        def auditLogDigest = fetchAuditSummaryDigest(auditId, auditLogFile, listener)
+        log("audit-log digest: ${auditLogDigest}")
 
         def teamSlug = fullName.split('/')[1]
         def repoName = fullName.split('/')[2]
@@ -127,6 +126,38 @@ _runListeners.add(new RunListener<Run>() {
         log("Looking for successful scan: platform/${teamSlug}/scan upstream=${fullName} build=${run.number}")
         def scanResult = findSuccessfulScan(teamSlug, fullName, run.number.toString())
         log("Scan result found: ${scanResult != null}${scanResult ? ' (#' + scanResult.number + ')' : ''}")
+
+        // Cedar Layer 5 check — additive on top of imperative standards above.
+        // Non-blocking if service is unreachable during rollout.
+        def artifactsFile = new File(run.artifactsDir, 'artifacts.json')
+        def imageRef = ''
+        if (artifactsFile.exists()) {
+            try {
+                imageRef = new groovy.json.JsonSlurper().parseText(artifactsFile.text)?.builds?.get(0)?.tag ?: ''
+            } catch (ignored) {}
+        }
+
+        def completedStages    = extractStages(run).findAll { it.status == 'SUCCESS' }.collect { it.name }
+        def calledLibrarySteps = extractLibrarySteps(auditLogFile)
+
+        def cedarCtx = [
+            testsRun:           testAction.totalCount,
+            testsFailed:        testAction.failCount,
+            lineCoveragePct:    lineCoverage.toLong(),
+            coverageThreshold:  (long) threshold,
+            hasArtifactsJson:   true,
+            hasScanAttestation: scanResult != null,
+            scanAgeSeconds:     0L,
+            completedStages:    completedStages,
+            calledLibrarySteps: calledLibrarySteps,
+        ]
+
+        def cedarEntities = buildCedarEntities(fullName, teamSlug, run, scmTriggered, auditId != null)
+        def cedarResult = callCedarAuthorize(fullName, imageRef, cedarCtx, cedarEntities, listener)
+        if (cedarResult != null && cedarResult.startsWith('DENY')) {
+            refuse("Cedar policy: ${cedarResult}")
+            return
+        }
 
         if (scanResult) {
             log("Scan already completed — scheduling attestation immediately")
@@ -186,8 +217,7 @@ _runListeners.add(new RunListener<Run>() {
             return
         }
 
-        def auditLogDigest = java.security.MessageDigest.getInstance('SHA-256')
-            .digest(auditLogFile.bytes).encodeHex().toString()
+        def auditLogDigest = fetchAuditSummaryDigest(auditId, auditLogFile, listener)
 
         def threshold    = resolveCoverageThreshold(teamBuild)
         def lineCoverage = coverageAction.lineCoverage?.getPercentageFloat() ?: 0.0f
@@ -285,6 +315,124 @@ _runListeners.add(new RunListener<Run>() {
         if (!libAction) return []
         return libAction.libraries.collect { lib ->
             [name: lib.name, sha: lib.version ?: 'unknown']
+        }
+    }
+
+    // Fetch the out-of-band audit summary from the audit service and return its SHA-256.
+    // The audit service received all events via the graph listener — build pods are
+    // Cilium-locked and cannot reach the platform namespace, so this hash reflects a
+    // record the build could not have influenced. Falls back to the Jenkins artifact
+    // hash if the audit service is unavailable (with a warning).
+    private String fetchAuditSummaryDigest(String auditId, File fallbackFile, TaskListener listener) {
+        def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
+        def url = "http://platform-audit-service.platform.svc.cluster.local:8080/builds/${auditId}/summary"
+
+        for (int attempt = 1; attempt <= 6; attempt++) {
+            try {
+                def conn = new URL(url).openConnection() as java.net.HttpURLConnection
+                conn.setConnectTimeout(5000)
+                conn.setReadTimeout(5000)
+                def code = conn.responseCode
+                if (code == 200) {
+                    def body = conn.inputStream.bytes
+                    def digest = java.security.MessageDigest.getInstance('SHA-256')
+                        .digest(body).encodeHex().toString()
+                    log("Audit service summary sha256 (out-of-band): ${digest}")
+                    return digest
+                }
+                log("Audit service returned HTTP ${code} for ${auditId} (attempt ${attempt}/6)")
+            } catch (Exception e) {
+                log("Audit service unreachable: ${e.message} (attempt ${attempt}/6)")
+            }
+            if (attempt < 6) Thread.sleep(5000)
+        }
+
+        log("WARNING: audit service unavailable after 30s — falling back to Jenkins artifact hash")
+        return java.security.MessageDigest.getInstance('SHA-256')
+            .digest(fallbackFile.bytes).encodeHex().toString()
+    }
+
+    // Call the Cedar authorization service. Returns 'ALLOW', 'DENY: <reason1>; <reason2>', or
+    // null if the Cedar service is unreachable (caller should treat null as non-blocking during rollout).
+    private String callCedarAuthorize(String pipeline, String image, Map<String, Object> ctx,
+                                      List entities, TaskListener listener) {
+        def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
+        def url = 'http://platform-cedar-sidecar.platform.svc.cluster.local/authorize'
+
+        def body = groovy.json.JsonOutput.toJson([
+            principal: "TuxGrid::Pipeline::\"${pipeline}\"",
+            action:    'TuxGrid::Action::"Attest"',
+            resource:  "TuxGrid::Image::\"${image}\"",
+            entities:  entities,
+            context:   ctx,
+        ])
+
+        try {
+            def conn = new URL(url).openConnection() as java.net.HttpURLConnection
+            conn.setRequestMethod('POST')
+            conn.setDoOutput(true)
+            conn.setRequestProperty('Content-Type', 'application/json')
+            conn.setConnectTimeout(5000)
+            conn.setReadTimeout(5000)
+            conn.outputStream.withWriter('UTF-8') { it.write(body) }
+            def code = conn.responseCode
+            def resp = code < 400
+                ? new groovy.json.JsonSlurper().parseText(conn.inputStream.text)
+                : null
+            if (!resp) { log("Cedar service returned HTTP ${code}"); return null }
+            if (resp.decision == 'DENY') {
+                def reasons = resp.reasons ? resp.reasons.join('; ') : 'policy denied'
+                return "DENY: ${reasons}"
+            }
+            log("Cedar authorized attestation for ${pipeline}")
+            return 'ALLOW'
+        } catch (Exception e) {
+            log("Cedar service unreachable: ${e.message} — skipping Cedar check (non-blocking during rollout)")
+            return null
+        }
+    }
+
+    private List buildCedarEntities(String fullName, String teamSlug, Run run,
+                                    boolean scmTriggered, boolean hasAuditId) {
+        def libNames = getLibrarySHAs(run).collect { it.name }
+        return [
+            [
+                uid    : [type: 'TuxGrid::Namespace', id: 'development'],
+                attrs  : [tier: 'development'],
+                parents: [],
+            ],
+            [
+                uid    : [type: 'TuxGrid::Team', id: teamSlug],
+                attrs  : [slug: teamSlug, coverageThreshold: (long) resolveCoverageThreshold(run)],
+                parents: [[type: 'TuxGrid::Namespace', id: 'development']],
+            ],
+            [
+                uid    : [type: 'TuxGrid::Pipeline', id: fullName],
+                attrs  : [
+                    jobPath       : fullName,
+                    branch        : run.getAction(BuildData)?.lastBuiltRevision?.branches?.find()?.name ?: 'unknown',
+                    triggeredBySCM: scmTriggered,
+                    hasAuditId    : hasAuditId,
+                    declaredBuild : true,
+                    declaredTest  : true,
+                ],
+                parents: [[type: 'TuxGrid::Team', id: teamSlug]],
+            ],
+        ]
+    }
+
+    // Parse audit-log.json to find library steps that were called.
+    // Returns strings in "library::stepName" format.
+    private List<String> extractLibrarySteps(File auditLogFile) {
+        if (!auditLogFile.exists()) return []
+        try {
+            def log = new groovy.json.JsonSlurper().parseText(auditLogFile.text)
+            return log.events
+                ?.findAll { it.event == 'STEP_START' && it.librarySource?.source == 'library' }
+                ?.collect { "${it.librarySource.library}::${it.stepName}" }
+                ?.unique() ?: []
+        } catch (ignored) {
+            return []
         }
     }
 
