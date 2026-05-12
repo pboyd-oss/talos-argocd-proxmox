@@ -10,6 +10,7 @@ resources:
 - policies/longhorn-pvc-backup-audit.yaml
 - policies/require-signed-images.yaml
 - policies/require-signed-platform-images.yaml
+- policies/restrict-platform-image-registries.yaml
 helmCharts:
 - name: kyverno
   repo: https://kyverno.github.io/kyverno

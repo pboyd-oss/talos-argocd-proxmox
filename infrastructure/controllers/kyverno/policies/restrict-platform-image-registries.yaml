@@ -1,0 +1,42 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-platform-image-registries
+  annotations:
+    policies.kyverno.io/title: Restrict Platform Namespace to Harbor Registry
+    policies.kyverno.io/description: >-
+      Blocks Pod admission in the platform namespace unless all container images
+      originate from harbor.tuxgrid.com. Prevents accidental pulls from Docker Hub
+      or other public registries.
+spec:
+  mutateExistingOnPolicyUpdate: false
+  background: false
+  emitWarning: false
+  validationFailureAction: Enforce
+  rules:
+    - name: restrict-image-registries
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - platform
+      validate:
+        message: "All images in the platform namespace must originate from harbor.tuxgrid.com"
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                all:
+                  - key: "{{ element.image }}"
+                    operator: NotEquals
+                    value: "harbor.tuxgrid.com/*"
+          - list: "request.object.spec.initContainers || `[]`"
+            deny:
+              conditions:
+                all:
+                  - key: "{{ element.image }}"
+                    operator: NotEquals
+                    value: "harbor.tuxgrid.com/*"
