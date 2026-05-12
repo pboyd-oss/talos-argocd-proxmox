@@ -128,8 +128,7 @@ _runListeners.add(new RunListener<Run>() {
         def scanResult = findSuccessfulScan(teamSlug, fullName, run.number.toString())
         log("Scan result found: ${scanResult != null}${scanResult ? ' (#' + scanResult.number + ')' : ''}")
 
-        // Cedar Layer 5 check — additive on top of imperative standards above.
-        // Non-blocking if service is unreachable during rollout.
+        // Cedar Layer 5 check — hard failure if service is unreachable or returns DENY.
         def artifactsFile = new File(run.artifactsDir, 'artifacts.json')
         def imageRef = ''
         if (artifactsFile.exists()) {
@@ -157,8 +156,8 @@ _runListeners.add(new RunListener<Run>() {
 
         def cedarEntities = buildCedarEntities(fullName, teamSlug, run, scmTriggered, auditId != null)
         def cedarResult = callCedarAuthorize(fullName, imageRef, cedarCtx, cedarEntities, listener)
-        if (cedarResult != null && cedarResult.startsWith('DENY')) {
-            refuse("Cedar policy: ${cedarResult}")
+        if (cedarResult == null || cedarResult.startsWith('DENY')) {
+            refuse(cedarResult == null ? 'Cedar policy service unreachable — attestation blocked' : "Cedar policy: ${cedarResult}")
             return
         }
 
@@ -360,14 +359,11 @@ _runListeners.add(new RunListener<Run>() {
             if (attempt < 12) Thread.sleep(5000)
         }
 
-        log("WARNING: audit service unavailable after 60s — falling back to Jenkins artifact hash")
-        def digest = java.security.MessageDigest.getInstance('SHA-256')
-            .digest(fallbackFile.bytes).encodeHex().toString()
-        return [digest: digest, anomalyCount: 0L, unexpectedNetworkCount: 0L]
+        throw new IllegalStateException("Audit service unavailable after 60s — attestation blocked (auditId=${auditId})")
     }
 
-    // Call the Cedar authorization service. Returns 'ALLOW', 'DENY: <reason1>; <reason2>', or
-    // null if the Cedar service is unreachable (caller should treat null as non-blocking during rollout).
+    // Call the Cedar authorization service. Returns 'ALLOW' or 'DENY: <reason1>; <reason2>'.
+    // Returns null if the service is unreachable — callers treat null as a hard block.
     private String callCedarAuthorize(String pipeline, String image, Map<String, Object> ctx,
                                       List entities, TaskListener listener) {
         def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
@@ -401,7 +397,7 @@ _runListeners.add(new RunListener<Run>() {
             log("Cedar authorized attestation for ${pipeline}")
             return 'ALLOW'
         } catch (Exception e) {
-            log("Cedar service unreachable: ${e.message} — skipping Cedar check (non-blocking during rollout)")
+            log("Cedar service unreachable: ${e.message}")
             return null
         }
     }
