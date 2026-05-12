@@ -101,8 +101,9 @@ _runListeners.add(new RunListener<Run>() {
         log("audit-log.json present: ${auditLogFile.exists()}")
         if (!auditLogFile.exists()) { refuse('audit-log.json was not written -- graph listener may not have flushed'); return }
 
-        def auditLogDigest = fetchAuditSummaryDigest(auditId, auditLogFile, listener)
-        log("audit-log digest: ${auditLogDigest}")
+        def auditSummary   = fetchAuditSummaryDigest(auditId, auditLogFile, listener)
+        def auditLogDigest = auditSummary.digest
+        log("audit-log digest: ${auditLogDigest} | anomalies: ${auditSummary.anomalyCount} | unexpected network: ${auditSummary.unexpectedNetworkCount}")
 
         def teamSlug = fullName.split('/')[1]
         def repoName = fullName.split('/')[2]
@@ -141,15 +142,17 @@ _runListeners.add(new RunListener<Run>() {
         def calledLibrarySteps = extractLibrarySteps(auditLogFile)
 
         def cedarCtx = [
-            testsRun:           testAction.totalCount,
-            testsFailed:        testAction.failCount,
-            lineCoveragePct:    lineCoverage.toLong(),
-            coverageThreshold:  (long) threshold,
-            hasArtifactsJson:   true,
-            hasScanAttestation: scanResult != null,
-            scanAgeSeconds:     0L,
-            completedStages:    completedStages,
-            calledLibrarySteps: calledLibrarySteps,
+            testsRun:                    testAction.totalCount,
+            testsFailed:                 testAction.failCount,
+            lineCoveragePct:             lineCoverage.toLong(),
+            coverageThreshold:           (long) threshold,
+            hasArtifactsJson:            true,
+            hasScanAttestation:          scanResult != null,
+            scanAgeSeconds:              0L,
+            completedStages:             completedStages,
+            calledLibrarySteps:          calledLibrarySteps,
+            auditAnomalyCount:           auditSummary.anomalyCount,
+            auditUnexpectedNetworkCount: auditSummary.unexpectedNetworkCount,
         ]
 
         def cedarEntities = buildCedarEntities(fullName, teamSlug, run, scmTriggered, auditId != null)
@@ -217,7 +220,8 @@ _runListeners.add(new RunListener<Run>() {
             return
         }
 
-        def auditLogDigest = fetchAuditSummaryDigest(auditId, auditLogFile, listener)
+        def auditSummary   = fetchAuditSummaryDigest(auditId, auditLogFile, listener)
+        def auditLogDigest = auditSummary.digest
 
         def threshold    = resolveCoverageThreshold(teamBuild)
         def lineCoverage = coverageAction.lineCoverage?.getPercentageFloat() ?: 0.0f
@@ -323,33 +327,43 @@ _runListeners.add(new RunListener<Run>() {
     // Cilium-locked and cannot reach the platform namespace, so this hash reflects a
     // record the build could not have influenced. Falls back to the Jenkins artifact
     // hash if the audit service is unavailable (with a warning).
-    private String fetchAuditSummaryDigest(String auditId, File fallbackFile, TaskListener listener) {
+    // Returns [digest: String, anomalyCount: long, unexpectedNetworkCount: long].
+    // Retries for up to 60s to allow the audit service correlation pass to finish.
+    // Falls back to local artifact hash with zero anomaly counts if unavailable.
+    private Map fetchAuditSummaryDigest(String auditId, File fallbackFile, TaskListener listener) {
         def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
         def url = "http://platform-audit-service.platform.svc.cluster.local:8080/builds/${auditId}/summary"
 
-        for (int attempt = 1; attempt <= 6; attempt++) {
+        for (int attempt = 1; attempt <= 12; attempt++) {
             try {
                 def conn = new URL(url).openConnection() as java.net.HttpURLConnection
                 conn.setConnectTimeout(5000)
                 conn.setReadTimeout(5000)
                 def code = conn.responseCode
                 if (code == 200) {
-                    def body = conn.inputStream.bytes
+                    def body   = conn.inputStream.bytes
                     def digest = java.security.MessageDigest.getInstance('SHA-256')
                         .digest(body).encodeHex().toString()
+
+                    def report = new groovy.json.JsonSlurper().parse(body)
+                    def anomalyCount = (report?.anomaly_count ?: 0) as long
+                    def unexpectedNetworkCount = (report?.correlated_execs ?: [])
+                        .count { it?.anomaly && it?.tetragon_event?.event_type == 'network' } as long
+
                     log("Audit service summary sha256 (out-of-band): ${digest}")
-                    return digest
+                    return [digest: digest, anomalyCount: anomalyCount, unexpectedNetworkCount: unexpectedNetworkCount]
                 }
-                log("Audit service returned HTTP ${code} for ${auditId} (attempt ${attempt}/6)")
+                log("Audit service returned HTTP ${code} for ${auditId} (attempt ${attempt}/12)")
             } catch (Exception e) {
-                log("Audit service unreachable: ${e.message} (attempt ${attempt}/6)")
+                log("Audit service unreachable: ${e.message} (attempt ${attempt}/12)")
             }
-            if (attempt < 6) Thread.sleep(5000)
+            if (attempt < 12) Thread.sleep(5000)
         }
 
-        log("WARNING: audit service unavailable after 30s — falling back to Jenkins artifact hash")
-        return java.security.MessageDigest.getInstance('SHA-256')
+        log("WARNING: audit service unavailable after 60s — falling back to Jenkins artifact hash")
+        def digest = java.security.MessageDigest.getInstance('SHA-256')
             .digest(fallbackFile.bytes).encodeHex().toString()
+        return [digest: digest, anomalyCount: 0L, unexpectedNetworkCount: 0L]
     }
 
     // Call the Cedar authorization service. Returns 'ALLOW', 'DENY: <reason1>; <reason2>', or
