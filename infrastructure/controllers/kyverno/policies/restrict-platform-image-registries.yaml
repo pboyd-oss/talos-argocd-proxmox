@@ -22,7 +22,7 @@ spec:
               kinds:
                 - Pod
               namespaces:
-                - platform
+                - "team-*"
       validate:
         message: "All images in the platform namespace must originate from harbor.tuxgrid.com"
         foreach:
