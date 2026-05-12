@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mitm-hooks
+  namespace: jenkins
+data:
+  hooks.py: |
+    import json
+    import hashlib
+    from mitmproxy import http
+
+    def response(flow: http.HTTPFlow) -> None:
+        try:
+            digest = hashlib.sha256(flow.response.content).hexdigest() if flow.response.content else ""
+            entry = {
+                "url": flow.request.pretty_url,
+                "method": flow.request.method,
+                "status": flow.response.status_code,
+                "size": len(flow.response.content) if flow.response.content else 0,
+                "sha256": digest,
+            }
+            with open("/mitm-data/deps.ndjson", "a") as f:
+                f.write(json.dumps(entry) + "\n")
+        except Exception:
+            pass

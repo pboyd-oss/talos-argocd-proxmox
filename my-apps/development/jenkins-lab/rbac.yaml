@@ -31,3 +31,63 @@ subjects:
   - kind: ServiceAccount
     name: jenkins
     namespace: jenkins
+---
+# Allows Jenkins to apply the tetragon-forwarder DaemonSet to kube-system.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: jenkins-kube-system-deployer
+  namespace: kube-system
+rules:
+  - apiGroups: ["apps"]
+    resources: ["daemonsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: jenkins-kube-system-deployer
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: jenkins-kube-system-deployer
+subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: jenkins
+---
+# Allows Jenkins to apply platform service manifests directly to the platform namespace.
+# Used by skaffold apply in the Deploy stage of platform service pipelines.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: jenkins-platform-deployer
+  namespace: platform
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "daemonsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["services", "configmaps", "serviceaccounts"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: jenkins-platform-deployer
+  namespace: platform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: jenkins-platform-deployer
+subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: jenkins

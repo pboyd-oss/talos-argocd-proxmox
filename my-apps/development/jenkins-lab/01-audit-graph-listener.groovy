@@ -230,6 +230,8 @@ private void postToAuditService(String json) {
         conn.setRequestMethod('POST')
         conn.setDoOutput(true)
         conn.setRequestProperty('Content-Type', 'application/json; charset=UTF-8')
+        def secret = System.getenv('AUDIT_INGEST_SECRET') ?: ''
+        if (secret) conn.setRequestProperty('Authorization', "Bearer ${secret}")
         conn.outputStream.withStream { it.write(json.getBytes('UTF-8')) }
         conn.inputStream.close()
     } catch (ignored) {

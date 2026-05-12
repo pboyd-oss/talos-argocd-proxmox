@@ -11,6 +11,7 @@ resources:
  - ip-pool.yaml
  - l2-policy.yaml
  - policies/block-lan-access.yaml
+ - policies/build-pods-egress.yaml
 
 helmCharts:
 - name: cilium

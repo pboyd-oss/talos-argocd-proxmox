@@ -217,3 +217,85 @@ spec:
         - ports:
             - port: "53"
               protocol: ANY
+---
+# tetragon-forwarder DaemonSet in kube-system — forwards kernel telemetry to the platform
+# audit service. The cluster-wide LAN deny blocks inter-namespace traffic by default,
+# so an explicit egress rule is required to open this path.
+# Apply to main cluster only.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tetragon-forwarder-egress
+  namespace: kube-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app: tetragon-forwarder
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: platform
+            app: platform-audit-service
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+---
+# Platform audit service ingress — restrict /ingest/* callers to trusted sources only.
+# Build/scanner/deployer pods in jenkins namespace send pipeline step events and query
+# audit summaries. tetragon-forwarder delivers kernel telemetry. All other pods are denied.
+# Apply to main cluster only.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: platform-audit-service-ingress
+  namespace: platform
+spec:
+  endpointSelector:
+    matchLabels:
+      app: platform-audit-service
+  ingress:
+    # Build pods POST /ingest/event during pipeline execution
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: jenkins
+            role: build
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # Scanner pods POST /ingest/event during scan stages
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: jenkins
+            role: platform-scanner
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # Deployer pods GET /builds/{id}/summary during the Cedar attest gate
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: jenkins
+            role: platform-deployer
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # tetragon-forwarder POST /ingest/tetragon kernel telemetry
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            app: tetragon-forwarder
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
