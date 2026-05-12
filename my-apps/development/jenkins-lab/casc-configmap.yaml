@@ -250,3 +250,8 @@ data:
                   description: "Harbor robot account for platform image pushes"
                   username: "robot$platform+jenkins"
                   password: "${HARBOR_ROBOT_PLATFORM_TOKEN}"
+  06-oidc-provider.yaml: |
+    unclassified:
+      oidcProvider:
+        enabled: true
+        audience: "platform-token-service"
