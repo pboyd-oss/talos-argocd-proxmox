@@ -10,6 +10,9 @@ spec:
   egress:
     - toEndpoints:
         - matchLabels:
+            k8s:io.kubernetes.pod.namespace: harbor
+    - toEndpoints:
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: cloudnative-pg
             cnpg.io/cluster: harbor-database
       toPorts:
