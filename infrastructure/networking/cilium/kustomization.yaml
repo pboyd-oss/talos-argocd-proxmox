@@ -8,6 +8,7 @@ kind: Kustomization
 # These require Cilium CRDs to be installed first
 
 resources:
+ - platform-namespace.yaml
  - ip-pool.yaml
  - l2-policy.yaml
  - policies/block-lan-access.yaml
