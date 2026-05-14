@@ -28,3 +28,21 @@ AVD-KSV-0118
 # otel-agent ClusterRole: nodes/proxy access required by the kubeletstats
 # receiver to scrape per-node CPU/memory metrics from the Kubelet API.
 AVD-KSV-0047
+
+# readOnlyRootFilesystem not set on workloads cluster-wide.
+AVD-KSV-0014
+
+# dcgm-exporter DaemonSet: hostNetwork required for GPU metrics collection.
+AVD-KSV-0009
+
+# dcgm-exporter DaemonSet: /dev, /proc, /sys mounts required for DCGM GPU telemetry.
+AVD-KSV-0121
+
+# Jenkins Role: pods/exec required for Jenkins agents to run pipeline containers.
+AVD-KSV-0053
+
+# Jenkins roles: network resource management required for deploying services and routes.
+AVD-KSV-0056
+
+# Jenkins CASC ConfigMap: credential key names flagged as secrets (not actual secret values).
+AVD-KSV-0109
