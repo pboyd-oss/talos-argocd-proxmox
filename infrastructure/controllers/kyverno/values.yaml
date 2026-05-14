@@ -17,6 +17,7 @@ config:
           - volsync-system
           - snapshot-controller
           - cert-manager
+          - cloudnative-pg
   excludeKyvernoNamespace: true
 
 admissionController:
