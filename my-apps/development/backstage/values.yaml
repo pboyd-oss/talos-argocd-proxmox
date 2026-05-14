@@ -1,14 +1,9 @@
 backstage:
   replicas: 1
 
-  # Using upstream image as placeholder — swap to harbor once you've built a custom image:
-  #   registry: harbor.tuxgrid.com
-  #   repository: backstage/backstage
-  #   tag: "<tag>"
-  #   pullSecrets: [harbor-pull-secret]
   image:
-    registry: ghcr.io
-    repository: backstage/backstage
+    registry: harbor.tuxgrid.com
+    repository: ghcr.io/backstage/backstage
     tag: "latest"
     pullPolicy: Always
 
