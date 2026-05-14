@@ -411,7 +411,5 @@ data:
                   username: "robot$platform+jenkins"
                   password: "${HARBOR_ROBOT_PLATFORM_TOKEN}"
   06-oidc-provider.yaml: |
-    unclassified:
-      oidcProvider:
-        enabled: true
-        audience: "platform-token-service"
+    # oidcProvider JCasC configurator not available in this plugin version
+    # configured programmatically via seed-token-service-user.groovy instead
