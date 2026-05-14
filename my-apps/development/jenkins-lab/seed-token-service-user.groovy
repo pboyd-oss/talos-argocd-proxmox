@@ -23,30 +23,35 @@ if (!(realm instanceof HudsonPrivateSecurityRealm)) {
     return
 }
 
-def user = hudson.model.User.getById(userId, false)
-if (!user) {
-    // Password is never used — login is via API token only; random value closes the UI login path.
-    realm.createAccount(userId, UUID.randomUUID().toString())
-    user = hudson.model.User.getById(userId, true)
-    println "[seed-token-service-user] created user '${userId}'"
-} else {
-    println "[seed-token-service-user] user '${userId}' already exists"
-}
+try {
+    def user = hudson.model.User.getById(userId, false)
+    if (!user) {
+        // Password is never used — login is via API token only; random value closes the UI login path.
+        realm.createAccount(userId, UUID.randomUUID().toString())
+        user = hudson.model.User.getById(userId, true)
+        println "[seed-token-service-user] created user '${userId}'"
+    } else {
+        println "[seed-token-service-user] user '${userId}' already exists"
+    }
 
-def apiTokenProp = user.getProperty(ApiTokenProperty)
-if (!apiTokenProp) {
-    apiTokenProp = new ApiTokenProperty()
-    user.addProperty(apiTokenProp)
-}
+    def apiTokenProp = user.getProperty(ApiTokenProperty)
+    if (!apiTokenProp) {
+        apiTokenProp = new ApiTokenProperty()
+        user.addProperty(apiTokenProp)
+    }
 
-def store = apiTokenProp.tokenStore
-if (store.getTokenListSortedByName().any { it.name == tokenName }) {
-    println "[seed-token-service-user] token '${tokenName}' already exists — skipping"
-    return
-}
+    def store = apiTokenProp.tokenStore
+    if (store.getTokenListSortedByName().any { it.name == tokenName }) {
+        println "[seed-token-service-user] token '${tokenName}' already exists — skipping"
+        return
+    }
 
-// addFixedNewToken seeds the store with a known plaintext (stores SHA-256 internally).
-// This is the same method used by JCasC for apiTokenProperty.tokenStore entries.
-store.addFixedNewToken(tokenName, tokenPlaintext, null)
-user.save()
-println "[seed-token-service-user] seeded API token '${tokenName}' for '${userId}'"
+    // addFixedNewToken seeds the store with a known plaintext (stores SHA-256 internally).
+    // This is the same method used by JCasC for apiTokenProperty.tokenStore entries.
+    store.addFixedNewToken(tokenName, tokenPlaintext, null)
+    user.save()
+    println "[seed-token-service-user] seeded API token '${tokenName}' for '${userId}'"
+} catch (e) {
+    println "[seed-token-service-user] ERROR: ${e.message}"
+    // Do not rethrow — operator must not block seed phase on a non-fatal groovy script error
+}

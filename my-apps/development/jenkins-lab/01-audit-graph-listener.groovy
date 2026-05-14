@@ -46,8 +46,8 @@ final Map<String, Map> libraryNodeMap = [:].asSynchronized()
 final String AUDIT_LISTENER_MARKER = 'PlatformAuditGraphListener-v1'
 def _flowListeners = Jenkins.instance.getExtensionList(FlowExecutionListener.class)
 // Remove then re-add so the Operator always runs the current version of this script.
-// The skip-if-exists guard prevented code updates from taking effect without a restart.
-_flowListeners.removeIf { it.toString() == AUDIT_LISTENER_MARKER }
+// ExtensionList does not support removeIf — collect first, then remove individually.
+_flowListeners.findAll { it.toString() == AUDIT_LISTENER_MARKER }.each { _flowListeners.remove(it) }
 _flowListeners.add(new FlowExecutionListener() {
 
     String toString() { AUDIT_LISTENER_MARKER }
