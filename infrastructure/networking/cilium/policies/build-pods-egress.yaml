@@ -81,6 +81,14 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+    # GitHub — checkout scm routes through mitmproxy (jnlp HTTPS_PROXY + GIT_SSL_CAINFO set)
+    - toFQDNs:
+        - matchName: github.com
+        - matchName: objects.githubusercontent.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
     # Jenkins JNLP agent connection back to controller
     - toEntities:
         - cluster
