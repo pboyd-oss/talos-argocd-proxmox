@@ -157,8 +157,8 @@ spec:
             - port: "53"
               protocol: ANY
 ---
-# Platform deployer pods — no Gitea needed; adds sts.amazonaws.com for the
-# credential exchange with the Token Service (which calls STS internally).
+# Platform deployer pods — used for audit-compliance and policy-scan pipelines
+# that clone from GitHub, plus actual deployment pipelines.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -178,6 +178,14 @@ spec:
   egress:
     - toFQDNs:
         - matchName: harbor.tuxgrid.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # GitHub — checkout scm for audit-compliance and policy-scan pipelines
+    - toFQDNs:
+        - matchName: github.com
+        - matchName: objects.githubusercontent.com
       toPorts:
         - ports:
             - port: "443"
