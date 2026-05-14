@@ -1,0 +1,30 @@
+# Kyverno background + admission controllers: need cluster-scoped secrets access
+# to generate Kopia credentials and validate VolSync backup policies.
+AVD-KSV-0041
+
+# CloudNativePG operator: wildcard verbs on postgresql.cnpg.io are required
+# for the operator to manage cluster, backup, and pooler resources.
+AVD-KSV-0045
+
+# CloudNativePG operator: must manage all CRD sub-resources for the PostgreSQL operator.
+AVD-KSV-0046
+
+# CloudNativePG operator: must create/update/delete Roles and RoleBindings
+# to grant database pod service accounts access to CNPG resources.
+AVD-KSV-0050
+
+# nvidia-powerlimit DaemonSet: hostPID required for persistence-mode write
+# across the driver namespace (nvidia-smi -pm 1).
+AVD-KSV-0010
+
+# nvidia-powerlimit DaemonSet: privileged required for nvidia-smi -pl;
+# the driver rejects the ioctl from an unprivileged user namespace.
+AVD-KSV-0017
+
+# nvidia-powerlimit DaemonSet: consequence of privileged=true; default
+# securityContext cannot be meaningfully restricted on a privileged container.
+AVD-KSV-0118
+
+# otel-agent ClusterRole: nodes/proxy access required by the kubeletstats
+# receiver to scrape per-node CPU/memory metrics from the Kubelet API.
+AVD-KSV-0047
