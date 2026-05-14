@@ -138,6 +138,15 @@ cleanupController:
         - list
         - watch
       - apiGroups:
+        - ""
+        resources:
+        - secrets
+        verbs:
+        - get
+        - list
+        - watch
+        - delete
+      - apiGroups:
         - volsync.backube
         resources:
         - replicationsources
