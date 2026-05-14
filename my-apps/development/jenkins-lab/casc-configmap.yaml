@@ -112,7 +112,7 @@ data:
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
-                    resourceLimitMemory: "6Gi"
+                    resourceLimitMemory: "1500Mi"
               - name: "deploy-sec-base-builder"
                 label: "deploy-sec-base-builder"
                 serviceAccount: "jenkins"
@@ -208,7 +208,7 @@ data:
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
-                    resourceLimitMemory: "8Gi"
+                    resourceLimitMemory: "1500Mi"
                   - name: "cosign"
                     image: "harbor.tuxgrid.com/platform/cosign:v2.5.2"
                     command: "cat"
@@ -225,7 +225,7 @@ data:
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "1"
-                    resourceLimitMemory: "2Gi"
+                    resourceLimitMemory: "512Mi"
               - name: "platform-builder"
                 label: "platform-builder"
                 serviceAccount: "jenkins"
@@ -311,7 +311,7 @@ data:
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "2"
-                    resourceLimitMemory: "6Gi"
+                    resourceLimitMemory: "1500Mi"
                   - name: "deploy-sec-base"
                     image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
                     alwaysPullImage: true
@@ -320,7 +320,7 @@ data:
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "256Mi"
                     resourceLimitCpu: "1"
-                    resourceLimitMemory: "2Gi"
+                    resourceLimitMemory: "512Mi"
         - kubernetes:
             name: "build-shared"
             serverUrl: "https://kubernetes.default.svc"
@@ -343,7 +343,7 @@ data:
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "128Mi"
                     resourceLimitCpu: "2"
-                    resourceLimitMemory: "4Gi"
+                    resourceLimitMemory: "1Gi"
                   - name: "golang"
                     image: "harbor.tuxgrid.com/docker.io/golang:1.23"
                     command: "cat"
@@ -351,7 +351,7 @@ data:
                     resourceRequestCpu: "100m"
                     resourceRequestMemory: "128Mi"
                     resourceLimitCpu: "2"
-                    resourceLimitMemory: "2Gi"
+                    resourceLimitMemory: "1Gi"
   02-global-env.yaml: |
     jenkins:
       globalNodeProperties:
