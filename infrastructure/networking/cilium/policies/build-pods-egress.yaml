@@ -191,6 +191,8 @@ spec:
               protocol: TCP
             - port: "8080"
               protocol: TCP
+            - port: "443"
+              protocol: TCP
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system
@@ -242,6 +244,13 @@ spec:
       toPorts:
         - ports:
             - port: "8080"
+              protocol: TCP
+    # Gateway API — Cedar sidecar HTTPS via cedar.platform.tuxgrid.com
+    - toEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "443"
               protocol: TCP
     - toEndpoints:
         - matchLabels:

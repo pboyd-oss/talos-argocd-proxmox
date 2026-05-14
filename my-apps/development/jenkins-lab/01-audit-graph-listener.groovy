@@ -27,6 +27,10 @@ final String AUDIT_SERVICE_URL = System.getProperty(
     'http://platform-audit-service.platform.svc.cluster.local:8080'
 )
 
+// GitHub org owning library repos — used to construct vars/ source URLs in audit events.
+@groovy.transform.Field
+final String LIBRARY_GITHUB_ORG = System.getProperty('platform.library.github.org', 'pboyd-oss')
+
 // In-memory store keyed by auditId → list of audit events.
 // Retained for audit-log.json artifact (required by attestation listener).
 // Events are also streamed to the audit service in real time.
@@ -318,7 +322,13 @@ private Map resolveLibrarySource(FlowNode node, WorkflowRun run) {
                 def clStr = cl.toString()
                 for (def lib : libs) {
                     if (clStr.contains(lib.name)) {
-                        return [source: 'library', library: lib.name, version: lib.version ?: 'unknown']
+                        def entry = [source: 'library', library: lib.name, version: lib.version ?: 'unknown']
+                        def fname = descriptor.functionName
+                        def ver   = lib.version ?: ''
+                        if (fname && ver && ver != 'unknown') {
+                            entry.sourceUrl = "https://github.com/${LIBRARY_GITHUB_ORG}/${lib.name}/blob/${ver}/vars/${fname}.groovy"
+                        }
+                        return entry
                     }
                 }
                 // GroovyClassLoader present but library name not in its toString —
@@ -339,7 +349,12 @@ private Map resolveLibrarySource(FlowNode node, WorkflowRun run) {
                     // e.g. functionName 'tuxgridBuild' declared in 'jenkins-library'
                     def libSlug = lib.name.toLowerCase().replaceAll('[^a-z0-9]', '')
                     if (fn.contains(libSlug) || libSlug.contains(fn)) {
-                        return [source: 'library', library: lib.name, version: lib.version ?: 'unknown', via: 'GlobalVariable']
+                        def entry = [source: 'library', library: lib.name, version: lib.version ?: 'unknown', via: 'GlobalVariable']
+                        def ver   = lib.version ?: ''
+                        if (ver && ver != 'unknown') {
+                            entry.sourceUrl = "https://github.com/${LIBRARY_GITHUB_ORG}/${lib.name}/blob/${ver}/vars/${descriptor.functionName}.groovy"
+                        }
+                        return entry
                     }
                 }
             }

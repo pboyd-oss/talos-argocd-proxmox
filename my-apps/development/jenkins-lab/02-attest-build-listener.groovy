@@ -113,6 +113,15 @@ _runListeners.add(new RunListener<Run>() {
         def gitUrl    = gitData?.remoteUrls?.find() ?: ''
         def gitCommit = gitData?.lastBuiltRevision?.sha1String ?: ''
 
+        // Detect env.GIT_COMMIT spoofing: teams set this env var, but BuildData records the
+        // actual checkout SHA from the Git plugin. If they disagree, a team Jenkinsfile set
+        // GIT_COMMIT to a different value than what was actually cloned — refuse immediately.
+        def envGitCommit = run.getEnvironment(listener).get('GIT_COMMIT') ?: ''
+        if (envGitCommit && gitCommit && envGitCommit != gitCommit) {
+            refuse("env.GIT_COMMIT '${envGitCommit.take(7)}' does not match git checkout SHA '${gitCommit.take(7)}' — possible commit SHA forgery")
+            return
+        }
+
         // Standard 7: a successful source-scan must exist for this exact commit
         if (!gitCommit) { refuse('could not determine GIT_COMMIT from build data'); return }
         log("Looking for successful source-scan: platform/${teamSlug}/${repoName}/source-scan@${gitCommit.take(7)}")
@@ -137,8 +146,9 @@ _runListeners.add(new RunListener<Run>() {
             } catch (ignored) {}
         }
 
-        def completedStages    = extractStages(run).findAll { it.status == 'SUCCESS' }.collect { it.name }
-        def calledLibrarySteps = extractLibrarySteps(auditLogFile)
+        def completedStages      = extractStages(run).findAll { it.status == 'SUCCESS' }.collect { it.name }
+        def calledLibrarySteps   = extractLibrarySteps(auditLogFile)
+        def hasUnpinnedLibraries = getLibrarySHAs(run).any { !(it.sha ==~ /^[0-9a-f]{40}$/) }
 
         def cedarCtx = [
             testsRun:                    testAction.totalCount,
@@ -152,6 +162,7 @@ _runListeners.add(new RunListener<Run>() {
             calledLibrarySteps:          calledLibrarySteps,
             auditAnomalyCount:           auditSummary.anomalyCount,
             auditUnexpectedNetworkCount: auditSummary.unexpectedNetworkCount,
+            hasUnpinnedLibraries:        hasUnpinnedLibraries,
         ]
 
         def cedarEntities = buildCedarEntities(fullName, teamSlug, run, scmTriggered, auditId != null)
@@ -371,7 +382,7 @@ _runListeners.add(new RunListener<Run>() {
     private String callCedarAuthorize(String pipeline, String image, Map<String, Object> ctx,
                                       List entities, TaskListener listener) {
         def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
-        def url = 'http://platform-cedar-sidecar.platform.svc.cluster.local/authorize'
+        def url = 'https://cedar.platform.tuxgrid.com/authorize'
 
         def body = groovy.json.JsonOutput.toJson([
             principal: "TuxGrid::Pipeline::\"${pipeline}\"",

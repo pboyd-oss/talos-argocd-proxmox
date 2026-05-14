@@ -44,6 +44,10 @@ data:
               - name: "deploy-sec-base"
                 label: "deploy-sec-base"
                 serviceAccount: "jenkins"
+                yaml: |
+                  metadata:
+                    labels:
+                      role: platform-deployer
                 volumes:
                   - secretVolume:
                       mountPath: "/root/.docker"
@@ -392,7 +396,7 @@ data:
                     directEntry:
                       privateKey: "${GIT_DEPLOY_KEY}"
               - string:
-                  scope: GLOBAL
+                  scope: SYSTEM
                   id: "cosign-key"
                   description: "Cosign private key for attestation and image signing"
                   secret: "${COSIGN_PRIVATE_KEY}"
