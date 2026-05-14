@@ -50,7 +50,7 @@ data:
                 containers:
                   - name: "deploy-sec-base"
                     image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
-                    imagePullPolicy: "Always"
+                    alwaysPullImage: true
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
@@ -219,7 +219,7 @@ data:
                     resourceLimitMemory: "256Mi"
                   - name: "deploy-sec-base"
                     image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
-                    imagePullPolicy: "Always"
+                    alwaysPullImage: true
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
@@ -314,7 +314,7 @@ data:
                     resourceLimitMemory: "6Gi"
                   - name: "deploy-sec-base"
                     image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
-                    imagePullPolicy: "Always"
+                    alwaysPullImage: true
                     command: "cat"
                     ttyEnabled: true
                     resourceRequestCpu: "100m"
