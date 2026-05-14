@@ -1,16 +1,16 @@
 backstage:
   replicas: 1
 
-  # Build and push your custom image to harbor before deploying:
-  #   docker build -t harbor.tuxgrid.com/backstage/backstage:<tag> .
-  #   docker push harbor.tuxgrid.com/backstage/backstage:<tag>
+  # Using upstream image as placeholder — swap to harbor once you've built a custom image:
+  #   registry: harbor.tuxgrid.com
+  #   repository: backstage/backstage
+  #   tag: "<tag>"
+  #   pullSecrets: [harbor-pull-secret]
   image:
-    registry: harbor.tuxgrid.com
+    registry: ghcr.io
     repository: backstage/backstage
     tag: "latest"
     pullPolicy: Always
-    pullSecrets:
-      - harbor-pull-secret
 
   # TLS terminated at gateway-internal; Backstage speaks plain HTTP internally.
   appConfig:
