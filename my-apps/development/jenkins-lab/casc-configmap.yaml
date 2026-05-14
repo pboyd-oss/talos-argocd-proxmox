@@ -137,7 +137,7 @@ data:
                     containers:
                       - name: mitmproxy
                         image: harbor.tuxgrid.com/docker.io/mitmproxy/mitmproxy:11
-                        args: ["mitmdump", "--confdir", "/mitm-conf", "--scripts", "/hooks/hooks.py", "--listen-port", "8080", "--quiet"]
+                        args: ["mitmdump", "--set", "confdir=/mitm-conf", "--scripts", "/hooks/hooks.py", "--listen-port", "8080", "--quiet"]
                         env:
                           - name: MITM_EXTRA_HOSTS
                             value: "archive.ubuntu.com,security.ubuntu.com,pypi.org,files.pythonhosted.org"
@@ -250,7 +250,7 @@ data:
                     containers:
                       - name: mitmproxy
                         image: harbor.tuxgrid.com/docker.io/mitmproxy/mitmproxy:11
-                        args: ["mitmdump", "--confdir", "/mitm-conf", "--scripts", "/hooks/hooks.py", "--listen-port", "8080", "--quiet"]
+                        args: ["mitmdump", "--set", "confdir=/mitm-conf", "--scripts", "/hooks/hooks.py", "--listen-port", "8080", "--quiet"]
                         env:
                           - name: MITM_EXTRA_HOSTS
                             value: "proxy.golang.org,sum.golang.org,storage.googleapis.com,archive.ubuntu.com,security.ubuntu.com"
