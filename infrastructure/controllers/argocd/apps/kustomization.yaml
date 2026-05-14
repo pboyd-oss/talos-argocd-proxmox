@@ -21,6 +21,7 @@ resources:
   - cnpg-operator-app.yaml      # Wave 3 - CNPG operator (must be healthy before database clusters)
   - gitea-database-app.yaml     # Wave 4 - Gitea CNPG database (standalone, not via AppSet)
   - harbor-database-app.yaml   # Wave 4 - Harbor CNPG database (standalone, not via AppSet)
+  - backstage-database-app.yaml # Wave 4 - Backstage CNPG database (standalone, not via AppSet)
 #  - opentelemetry-operator-app.yaml # Wave 5 - OTEL (needs cert-manager from Wave 4)
 #  - monitoring-appset.yaml      # Wave 5
   - my-apps-appset.yaml         # Wave 6

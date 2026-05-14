@@ -1,0 +1,80 @@
+backstage:
+  replicas: 1
+
+  # Build and push your custom image to harbor before deploying:
+  #   docker build -t harbor.tuxgrid.com/backstage/backstage:<tag> .
+  #   docker push harbor.tuxgrid.com/backstage/backstage:<tag>
+  image:
+    registry: harbor.tuxgrid.com
+    repository: backstage/backstage
+    tag: "latest"
+    pullPolicy: Always
+    pullSecrets:
+      - harbor-pull-secret
+
+  # TLS terminated at gateway-internal; Backstage speaks plain HTTP internally.
+  appConfig:
+    app:
+      baseUrl: https://backstage.tuxgrid.com
+    backend:
+      baseUrl: https://backstage.tuxgrid.com
+      listen:
+        port: 7007
+      cors:
+        origin: https://backstage.tuxgrid.com
+      database:
+        client: pg
+        connection:
+          host: backstage-database-rw.cloudnative-pg.svc.cluster.local
+          port: 5432
+          user: backstage
+          database: backstage
+          password:
+            $env: POSTGRES_PASSWORD
+
+    auth:
+      environment: production
+      providers:
+        github:
+          production:
+            clientId:
+              $env: GITHUB_CLIENT_ID
+            clientSecret:
+              $env: GITHUB_CLIENT_SECRET
+
+    integrations:
+      github:
+        - host: github.com
+          token:
+            $env: GITHUB_TOKEN
+
+    catalog:
+      providers:
+        github:
+          default:
+            organization: pboyd-oss
+            catalogPath: /catalog-info.yaml
+            filters:
+              branch: main
+
+  # Inject DB and GitHub credentials from sealed secrets
+  extraEnvVarsSecrets:
+    - backstage-credentials
+    - backstage-db
+
+  strategy:
+    type: Recreate
+
+# Disable bundled PostgreSQL — using CNPG cluster instead
+postgresql:
+  enabled: false
+
+service:
+  type: ClusterIP
+  ports:
+    backend: 7007
+    name: http-backend
+    targetPort: backend
+
+serviceAccount:
+  create: true

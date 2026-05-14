@@ -1,0 +1,49 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: backstage-database
+  labels:
+    app: backstage
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.2
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+  postgresql:
+    parameters:
+      shared_buffers: "64MB"
+      max_wal_size: "256MB"
+      wal_compression: "on"
+    pg_hba:
+      - host all all 0.0.0.0/0 md5
+  storage:
+    size: 10Gi
+    storageClass: longhorn
+  walStorage:
+    size: 5Gi
+    storageClass: longhorn
+  enableSuperuserAccess: true
+  monitoring:
+    enablePodMonitor: true
+  backup:
+    barmanObjectStore:
+      serverName: backstage-database-v1
+      destinationPath: s3://postgres-backups/cnpg/backstage
+      endpointURL: http://192.168.100.2:30293
+      s3Credentials:
+        accessKeyId:
+          name: cnpg-s3-credentials
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: cnpg-s3-credentials
+          key: AWS_SECRET_ACCESS_KEY
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+    retentionPolicy: "14d"

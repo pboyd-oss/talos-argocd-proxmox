@@ -1,0 +1,29 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: backstage-database
+spec:
+  bootstrap:
+    recovery:
+      source: backstage-recovery-source
+      database: backstage
+      owner: backstage
+      secret:
+        name: backstage-app-secret
+      # No recoveryTarget → restore to latest-WAL available on S3.
+  externalClusters:
+    - name: backstage-recovery-source
+      barmanObjectStore:
+        # Prior lineage to restore from. Bump to N-1 at DR time.
+        serverName: backstage-database-v1
+        destinationPath: s3://postgres-backups/cnpg/backstage
+        endpointURL: http://192.168.100.2:30293
+        s3Credentials:
+          accessKeyId:
+            name: cnpg-s3-credentials
+            key: AWS_ACCESS_KEY_ID
+          secretAccessKey:
+            name: cnpg-s3-credentials
+            key: AWS_SECRET_ACCESS_KEY
+        wal:
+          compression: gzip
