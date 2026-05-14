@@ -416,6 +416,17 @@ data:
                   description: "Harbor robot account for platform image pushes"
                   username: "robot$platform+jenkins"
                   password: "${HARBOR_ROBOT_PLATFORM_TOKEN}"
+              - string:
+                  scope: GLOBAL
+                  id: "github-token"
+                  description: "GitHub PAT for infra-terraform PR comments and branch source"
+                  secret: "${GITHUB_TOKEN_INFRA}"
+              - usernamePassword:
+                  scope: GLOBAL
+                  id: "aws-terraform"
+                  description: "AWS credentials for Terraform — infra-terraform repo"
+                  username: "${AWS_TERRAFORM_KEY_ID}"
+                  password: "${AWS_TERRAFORM_SECRET_KEY}"
   06-oidc-provider.yaml: |
     # oidcProvider JCasC configurator not available in this plugin version
     # configured programmatically via seed-token-service-user.groovy instead

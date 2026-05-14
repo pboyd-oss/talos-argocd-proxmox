@@ -56,6 +56,11 @@ backstage:
             catalogPath: /catalog-info.yaml
             filters:
               branch: main
+      locations:
+        - type: url
+          target: https://github.com/pboyd-oss/backstage-templates/blob/main/all-templates.yaml
+          rules:
+            - allow: [Template]
 
   # Inject DB and GitHub credentials from sealed secrets
   extraEnvVarsSecrets:

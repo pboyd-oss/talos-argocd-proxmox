@@ -17,6 +17,7 @@ resources:
   - audit-ingest-sealedsecret.yaml
   - mitm-ca-sealedsecret.yaml
   - mitm-hooks-configmap.yaml
+  - terraform-credentials-sealedsecret.yaml
 
 configMapGenerator:
   - name: jenkins-groovy-init

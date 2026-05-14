@@ -67,6 +67,21 @@ spec:
               secretKeyRef:
                 name: audit-ingest-secret
                 key: token
+          - name: GITHUB_TOKEN_INFRA
+            valueFrom:
+              secretKeyRef:
+                name: terraform-credentials
+                key: github-token
+          - name: AWS_TERRAFORM_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: terraform-credentials
+                key: aws-access-key-id
+          - name: AWS_TERRAFORM_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: terraform-credentials
+                key: aws-secret-access-key
         livenessProbe:
           httpGet:
             path: /login
@@ -120,6 +135,8 @@ spec:
       - name: folder-properties
         version: "latest"
       - name: envinject
+        version: "latest"
+      - name: github-branch-source
         version: "latest"
   seedJobAgentImage: "harbor.tuxgrid.com/docker.io/jenkins/inbound-agent:latest-jdk21"
   seedJobs:
