@@ -8,6 +8,7 @@ resources:
   - pvc-registry.yaml
   - sealedsecret.yaml
   - harbor-db-secret.yaml
+  - network-policy.yaml
 
 helmCharts:
   - name: harbor
