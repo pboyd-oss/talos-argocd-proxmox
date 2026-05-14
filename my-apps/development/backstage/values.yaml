@@ -57,6 +57,11 @@ backstage:
           rules:
             - allow: [Template]
 
+  startupProbe:
+    failureThreshold: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+
   # Inject DB and GitHub credentials from sealed secrets
   extraEnvVarsSecrets:
     - backstage-credentials
