@@ -47,6 +47,40 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
+    # Go module proxy, checksum DB, and GCS backing store (via mitmproxy)
+    - toFQDNs:
+        - matchName: proxy.golang.org
+        - matchName: sum.golang.org
+        - matchName: storage.googleapis.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Ubuntu package mirrors — apt-get routes through mitmproxy via HTTP_PROXY
+    - toFQDNs:
+        - matchName: archive.ubuntu.com
+        - matchName: security.ubuntu.com
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    # Python package index — pip install routes through mitmproxy
+    - toFQDNs:
+        - matchName: pypi.org
+        - matchName: files.pythonhosted.org
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Alpine package CDN — apk add routes through mitmproxy
+    - toFQDNs:
+        - matchName: dl-cdn.alpinelinux.org
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
     # Jenkins JNLP agent connection back to controller
     - toEntities:
         - cluster

@@ -25,9 +25,6 @@ data:
                 serviceAccount: "jenkins"
                 volumes:
                   - secretVolume:
-                      mountPath: "/cosign-key"
-                      secretName: "cosign-key"
-                  - secretVolume:
                       mountPath: "/root/.docker"
                       secretName: "gitea-docker-cfg"
                 containers:
@@ -50,9 +47,6 @@ data:
                   - secretVolume:
                       mountPath: "/root/.docker"
                       secretName: "gitea-docker-cfg"
-                  - secretVolume:
-                      mountPath: "/cosign-key"
-                      secretName: "cosign-key"
                 containers:
                   - name: "deploy-sec-base"
                     image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
@@ -194,6 +188,7 @@ data:
                         volumeMounts:
                           - name: mitm-data
                             mountPath: /mitm-data
+                            readOnly: true
                     volumes:
                       - name: mitm-data
                         emptyDir: {}
@@ -296,6 +291,7 @@ data:
                         volumeMounts:
                           - name: mitm-data
                             mountPath: /mitm-data
+                            readOnly: true
                     volumes:
                       - name: mitm-data
                         emptyDir: {}
@@ -336,9 +332,6 @@ data:
                 label: "base"
                 serviceAccount: "jenkins"
                 volumes:
-                  - secretVolume:
-                      mountPath: "/cosign-key"
-                      secretName: "cosign-key"
                   - secretVolume:
                       mountPath: "/root/.docker"
                       secretName: "gitea-docker-cfg"

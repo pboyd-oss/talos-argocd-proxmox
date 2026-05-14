@@ -11,6 +11,7 @@ resources:
 - policies/require-signed-images.yaml
 - policies/require-signed-platform-images.yaml
 - policies/restrict-platform-image-registries.yaml
+- policies/protect-cedar-policies.yaml
 helmCharts:
 - name: kyverno
   repo: https://kyverno.github.io/kyverno

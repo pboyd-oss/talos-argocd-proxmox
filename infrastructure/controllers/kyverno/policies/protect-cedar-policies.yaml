@@ -1,0 +1,35 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: protect-cedar-policies
+  annotations:
+    policies.kyverno.io/title: Protect Cedar Policy ConfigMap
+    policies.kyverno.io/description: >-
+      Blocks direct updates to the cedar-policies ConfigMap in the platform namespace
+      except from the ArgoCD application controller. Cedar policies gate AWS credential
+      issuance — changes require a git commit reviewed by the platform team.
+spec:
+  mutateExistingOnPolicyUpdate: false
+  background: false
+  emitWarning: false
+  validationFailureAction: Enforce
+  rules:
+    - name: deny-direct-cedar-policy-modification
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds:
+                - ConfigMap
+              namespaces:
+                - platform
+              names:
+                - cedar-policies
+      exclude:
+        any:
+          - subjects:
+              - kind: ServiceAccount
+                name: argocd-application-controller
+                namespace: argocd
+      validate:
+        deny: {}

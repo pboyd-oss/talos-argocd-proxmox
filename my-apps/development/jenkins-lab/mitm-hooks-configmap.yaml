@@ -7,16 +7,37 @@ data:
   hooks.py: |
     import json
     import hashlib
+    import os
     from mitmproxy import http
+
+    # Hosts always permitted regardless of build type.
+    _BASE_ALLOWED = {
+        "harbor.tuxgrid.com",       # private registry + all mirrors
+        "token-service.platform.svc.cluster.local",
+    }
+
+    # Additional hosts loaded from MITM_EXTRA_HOSTS (comma-separated).
+    # Set this per pod template for language-specific package registries.
+    _extra = os.environ.get("MITM_EXTRA_HOSTS", "")
+    ALLOWED_HOSTS = _BASE_ALLOWED | {h.strip() for h in _extra.split(",") if h.strip()}
+
+    def request(flow: http.HTTPFlow) -> None:
+        host = flow.request.pretty_host
+        if host not in ALLOWED_HOSTS:
+            flow.response = http.Response.make(
+                403,
+                f"[Platform] Blocked: {host} is not in the build allowlist",
+                {"Content-Type": "text/plain"},
+            )
 
     def response(flow: http.HTTPFlow) -> None:
         try:
             digest = hashlib.sha256(flow.response.content).hexdigest() if flow.response.content else ""
             entry = {
-                "url": flow.request.pretty_url,
+                "url":    flow.request.pretty_url,
                 "method": flow.request.method,
                 "status": flow.response.status_code,
-                "size": len(flow.response.content) if flow.response.content else 0,
+                "size":   len(flow.response.content) if flow.response.content else 0,
                 "sha256": digest,
             }
             with open("/mitm-data/deps.ndjson", "a") as f:

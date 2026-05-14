@@ -163,7 +163,7 @@ _runListeners.add(new RunListener<Run>() {
 
         if (scanResult) {
             log("Scan already completed — scheduling attestation immediately")
-            scheduleAttest(run, fullName, teamSlug, scanResult, testAction, lineCoverage, threshold, auditId, auditLogDigest, listener)
+            scheduleAttest(run, fullName, teamSlug, scanResult, testAction, lineCoverage, threshold, auditId, auditLogDigest, gitUrl, gitCommit, listener)
         } else {
             def scanJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/scan")
             if (!scanJob) { refuse("no scan job found at platform/${teamSlug}/scan"); return }
@@ -212,6 +212,7 @@ _runListeners.add(new RunListener<Run>() {
 
         def gitData2     = teamBuild.getAction(BuildData)
         def gitCommit2   = gitData2?.lastBuiltRevision?.sha1String ?: ''
+        def gitUrl2      = gitData2?.remoteUrls?.find() ?: ''
         def sourceScanOk = gitCommit2 ? findSuccessfulSourceScan(teamSlug, repoName, gitCommit2) != null : false
 
         if (!testAction || testAction.failCount > 0 || !coverageAction || !hasArtifacts || !auditLogFile.exists() || !auditId || !sourceScanOk) {
@@ -226,14 +227,15 @@ _runListeners.add(new RunListener<Run>() {
         def lineCoverage = coverageAction.lineCoverage?.getPercentageFloat() ?: 0.0f
 
         log("All standards met — scheduling attestation for ${upstreamJob} #${upstreamBuild}")
-        scheduleAttest(teamBuild, upstreamJob, teamSlug, scanRun, testAction, lineCoverage, threshold, auditId, auditLogDigest, listener)
+        scheduleAttest(teamBuild, upstreamJob, teamSlug, scanRun, testAction, lineCoverage, threshold, auditId, auditLogDigest, gitUrl2, gitCommit2, listener)
     }
 
     // ── Shared: schedule the attest job ────────────────────────────────────
     private void scheduleAttest(Run teamBuild, String fullName, String teamSlug,
                                 Run scanRun, TestResultAction testAction,
                                 float lineCoverage, int threshold, String auditId,
-                                String auditLogDigest, TaskListener listener) {
+                                String auditLogDigest, String gitUrl, String gitCommit,
+                                TaskListener listener) {
         def log = { String msg -> listener.logger.println("[Platform] ${msg}") }
 
         def attestJob = Jenkins.get().getItemByFullName("platform/${teamSlug}/attest")
@@ -256,6 +258,8 @@ _runListeners.add(new RunListener<Run>() {
             new StringParameterValue('PLATFORM_SCAN_JOB_REF',    "platform/${teamSlug}/scan#${scanRun.number}"),
             new StringParameterValue('PLATFORM_STAGES_JSON',      JsonOutput.toJson(stages)),
             new StringParameterValue('PLATFORM_LIBRARIES_JSON',   JsonOutput.toJson(librarySHAs)),
+            new StringParameterValue('PLATFORM_GIT_COMMIT',       gitCommit),
+            new StringParameterValue('PLATFORM_GIT_URL',          gitUrl),
         ]))
 
         log("Attestation scheduled for ${fullName} #${teamBuild.number} | auditId=${auditId} | tests=${testAction.totalCount} | coverage=${lineCoverage.round(1)}% | scan=platform/${teamSlug}/scan#${scanRun.number}")
