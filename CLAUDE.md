@@ -37,15 +37,12 @@ Applications deploy in strict order to prevent race conditions:
 | Wave | Component | Purpose |
 |------|-----------|---------|
 | **0** | Foundation | Cilium (CNI), ArgoCD, 1Password Connect, External Secrets, AppProjects |
-| **1** | Storage | Longhorn, VolumeSnapshot Controller, VolSync |
-| **2** | PVC Plumber | Backup existence checker (FAIL-CLOSED gate) |
+| **1** | Storage | Longhorn, VolumeSnapshot Controller |
 | **3** | Kyverno | Policy engine (standalone App, webhooks must register before app PVCs) |
 | **4** | Infrastructure AppSet | Explicit path list: cert-manager, external-dns, GPU operators, gateway |
 | **4** | Database AppSet | Discovers `infrastructure/database/*/*` — `selfHeal: false` for DR |
 | **5** | Monitoring AppSet | Discovers `monitoring/*` |
 | **6** | My-Apps AppSet | Discovers `my-apps/*/*` |
-
-**FAIL-CLOSED**: If PVC Plumber is down, Kyverno denies backup-labeled PVC creation. Apps retry via ArgoCD backoff. This prevents data loss during disaster recovery.
 
 **Kyverno** is a standalone Application (not in an AppSet) to guarantee webhooks register before app PVCs. ApplicationSets are considered "healthy" immediately on creation.
 
@@ -90,8 +87,6 @@ docs/                   # Documentation
 - On **external** HTTPRoutes: add `labels: external-dns: "true"`, annotation `external-dns.alpha.kubernetes.io/target: tuxgrid.com`, and `sectionName: https` on the parentRef — **all three are required or DNS/routing silently fails**
 - Follow GitOps workflow for all changes
 - Store secrets in 1Password, reference via ExternalSecret
-- Add `backup: "hourly"` or `backup: "daily"` labels to critical PVCs for automatic Kyverno backup
-- Use `storageClassName: longhorn` for PVCs that need backups (volumesnapshot required)
 - Use NFS CSI driver (`csi: driver: nfs.csi.k8s.io`) for static NFS PVs — **legacy `nfs:` silently ignores mountOptions**
 - Add new infrastructure component paths to `infrastructure-appset.yaml` explicitly (not glob-discovered)
 - List ALL YAML files in each directory's `kustomization.yaml` under `resources:` — **unlisted files are never deployed**
@@ -99,7 +94,6 @@ docs/                   # Documentation
 - Use sync waves when adding infrastructure components
 - Add ArgoCD hook annotations to all Kubernetes Jobs — `argocd.argoproj.io/hook: Sync` + `argocd.argoproj.io/hook-delete-policy: BeforeHookCreation`. K8s Jobs are immutable after creation; without these, image tag bumps from Renovate cause "field is immutable" sync failures. For standalone Jobs, add annotations directly. For Helm-rendered Jobs, use Kustomize patches targeting `kind: Job`
 - Check `helm show values <chart> | grep -A20 certManager` when adding any Helm chart with webhooks — if a `certManager.enabled` option exists, **set it to `true`**. Helm hook Jobs for webhook certs break under ArgoCD (SA deleted before Job runs = stuck forever = API server death)
-- Verify Kyverno generated backup resources after creating PVCs with backup labels
 - Use `strategy: type: Recreate` on Deployments with RWO PVCs — **RollingUpdate causes Multi-Attach deadlock**
 
 ### DON'T:
@@ -110,14 +104,8 @@ docs/                   # Documentation
 - Commit secrets to Git
 - Bypass GitOps workflow for configuration changes
 - Deploy without considering sync wave order
-- Add Kyverno backup labels to CNPG database PVCs (they use Barman to S3, not Kyverno/VolSync)
-- Add backup labels to system namespace PVCs (kube-system, volsync-system, kyverno)
-- Manually create or delete ReplicationSource/ReplicationDestination (Kyverno manages these)
 - Use legacy `nfs:` block for NFS PVs (mountOptions silently ignored — use CSI)
 - Use `RollingUpdate` strategy on Deployments with RWO PVCs (causes Multi-Attach deadlock)
-- Use `background: true` on Kyverno generate policies — **causes API server overload from continuous background scanning; use `background: false`**
-- Use `mutateExistingOnPolicyUpdate: true` on Kyverno generate policies — **re-evaluates ALL matching resources cluster-wide on any policy change**
-- Use `synchronize: true` on Kyverno generate policies — **drift watchers create UpdateRequests on every controller status update, hammering the API server; use `synchronize: false`**
 - Omit Kyverno canonical defaults (`emitWarning`, `validationFailureAction`, `skipBackgroundRequests`) from policy YAML — **Kyverno webhook adds them, ArgoCD detects the diff, app shows OutOfSync**
 - Create external HTTPRoutes without the three required pieces: `external-dns: "true"` label, `external-dns.alpha.kubernetes.io/target: tuxgrid.com` annotation, and `sectionName: https` — **DNS won't be created and Cloudflare tunnel routing fails silently**
 - Use `Replace=true,Force=true` sync-options on Jobs — causes duplicate Job execution bug ([#24005](https://github.com/argoproj/argo-cd/issues/24005)); use ArgoCD hooks instead
@@ -132,7 +120,7 @@ Detailed instructions load automatically when working in these directories:
 |-----------|----------|
 | `infrastructure/` | Essential commands, AppSet rules, ArgoCD/secret debugging |
 | `infrastructure/storage/` | Storage classes, NFS CSI patterns, 10G performance tuning |
-| `infrastructure/controllers/kyverno/` | Full backup/restore system, PVC Plumber, Kyverno policies |
+| `infrastructure/controllers/kyverno/` | Kyverno policies, webhook deadlock prevention |
 | `infrastructure/database/` | CNPG patterns, database DR procedures, serverName tracking |
 | `infrastructure/networking/` | Gateway API routing patterns, HTTPRoute templates |
 | `my-apps/` | App templates (minimal, web, secrets, storage), Helm+Kustomize patterns |
@@ -154,10 +142,6 @@ Detailed instructions load automatically when working in these directories:
 | **Minimal app** | `my-apps/development/nginx/` |
 | **GPU workload** | `my-apps/ai/comfyui/` |
 | **Complex app with storage** | `my-apps/media/immich/` |
-| **PVC with automatic backup** | `my-apps/home/project-zomboid/pvc.yaml` (backup on `zomboid-data`, unlabeled `zomboid-server-files`) |
-| **Kyverno backup policies** | `infrastructure/controllers/kyverno/policies/volsync-pvc-backup-restore.yaml` |
-| **PVC Plumber** | `infrastructure/controllers/pvc-plumber/` |
-| **VolSync configuration** | `infrastructure/storage/volsync/` |
 | **Helm + Kustomize** | `infrastructure/controllers/1passwordconnect/` |
 | **Database with CNPG** | `infrastructure/database/cloudnative-pg/immich/` |
 | **Database AppSet** | `infrastructure/controllers/argocd/apps/database-appset.yaml` |
@@ -176,9 +160,7 @@ edits or transient debugging.
 
 ## Additional Documentation
 
-- **[docs/backup-restore.md](docs/backup-restore.md)** - Full backup/restore architecture with diagrams
 - **[docs/cnpg-disaster-recovery.md](docs/cnpg-disaster-recovery.md)** - CNPG database DR procedures
-- **[docs/pvc-plumber-full-flow.md](docs/pvc-plumber-full-flow.md)** - Complete PVC backup flow from bare metal
 - **[docs/network-topology.md](docs/network-topology.md)** - Network architecture details
 - **[docs/network-policy.md](docs/network-policy.md)** - Cilium network policies
 - **[docs/argocd.md](docs/argocd.md)** - ArgoCD documentation

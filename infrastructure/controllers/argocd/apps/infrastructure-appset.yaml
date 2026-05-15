@@ -37,11 +37,9 @@ spec:
       - path: infrastructure/storage/csi-driver-nfs
       - path: infrastructure/storage/csi-driver-smb
       - path: infrastructure/storage/local-storage
-      # NOTE: longhorn, snapshot-controller, volsync are NOT listed here
-      # They have dedicated standalone Applications at Wave 1 (longhorn-app.yaml,
-      # snapshot-controller-app.yaml, volsync-app.yaml) to ensure storage is
-      # healthy before PVC Plumber (Wave 2) and Kyverno (Wave 3).
-      - path: infrastructure/storage/kopia-ui
+      # NOTE: longhorn and snapshot-controller are NOT listed here — they have
+      # dedicated standalone Applications at Wave 1 to ensure storage is
+      # healthy before Kyverno (Wave 3).
       # Tetragon (eBPF kernel agent + TracingPolicies) stays in ArgoCD as infrastructure.
       # audit-service, tetragon-forwarder, and token-service are deployed by Jenkins platform pipelines.
       - path: infrastructure/controllers/tetragon
