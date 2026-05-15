@@ -383,6 +383,30 @@ data:
     security:
       globalJobDslSecurityConfiguration:
         useScriptSecurity: false
+      scriptApproval:
+        approvedSignatures:
+          - "staticMethod jenkins.model.Jenkins get"
+          - "method hudson.model.ItemGroup getAllItems java.lang.Class"
+          - "method jenkins.model.Jenkins getItemByFullName java.lang.String"
+          - "method jenkins.model.FullyNamed getFullName"
+          - "method hudson.model.Item getFullName"
+          - "method hudson.model.Job getFullName"
+          - "method hudson.model.Job getLastSuccessfulBuild"
+          - "method hudson.model.Job isBuildable"
+          - "method hudson.model.AbstractProject getLastSuccessfulBuild"
+          - "method hudson.model.Run getTimeInMillis"
+          - "method hudson.model.Run getArtifactsDir"
+          - "method hudson.model.AbstractBuild getArtifactsDir"
+          - "new java.io.File java.io.File java.lang.String"
+          - "new java.io.File java.lang.String java.lang.String"
+          - "method java.io.File exists"
+          - "method java.io.File getText"
+          - "method java.io.File getText java.lang.String"
+          - "method java.io.File getAbsolutePath"
+          - "method java.io.File isFile"
+          - "method java.io.File isDirectory"
+          - "method java.io.File listFiles"
+          - "method java.io.File getName"
   04-global-library.yaml: |
     unclassified:
       globalLibraries:
