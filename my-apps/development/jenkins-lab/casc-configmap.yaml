@@ -13,7 +13,7 @@ data:
             namespace: "jenkins"
             jenkinsUrl: "http://jenkins-operator-http-jenkins.jenkins.svc.cluster.local:8080"
             jenkinsTunnel: "jenkins-operator-slave-jenkins.jenkins.svc.cluster.local:50000"
-            containerCap: 2
+            containerCap: 15
             templates:
               - name: "default"
                 label: "default"
@@ -355,7 +355,7 @@ data:
             namespace: "jenkins"
             jenkinsUrl: "http://jenkins-operator-http-jenkins.jenkins.svc.cluster.local:8080"
             jenkinsTunnel: "jenkins-operator-slave-jenkins.jenkins.svc.cluster.local:50000"
-            containerCap: 1
+            containerCap: 5
             templates:
               - name: "base"
                 label: "base"
