@@ -60,7 +60,7 @@ backstage:
             - allow: [Template]
 
   startupProbe:
-    failureThreshold: 30
+    failureThreshold: 60
     periodSeconds: 10
     timeoutSeconds: 5
 
