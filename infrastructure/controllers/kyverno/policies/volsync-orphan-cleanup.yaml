@@ -26,16 +26,6 @@ spec:
                 values: ["kyverno"]
               - key: volsync.backup/pvc
                 operator: Exists
-      - resources:
-          kinds:
-            - Secret
-          selector:
-            matchExpressions:
-              - key: app.kubernetes.io/managed-by
-                operator: In
-                values: ["kyverno"]
-              - key: volsync.backup/pvc
-                operator: Exists
   exclude:
     any:
       - resources:
