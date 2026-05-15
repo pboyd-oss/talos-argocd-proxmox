@@ -81,19 +81,12 @@ backstage:
     - backstage-credentials
     - backstage-db
 
-  imagePullSecrets:
-    - name: harbor-pull-secret
-
   strategy:
     type: Recreate
 
 # Disable bundled PostgreSQL — using CNPG cluster instead
 postgresql:
   enabled: false
-
-global:
-  imagePullSecrets:
-    - harbor-pull-secret
 
 service:
   type: ClusterIP

@@ -15,3 +15,13 @@ helmCharts:
     releaseName: backstage
     namespace: backstage
     valuesFile: values.yaml
+
+patches:
+  - target:
+      kind: Deployment
+      name: backstage
+    patch: |
+      - op: add
+        path: /spec/template/spec/imagePullSecrets
+        value:
+          - name: harbor-pull-secret
