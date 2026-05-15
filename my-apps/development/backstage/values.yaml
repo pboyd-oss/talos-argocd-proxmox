@@ -3,7 +3,7 @@ backstage:
 
   image:
     registry: harbor.tuxgrid.com
-    repository: ghcr.io/backstage/backstage
+    repository: platform/backstage
     tag: "latest"
     pullPolicy: IfNotPresent
 
