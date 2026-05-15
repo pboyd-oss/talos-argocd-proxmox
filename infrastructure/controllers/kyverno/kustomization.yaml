@@ -4,9 +4,6 @@ namespace: kyverno
 resources:
 - namespace.yaml
 - rbac-patch.yaml
-- policies/volsync-pvc-backup-restore.yaml
-- policies/volsync-nfs-inject.yaml
-- policies/volsync-orphan-cleanup.yaml
 - policies/longhorn-pvc-backup-audit.yaml
 - policies/require-signed-images.yaml
 - policies/require-signed-platform-images.yaml
