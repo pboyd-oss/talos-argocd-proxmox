@@ -25,3 +25,15 @@ patches:
         path: /spec/template/spec/imagePullSecrets
         value:
           - name: harbor-pull-secret
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/timeoutSeconds
+        value: 10
+      - op: add
+        path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
+        value: 60
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/timeoutSeconds
+        value: 10
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
+        value: 60
