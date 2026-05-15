@@ -5,151 +5,19 @@ metadata:
   name: volsync-pvc-backup-restore
   annotations:
     argocd.argoproj.io/sync-wave: "4"
-    policies.kyverno.io/title: VolSync PVC Backup and Restore (Kopia NFS)
+    policies.kyverno.io/title: VolSync PVC Backup (Kopia NFS)
     policies.kyverno.io/description: >-
-      Automatically configures VolSync backup and restore for PVCs with the
-      label backup: "hourly" or backup: "daily". Uses Kopia with NFS filesystem
-      backend for faster backups with compression. MutatingAdmissionPolicy injects
-      NFS mount into mover pods.
+      Automatically generates VolSync backup resources for PVCs with the label
+      backup: "hourly" or backup: "daily". Uses Kopia with NFS filesystem backend.
+      Generates kopia Secret, ReplicationSource, and ReplicationDestination on PVC
+      creation. Restore-on-create (dataSourceRef injection) must be done manually.
 spec:
   mutateExistingOnPolicyUpdate: false
   background: false
   emitWarning: false
   validationFailureAction: Enforce
   rules:
-    # Rule 1: Gate PVC creation on authoritative per-PVC backup truth.
-    # This single rule covers BOTH plumber-availability and per-PVC backup
-    # truth: when pvc-plumber is unreachable the apiCall on /exists below
-    # returns the configured `default` (decision=unknown, authoritative=false)
-    # which trips the deny block. The previous separate /readyz probe rule
-    # was redundant and added a second serial HTTP call to the admission
-    # path — under DR-storm load that risked a 10s webhook timeout.
-    # If the repository lookup is unknown/error, DENY PVC creation. A false
-    # negative here can let apps initialize empty state over restorable data.
-    - name: require-authoritative-backup-decision
-      skipBackgroundRequests: true
-      match:
-        any:
-          - resources:
-              kinds:
-                - PersistentVolumeClaim
-              operations:
-                - CREATE
-              selector:
-                matchExpressions:
-                  - key: backup
-                    operator: In
-                    values: ["hourly", "daily"]
-      exclude:
-        any:
-          - resources:
-              namespaces:
-                - kube-system
-                - volsync-system
-                - kyverno
-      preconditions:
-        all:
-          # Escape hatch: if the PVC explicitly opts out of restore-on-create,
-          # do not require an authoritative decision from pvc-plumber. This
-          # lets you "nuke and start fresh" on a labeled PVC without having
-          # to clear the kopia repo first. Backup generation rules below
-          # still fire, so the new fresh PVC gets backed up going forward.
-          - key: "{{ request.object.metadata.annotations.\"volsync.backup/skip-restore\" || 'false' }}"
-            operator: NotEquals
-            value: "true"
-      context:
-        - name: backupCheck
-          apiCall:
-            method: GET
-            default:
-              exists: false
-              decision: unknown
-              authoritative: false
-              error: pvc-plumber lookup failed
-            service:
-              url: "http://pvc-plumber.volsync-system.svc.cluster.local/exists/{{request.object.metadata.namespace}}/{{request.object.metadata.name}}"
-      validate:
-        failureAction: Enforce
-        allowExistingViolations: true
-        message: >-
-          PVC Plumber could not make an authoritative restore/fresh decision
-          for this backup-labeled PVC. PVC creation is denied to prevent silent
-          empty-volume initialization when backup state is unknown.
-        deny:
-          conditions:
-            any:
-              - key: "{{ backupCheck.authoritative || false }}"
-                operator: Equals
-                value: false
-              - key: "{{ backupCheck.decision || 'unknown' }}"
-                operator: Equals
-                value: "unknown"
-              - key: "{{ backupCheck.error || '' }}"
-                operator: NotEquals
-                value: ""
-
-    # Rule 2: Conditionally add dataSourceRef if backup exists in Kopia
-    # IMPORTANT: Only trigger on CREATE to avoid race conditions during PVC deletion
-    - name: add-datasource-if-backup-exists
-      skipBackgroundRequests: true
-      match:
-        any:
-          - resources:
-              kinds:
-                - PersistentVolumeClaim
-              operations:
-                - CREATE
-              selector:
-                matchExpressions:
-                  - key: backup
-                    operator: In
-                    values: ["hourly", "daily"]
-      exclude:
-        any:
-          - resources:
-              namespaces:
-                - kube-system
-                - volsync-system
-                - kyverno
-      context:
-        - name: backupCheck
-          apiCall:
-            method: GET
-            default:
-              exists: false
-              decision: unknown
-              authoritative: false
-              error: pvc-plumber lookup failed
-            service:
-              url: "http://pvc-plumber.volsync-system.svc.cluster.local/exists/{{request.object.metadata.namespace}}/{{request.object.metadata.name}}"
-      preconditions:
-        all:
-          # Escape hatch: opt out of restore-on-create when nuking an app.
-          # Pair with the matching precondition in rule 1 above.
-          - key: "{{ request.object.metadata.annotations.\"volsync.backup/skip-restore\" || 'false' }}"
-            operator: NotEquals
-            value: "true"
-          - key: "{{ backupCheck.authoritative || false }}"
-            operator: Equals
-            value: true
-          - key: "{{ backupCheck.decision || 'unknown' }}"
-            operator: Equals
-            value: "restore"
-          - key: "{{ backupCheck.exists || false }}"
-            operator: Equals
-            value: true
-          - key: "{{ request.object.spec.dataSourceRef || '' }}"
-            operator: Equals
-            value: ""
-      mutate:
-        patchStrategicMerge:
-          spec:
-            dataSourceRef:
-              apiGroup: volsync.backube
-              kind: ReplicationDestination
-              name: "{{request.object.metadata.name}}-backup"
-
-    # Rule 2: Generate Secret for Kopia repository credentials
+    # Rule 1: Generate Secret for Kopia repository credentials
     # Reads credentials from volsync-kopia-template in volsync-system (SealedSecret).
     - name: generate-kopia-secret
       skipBackgroundRequests: true
