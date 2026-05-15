@@ -2,7 +2,7 @@
 #
 # Replaces the deprecated in-Cluster `spec.backup.barmanObjectStore` (removed
 # in CNPG 1.30.0). Provides the ObjectStore CRD and a plugin sidecar that the
-# CNPG operator reaches via gRPC over a cnpg-system/barman-cloud Service.
+# CNPG operator reaches via gRPC over a barman-cloud Service.
 #
 # Upstream: https://github.com/cloudnative-pg/plugin-barman-cloud
 # Pinned to v0.12.0 (2026-04-14). Bump the URL tag to upgrade.
@@ -10,12 +10,42 @@
 # Why URL instead of a vendored manifest.yaml: upstream doesn't publish a
 # Helm chart, and the raw manifest is ~1100 lines (mostly CRD OpenAPI
 # schema). Pulling from the tag keeps the repo lean and consistent with how
-# cilium/kyverno charts are fetched (remote reference, pinned version).
+# the cilium chart is fetched (remote reference, pinned version).
+#
+# CRITICAL: the plugin MUST be installed in the same namespace as the CNPG
+# operator. The CNPG operator's plugin discovery only finds Services within
+# its OWN namespace, regardless of the cnpg.io/pluginName label being set
+# correctly. The upstream manifest defaults to cnpg-system, but our operator
+# runs in cloudnative-pg — so we override with the namespace directive below.
+# See: https://cloudnative-pg.io/plugin-barman-cloud/docs/next/installation/
+#
+# After the cutover, the OLD plugin Deployment/Service/Secrets in cnpg-system
+# become dangling (ArgoCD no longer tracks them). Clean up manually after
+# verifying the new plugin works:
+#   kubectl delete ns cnpg-system
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+# Co-locate with the CNPG operator. Discovery requires same-namespace.
+namespace: cloudnative-pg
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "-9"  # after CNPG operator (-10), before Clusters
 
 resources:
   - https://github.com/cloudnative-pg/plugin-barman-cloud/releases/download/v0.12.0/manifest.yaml
+
+patches:
+  # The upstream manifest creates a Namespace resource named `cnpg-system`.
+  # Strip it — we're co-located in cloudnative-pg now. Without this,
+  # kustomize still emits the Namespace (cluster-scoped kinds are not
+  # affected by the `namespace:` directive above).
+  - patch: |
+      $patch: delete
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: cnpg-system
+    target:
+      kind: Namespace
+      name: cnpg-system
