@@ -63,6 +63,18 @@ backstage:
     periodSeconds: 10
     timeoutSeconds: 5
 
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 768Mi
+      cpu: 1000m
+
+  extraEnvVars:
+    - name: NODE_OPTIONS
+      value: "--max-old-space-size=512"
+
   # Inject DB and GitHub credentials from sealed secrets
   extraEnvVarsSecrets:
     - backstage-credentials
