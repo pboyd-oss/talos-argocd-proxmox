@@ -27,3 +27,22 @@ patches:
     target:
       kind: Deployment
       namespace: harbor
+  # Chart 1.18.3 hardcodes timeoutSeconds: 1, failureThreshold: 2 for core probes,
+  # which kills the pod on any brief slowness (e.g. jobservice not yet ready at startup).
+  - patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/timeoutSeconds
+        value: 5
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/failureThreshold
+        value: 5
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/timeoutSeconds
+        value: 5
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/failureThreshold
+        value: 5
+    target:
+      kind: Deployment
+      name: harbor-core
+      namespace: harbor

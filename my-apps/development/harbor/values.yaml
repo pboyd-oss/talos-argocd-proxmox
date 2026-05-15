@@ -60,12 +60,6 @@ core:
     limits:
       memory: 512Mi
       cpu: 1000m
-  livenessProbe:
-    timeoutSeconds: 5
-    failureThreshold: 5
-  readinessProbe:
-    timeoutSeconds: 5
-    failureThreshold: 5
 
 portal:
   resources:
