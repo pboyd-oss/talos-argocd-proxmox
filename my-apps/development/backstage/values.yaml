@@ -10,6 +10,7 @@ backstage:
   # TLS terminated at gateway-internal; Backstage speaks plain HTTP internally.
   appConfig:
     app:
+      title: Backstage
       baseUrl: https://backstage.tuxgrid.com
     backend:
       baseUrl: https://backstage.tuxgrid.com
