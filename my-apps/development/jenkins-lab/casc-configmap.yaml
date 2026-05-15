@@ -41,6 +41,15 @@ data:
                     image: "harbor.tuxgrid.com/docker.io/golang:1.23"
                     command: "cat"
                     ttyEnabled: true
+                  - name: "deploy-sec-base"
+                    image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
+                    alwaysPullImage: true
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
+                    resourceLimitCpu: "1"
+                    resourceLimitMemory: "512Mi"
               - name: "deploy-sec-base"
                 label: "deploy-sec-base"
                 serviceAccount: "jenkins"
