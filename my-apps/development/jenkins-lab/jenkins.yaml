@@ -18,21 +18,10 @@ spec:
     authorizationStrategy: createUser
   master:
     disableCSRFProtection: true
-    volumes:
-      - name: init-groovy
-        configMap:
-          name: jenkins-groovy-init
     containers:
       - name: jenkins-master
         image: harbor.tuxgrid.com/docker.io/jenkins/jenkins:2.555.1-lts-jdk21
         imagePullPolicy: IfNotPresent
-        volumeMounts:
-          - name: init-groovy
-            mountPath: /var/jenkins/init-configuration/01-audit-graph-listener.groovy
-            subPath: 01-audit-graph-listener.groovy
-          - name: init-groovy
-            mountPath: /var/jenkins/init-configuration/02-attest-build-listener.groovy
-            subPath: 02-attest-build-listener.groovy
         resources:
           requests:
             cpu: 250m
