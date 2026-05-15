@@ -88,10 +88,11 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
-    # Python package index — pip install routes through mitmproxy
+    # Python package index and PyTorch CDN — pip install direct (no proxy in Docker build args)
     - toFQDNs:
         - matchName: pypi.org
         - matchName: files.pythonhosted.org
+        - matchName: download.pytorch.org
       toPorts:
         - ports:
             - port: "443"
