@@ -18,10 +18,17 @@ spec:
     authorizationStrategy: createUser
   master:
     disableCSRFProtection: true
+    volumes:
+      - name: init-groovy
+        configMap:
+          name: jenkins-groovy-init
     containers:
       - name: jenkins-master
         image: harbor.tuxgrid.com/docker.io/jenkins/jenkins:2.555.1-lts-jdk21
         imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: init-groovy
+            mountPath: /var/lib/jenkins/init.groovy.d
         resources:
           requests:
             cpu: 250m
