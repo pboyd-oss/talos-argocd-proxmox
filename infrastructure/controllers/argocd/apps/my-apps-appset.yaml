@@ -76,7 +76,8 @@ spec:
         - .spec.serviceAccount
         - .spec.master.plugins
         - .spec.master.terminationGracePeriodSeconds
-        - .spec.master.containers
+        - .spec.master.containers[].command
+        - .spec.master.containers[].lifecycle
         - .spec.seedJobs
 
       info:
