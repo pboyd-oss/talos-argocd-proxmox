@@ -5,7 +5,7 @@ backstage:
     registry: harbor.tuxgrid.com
     repository: ghcr.io/backstage/backstage
     tag: "latest"
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   # TLS terminated at gateway-internal; Backstage speaks plain HTTP internally.
   appConfig:
