@@ -372,6 +372,115 @@ data:
                     resourceRequestMemory: "128Mi"
                     resourceLimitCpu: "2"
                     resourceLimitMemory: "1Gi"
+              - name: "platform-builder"
+                label: "platform-builder"
+                serviceAccount: "jenkins"
+                yaml: |
+                  metadata:
+                    labels:
+                      role: build
+                  spec:
+                    initContainers:
+                      - name: init-mitm-conf
+                        image: harbor.tuxgrid.com/docker.io/alpine:3.20
+                        command: ["sh", "-c", "cp /mitm-ca-secret/mitmproxy-ca.pem /mitm-conf/mitmproxy-ca.pem && cp /mitm-ca-secret/mitmproxy-ca-cert.pem /mitm-data/ca.pem"]
+                        volumeMounts:
+                          - name: mitm-conf
+                            mountPath: /mitm-conf
+                          - name: mitm-ca-secret
+                            mountPath: /mitm-ca-secret
+                            readOnly: true
+                          - name: mitm-data
+                            mountPath: /mitm-data
+                    containers:
+                      - name: mitmproxy
+                        image: harbor.tuxgrid.com/docker.io/mitmproxy/mitmproxy:11
+                        args: ["mitmdump", "--set", "confdir=/mitm-conf", "--scripts", "/hooks/hooks.py", "--listen-port", "8080", "--quiet"]
+                        env:
+                          - name: MITM_EXTRA_HOSTS
+                            value: "proxy.golang.org,sum.golang.org,storage.googleapis.com,archive.ubuntu.com,security.ubuntu.com,github.com,objects.githubusercontent.com"
+                        resources:
+                          requests:
+                            cpu: "50m"
+                            memory: "128Mi"
+                          limits:
+                            cpu: "500m"
+                            memory: "256Mi"
+                        volumeMounts:
+                          - name: mitm-data
+                            mountPath: /mitm-data
+                          - name: mitm-conf
+                            mountPath: /mitm-conf
+                          - name: mitm-hooks
+                            mountPath: /hooks
+                            readOnly: true
+                      - name: jnlp
+                        env:
+                          - name: HTTPS_PROXY
+                            value: "http://localhost:8080"
+                          - name: HTTP_PROXY
+                            value: "http://localhost:8080"
+                          - name: NO_PROXY
+                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1"
+                          - name: GIT_SSL_CAINFO
+                            value: "/mitm-data/ca.pem"
+                        volumeMounts:
+                          - name: mitm-data
+                            mountPath: /mitm-data
+                            readOnly: true
+                      - name: kaniko
+                        env:
+                          - name: HTTPS_PROXY
+                            value: "http://localhost:8080"
+                          - name: SSL_CERT_FILE
+                            value: "/mitm-data/ca.pem"
+                        volumeMounts:
+                          - name: mitm-data
+                            mountPath: /mitm-data
+                            readOnly: true
+                      - name: deploy-sec-base
+                        env:
+                          - name: HTTPS_PROXY
+                            value: "http://localhost:8080"
+                          - name: HTTP_PROXY
+                            value: "http://localhost:8080"
+                          - name: NO_PROXY
+                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1"
+                          - name: SSL_CERT_FILE
+                            value: "/mitm-data/ca.pem"
+                        volumeMounts:
+                          - name: mitm-data
+                            mountPath: /mitm-data
+                            readOnly: true
+                    volumes:
+                      - name: mitm-data
+                        emptyDir: {}
+                      - name: mitm-conf
+                        emptyDir: {}
+                      - name: mitm-ca-secret
+                        secret:
+                          secretName: mitm-ca-secret
+                      - name: mitm-hooks
+                        configMap:
+                          name: mitm-hooks
+                containers:
+                  - name: "kaniko"
+                    image: "harbor.tuxgrid.com/gcr.io/kaniko-project/executor:v1.23.2-debug"
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
+                    resourceLimitCpu: "2"
+                    resourceLimitMemory: "2Gi"
+                  - name: "deploy-sec-base"
+                    image: "harbor.tuxgrid.com/platform/deploy-sec-base:latest"
+                    alwaysPullImage: true
+                    command: "cat"
+                    ttyEnabled: true
+                    resourceRequestCpu: "100m"
+                    resourceRequestMemory: "256Mi"
+                    resourceLimitCpu: "1"
+                    resourceLimitMemory: "512Mi"
   02-global-env.yaml: |
     jenkins:
       globalNodeProperties:
