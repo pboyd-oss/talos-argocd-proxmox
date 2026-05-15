@@ -19,6 +19,7 @@ backstage:
         origin: https://backstage.tuxgrid.com
       database:
         client: pg
+        pluginDivisionMode: schema
         connection:
           host: backstage-database-rw.cloudnative-pg.svc.cluster.local
           port: 5432
