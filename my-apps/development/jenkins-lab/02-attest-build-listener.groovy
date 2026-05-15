@@ -27,7 +27,7 @@ DEFAULT_COVERAGE_THRESHOLD = 70
 // Idempotent registration — same reason as audit-graph-listener.
 final String ATTEST_LISTENER_MARKER = 'PlatformAttestBuildListener-v1'
 def _runListeners = Jenkins.instance.getExtensionList(RunListener.class)
-_runListeners.removeIf { it.toString() == ATTEST_LISTENER_MARKER }
+_runListeners.findAll { it.toString() == ATTEST_LISTENER_MARKER }.each { _runListeners.remove(it) }
 _runListeners.add(new RunListener<Run>() {
 
     String toString() { ATTEST_LISTENER_MARKER }
