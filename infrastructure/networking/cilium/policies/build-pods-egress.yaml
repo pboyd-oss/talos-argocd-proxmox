@@ -62,11 +62,20 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
-    # Python package index and PyTorch CDN — pip install direct (no proxy in Docker build args)
+    # Python package index (Fastly CDN) and PyTorch CDN (CloudFront).
+    # Both FQDN and explicit CIDRs are specified: FQDN handles new IPs, CIDR handles cached
+    # IPs that bypass DNS (Cilium FQDN cache miss on cold start).
     - toFQDNs:
         - matchName: pypi.org
         - matchName: files.pythonhosted.org
         - matchName: download.pytorch.org
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 151.101.0.0/16   # Fastly (pypi.org, files.pythonhosted.org)
+        - cidr: 108.156.46.0/24  # CloudFront (download.pytorch.org)
       toPorts:
         - ports:
             - port: "443"
