@@ -160,7 +160,7 @@ data:
                             memory: "128Mi"
                           limits:
                             cpu: "500m"
-                            memory: "512Mi"
+                            memory: "1Gi"
                         volumeMounts:
                           - name: mitm-data
                             mountPath: /mitm-data
@@ -173,6 +173,8 @@ data:
                         env:
                           - name: HTTPS_PROXY
                             value: "http://localhost:8080"
+                          - name: NO_PROXY
+                            value: "harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: SSL_CERT_FILE
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
@@ -196,7 +198,7 @@ data:
                           - name: HTTP_PROXY
                             value: "http://localhost:8080"
                           - name: NO_PROXY
-                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1"
+                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1,harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: SSL_CERT_FILE
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
@@ -273,7 +275,7 @@ data:
                             memory: "128Mi"
                           limits:
                             cpu: "500m"
-                            memory: "512Mi"
+                            memory: "1Gi"
                         volumeMounts:
                           - name: mitm-data
                             mountPath: /mitm-data
@@ -289,7 +291,7 @@ data:
                           - name: HTTP_PROXY
                             value: "http://localhost:8080"
                           - name: NO_PROXY
-                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1"
+                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1,harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: GIT_SSL_CAINFO
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
@@ -300,6 +302,8 @@ data:
                         env:
                           - name: HTTPS_PROXY
                             value: "http://localhost:8080"
+                          - name: NO_PROXY
+                            value: "harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: SSL_CERT_FILE
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
@@ -313,7 +317,7 @@ data:
                           - name: HTTP_PROXY
                             value: "http://localhost:8080"
                           - name: NO_PROXY
-                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1"
+                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1,harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: SSL_CERT_FILE
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
@@ -414,7 +418,7 @@ data:
                             memory: "128Mi"
                           limits:
                             cpu: "500m"
-                            memory: "512Mi"
+                            memory: "1Gi"
                         volumeMounts:
                           - name: mitm-data
                             mountPath: /mitm-data
@@ -430,7 +434,7 @@ data:
                           - name: HTTP_PROXY
                             value: "http://localhost:8080"
                           - name: NO_PROXY
-                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1"
+                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1,harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: GIT_SSL_CAINFO
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
@@ -441,6 +445,8 @@ data:
                         env:
                           - name: HTTPS_PROXY
                             value: "http://localhost:8080"
+                          - name: NO_PROXY
+                            value: "harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: SSL_CERT_FILE
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
@@ -454,7 +460,7 @@ data:
                           - name: HTTP_PROXY
                             value: "http://localhost:8080"
                           - name: NO_PROXY
-                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1"
+                            value: "kubernetes.default.svc,.cluster.local,localhost,127.0.0.1,harbor.tuxgrid.com,gitea.tuxgrid.com"
                           - name: SSL_CERT_FILE
                             value: "/mitm-data/ca.pem"
                         volumeMounts:
