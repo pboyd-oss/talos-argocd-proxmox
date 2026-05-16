@@ -4,7 +4,14 @@ metadata:
   name: default-deny-lan-egress
 spec:
   description: "Block pods from accessing LAN - allow internet, cluster, and whitelisted storage"
-  endpointSelector: {}  # Applies to ALL pods
+  # Applies to all pods EXCEPT build pods, which have their own egress policy
+  # (build-pods-egress.yaml) using toFQDNs allowlist — egressDeny here would
+  # override those FQDN allows, preventing package downloads.
+  endpointSelector:
+    matchExpressions:
+      - key: role
+        operator: NotIn
+        values: ["build"]
 
   # ============================================
   # INGRESS: Allow all legitimate traffic
