@@ -266,7 +266,7 @@ data:
                         args: ["mitmdump", "--set", "confdir=/mitm-conf", "--scripts", "/hooks/hooks.py", "--listen-port", "8080", "--quiet"]
                         env:
                           - name: MITM_EXTRA_HOSTS
-                            value: "proxy.golang.org,sum.golang.org,storage.googleapis.com,archive.ubuntu.com,security.ubuntu.com,github.com,objects.githubusercontent.com,pypi.org,files.pythonhosted.org"
+                            value: "proxy.golang.org,sum.golang.org,storage.googleapis.com,archive.ubuntu.com,security.ubuntu.com,github.com,objects.githubusercontent.com,pypi.org,files.pythonhosted.org,download.pytorch.org"
                         resources:
                           requests:
                             cpu: "50m"
@@ -407,7 +407,7 @@ data:
                         args: ["mitmdump", "--set", "confdir=/mitm-conf", "--scripts", "/hooks/hooks.py", "--listen-port", "8080", "--quiet"]
                         env:
                           - name: MITM_EXTRA_HOSTS
-                            value: "proxy.golang.org,sum.golang.org,storage.googleapis.com,archive.ubuntu.com,security.ubuntu.com,github.com,objects.githubusercontent.com,pypi.org,files.pythonhosted.org"
+                            value: "proxy.golang.org,sum.golang.org,storage.googleapis.com,archive.ubuntu.com,security.ubuntu.com,github.com,objects.githubusercontent.com,pypi.org,files.pythonhosted.org,download.pytorch.org"
                         resources:
                           requests:
                             cpu: "50m"
