@@ -145,6 +145,21 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+    # Sigstore Rekor transparency log — cosign sign uploads signature entries here.
+    # Both FQDN and explicit CIDR are specified: FQDN handles new IPs, CIDR handles
+    # Cilium FQDN cache miss on cold start (node restart clears the cache).
+    - toFQDNs:
+        - matchName: rekor.sigstore.dev
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 34.36.0.0/16    # Google Cloud (rekor.sigstore.dev — 34.36.47.134)
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
     # Jenkins JNLP agent connection back to controller
     - toEntities:
         - cluster

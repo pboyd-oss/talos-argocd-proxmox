@@ -14,6 +14,7 @@ data:
     _BASE_ALLOWED = {
         "harbor.tuxgrid.com",       # private registry + all mirrors
         "token-service.platform.svc.cluster.local",
+        "rekor.sigstore.dev",       # sigstore transparency log for cosign sign
     }
 
     # Additional hosts loaded from MITM_EXTRA_HOSTS (comma-separated).
