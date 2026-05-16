@@ -100,9 +100,15 @@ _runListeners.add(new RunListener<Run>() {
         log("Audit ID: ${auditId ?: 'NOT PRESENT -- graph listener may not be active'}")
         if (!auditId) { refuse('no PLATFORM_AUDIT_ID found -- audit-graph-listener may not be loaded'); return }
 
-        // audit-log.json written by the graph listener — check the file directly
-        // since run.getArtifacts() may not reflect it yet at onCompleted time
+        // audit-log.json written by the graph listener's FlowExecutionListener.onCompleted,
+        // which races with this RunListener.onCompleted — poll briefly for it to appear.
         def auditLogFile = new File(run.artifactsDir, 'audit-log.json')
+        if (!auditLogFile.exists()) {
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(500)
+                if (auditLogFile.exists()) break
+            }
+        }
         log("audit-log.json present: ${auditLogFile.exists()}")
         if (!auditLogFile.exists()) { refuse('audit-log.json was not written -- graph listener may not have flushed'); return }
 
