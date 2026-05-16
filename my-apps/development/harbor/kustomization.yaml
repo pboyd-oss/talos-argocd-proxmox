@@ -46,3 +46,22 @@ patches:
       kind: Deployment
       name: harbor-core
       namespace: harbor
+  # harbor-nginx has a 1s liveness/readiness timeout that fires during large blob downloads,
+  # causing restart loops that drop active kaniko pull connections (EOF mid-transfer).
+  - patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/timeoutSeconds
+        value: 10
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/failureThreshold
+        value: 5
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/timeoutSeconds
+        value: 10
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/failureThreshold
+        value: 5
+    target:
+      kind: Deployment
+      name: harbor-nginx
+      namespace: harbor
