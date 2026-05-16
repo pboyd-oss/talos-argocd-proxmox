@@ -43,11 +43,20 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
-    # Go module proxy, checksum DB, and GCS backing store (via mitmproxy)
+    # Go module proxy, checksum DB, and GCS backing store (via mitmproxy).
+    # Both FQDN and explicit CIDRs are specified: FQDN handles new IPs, CIDR handles
+    # Cilium FQDN cache miss on cold start (node restart clears the cache).
     - toFQDNs:
         - matchName: proxy.golang.org
         - matchName: sum.golang.org
         - matchName: storage.googleapis.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 142.250.0.0/15    # Google GFE anycast (sum.golang.org, storage.googleapis.com — covers 142.250/251.x.x)
+        - cidr: 192.178.0.0/15    # Google GFE anycast (proxy.golang.org, storage.googleapis.com)
       toPorts:
         - ports:
             - port: "443"
