@@ -552,7 +552,7 @@ data:
                     directEntry:
                       privateKey: "${GIT_DEPLOY_KEY}"
               - string:
-                  scope: SYSTEM
+                  scope: GLOBAL
                   id: "cosign-key"
                   description: "Cosign private key for attestation and image signing"
                   secret: "${COSIGN_PRIVATE_KEY}"
