@@ -51,6 +51,12 @@ redis:
 
 trivy:
   enabled: true
+  livenessProbe:
+    timeoutSeconds: 5
+    failureThreshold: 10
+  readinessProbe:
+    timeoutSeconds: 5
+    failureThreshold: 10
 
 core:
   resources:
@@ -62,6 +68,12 @@ core:
       cpu: 1000m
 
 portal:
+  livenessProbe:
+    timeoutSeconds: 5
+    failureThreshold: 5
+  readinessProbe:
+    timeoutSeconds: 5
+    failureThreshold: 5
   resources:
     requests:
       memory: 128Mi
@@ -72,6 +84,12 @@ portal:
 
 registry:
   registry:
+    livenessProbe:
+      timeoutSeconds: 5
+      failureThreshold: 5
+    readinessProbe:
+      timeoutSeconds: 5
+      failureThreshold: 5
     resources:
       requests:
         memory: 256Mi
@@ -89,6 +107,12 @@ registry:
         cpu: 250m
 
 jobservice:
+  livenessProbe:
+    timeoutSeconds: 5
+    failureThreshold: 5
+  readinessProbe:
+    timeoutSeconds: 5
+    failureThreshold: 5
   resources:
     requests:
       memory: 128Mi
@@ -96,3 +120,4 @@ jobservice:
     limits:
       memory: 256Mi
       cpu: 250m
+
