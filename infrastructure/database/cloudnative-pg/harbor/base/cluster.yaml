@@ -27,7 +27,7 @@ spec:
     size: 10Gi
     storageClass: longhorn
   walStorage:
-    size: 5Gi
+    size: 10Gi
     storageClass: longhorn
   enableSuperuserAccess: true
   monitoring:
