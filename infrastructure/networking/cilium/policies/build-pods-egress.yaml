@@ -52,10 +52,21 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # Ubuntu package mirrors — apt-get routes through mitmproxy via HTTP_PROXY
+    # Ubuntu package mirrors — apt-get routes through mitmproxy via apt.conf.d/99proxy.
+    # Both FQDN and explicit CIDRs are specified: FQDN handles new IPs, CIDR handles
+    # Cilium FQDN cache miss on cold start (node restart clears the cache).
     - toFQDNs:
         - matchName: archive.ubuntu.com
         - matchName: security.ubuntu.com
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 104.16.0.0/12    # Cloudflare CDN anycast (104.20.x.x range)
+        - cidr: 172.64.0.0/13    # Cloudflare CDN (172.66.x.x, 172.67.x.x range)
       toPorts:
         - ports:
             - port: "80"
