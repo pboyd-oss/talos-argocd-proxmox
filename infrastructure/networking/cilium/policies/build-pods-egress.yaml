@@ -62,20 +62,23 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
-    # Python package index (Fastly CDN) and PyTorch CDN (CloudFront).
-    # Both FQDN and explicit CIDRs are specified: FQDN handles new IPs, CIDR handles cached
-    # IPs that bypass DNS (Cilium FQDN cache miss on cold start).
+    # Python package index (Fastly CDN), PyTorch index (CloudFront), and PyTorch wheels (Cloudflare R2).
+    # pip downloads the index from download.pytorch.org (CloudFront) but redirects wheel fetches to
+    # download-r2.pytorch.org (Cloudflare R2 at 104.16.0.0/12). Both FQDN and explicit CIDRs are
+    # specified: FQDN handles new IPs, CIDR handles cached IPs that bypass DNS (Cilium FQDN cache miss).
     - toFQDNs:
         - matchName: pypi.org
         - matchName: files.pythonhosted.org
         - matchName: download.pytorch.org
+        - matchName: download-r2.pytorch.org
       toPorts:
         - ports:
             - port: "443"
               protocol: TCP
     - toCIDRSet:
         - cidr: 151.101.0.0/16   # Fastly (pypi.org, files.pythonhosted.org)
-        - cidr: 108.156.46.0/24  # CloudFront (download.pytorch.org)
+        - cidr: 108.156.0.0/14   # CloudFront (download.pytorch.org — wider than /24 to cover CDN rotation)
+        - cidr: 104.16.0.0/12    # Cloudflare CDN anycast (download-r2.pytorch.org)
       toPorts:
         - ports:
             - port: "443"
