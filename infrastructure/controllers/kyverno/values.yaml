@@ -87,7 +87,7 @@ backgroundController:
     limits:
       memory: 512Mi
     requests:
-      cpu: 2500m
+      cpu: 200m
       memory: 192Mi
   rbac:
     clusterRole:
