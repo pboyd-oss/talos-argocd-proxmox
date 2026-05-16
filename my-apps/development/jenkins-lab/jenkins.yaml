@@ -18,6 +18,8 @@ spec:
     authorizationStrategy: createUser
   master:
     disableCSRFProtection: true
+    imagePullSecrets:
+      - name: harbor-docker-pull
     containers:
       - name: jenkins-master
         image: harbor.tuxgrid.com/docker.io/jenkins/jenkins:2.555.1-lts-jdk21

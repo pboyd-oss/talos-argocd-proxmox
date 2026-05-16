@@ -37,12 +37,17 @@ _runListeners.add(new RunListener<Run>() {
         def fullName = run.parent.fullName
         listener.logger.println("[Platform:debug] onCompleted fired for ${fullName} #${run.number} result=${run.result}")
 
-        if (fullName.startsWith('teams/') && run.result == Result.SUCCESS) {
+        def isTeamBuild = fullName.startsWith('teams/')
+        def isScanJob   = (fullName =~ /^platform\/[^\/]+\/scan$/).matches()
+
+        if (isTeamBuild && run.result == Result.SUCCESS) {
             handleTeamBuild(run, listener, fullName)
-        } else if ((fullName =~ /^platform\/[^\/]+\/scan$/).matches() && run.result == Result.SUCCESS) {
+        } else if (isScanJob && run.result == Result.SUCCESS) {
             handleScanCompleted(run, listener, fullName)
+        } else if (isTeamBuild || isScanJob) {
+            listener.logger.println("[Platform:debug] skipping -- tracked job but result=${run.result} (not SUCCESS)")
         } else {
-            listener.logger.println("[Platform:debug] skipping -- not a tracked build")
+            listener.logger.println("[Platform:debug] skipping -- not a tracked job pattern")
         }
     }
 

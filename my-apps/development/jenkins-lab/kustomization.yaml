@@ -14,6 +14,7 @@ resources:
   - jenkins-credentials-sealedsecret.yaml
   - infracost-api-key-sealedsecret.yaml
   - harbor-robot-platform-sealedsecret.yaml
+  - harbor-docker-pull-sealedsecret.yaml
   - audit-ingest-sealedsecret.yaml
   - mitm-ca-sealedsecret.yaml
   - mitm-hooks-configmap.yaml
